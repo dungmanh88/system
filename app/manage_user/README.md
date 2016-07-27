@@ -8,3 +8,5 @@ docker run -it --net=my-net --name=app -p 5000:5000 -e HOST=db -e USER=root -e P
 
 ### Vagrant
 vagrant up
+vagrant ssh
+python /vagrant/user.py

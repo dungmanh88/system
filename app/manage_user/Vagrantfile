@@ -14,9 +14,8 @@ Vagrant.configure(2) do |config|
      sudo echo "mysql-server-5.5 mysql-server/root_password_again password password" | sudo debconf-set-selections
      sudo apt-get install -y whois git mysql-server libmysqld-dev python-pip python-dev
      sudo pip install MySQL-python flask
-     mysql -uroot -p"password" -e "create database test"
      sudo useradd -m -p `mkpasswd password` -s /bin/bash dev
      sudo usermod -a -G sudo dev
-     python /vagrant/init_db_user.py && python /vargrant/user.py
+     python /vagrant/init_db_user.py
   SHELL
 end
