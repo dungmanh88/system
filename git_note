@@ -10,3 +10,8 @@ git add . && git commit -m "message" && git push -u origin master
 git config --global user.name "name"
 git config --global user.email "email"
 git config --list
+
+### before git add
+git diff <file>
+
+git log

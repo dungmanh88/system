@@ -1,10 +1,10 @@
 import MySQLdb as my
 import os
 
-host = os.environ.get('HOST')
-dbname = os.environ.get('DB')
-user = os.environ.get('USER')
-password = os.environ.get('PASSWORD')
+host = os.getenv('HOST', 'localhost')
+dbname = os.getenv('DB', 'test')
+user = os.getenv('USER', 'root')
+password = os.getenv('PASSWORD', 'password')
 
 
 db = my.connect(host, user, password)
