@@ -7,6 +7,6 @@ RUN yum -y install epel-release \
 
 COPY ./ /simple_flask
 WORKDIR /simple_flask
-EXPOSE 9000
+EXPOSE 8000
 
 CMD ["uwsgi", "--ini", "wsgi.ini"]
