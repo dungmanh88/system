@@ -1,0 +1,61 @@
+{% block body %}
+ {% for message in get_flashed_messages() %}
+        <h1>{{ message }}</h1>
+ {% endfor %}
+
+{% if user %}
+ <form id="edit_form" role="form" action="{{ url_for('edit_user', user_id=user.user_id) }}" method="post">
+	<div class="form-group">
+            <label for="user_name">UserName:</label>
+            <input type="text" size=30 name="user_name" id="user_name" class="form-control" value={{ user.user_name }}>
+	</div>
+	<div class="form-group">
+            <label for="first_name">FirstName:</label>
+            <input type="text" name="first_name" size="30" id="first_name" class="form-control" value={{ user.first_name }}>
+	</div>
+	<div class="form-group">
+            <label for="last_name">LastName:</label>
+            <input type="text" name="last_name" size="30" id="last_name" class="form-control" value={{ user.last_name }} >
+	</div>
+	<div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" class="form-control" size="30" value={{ user.email }}>
+	</div>
+            <button type="submit" class="btn btn-default">Edit User</button>
+    </form>
+{% else %}
+<h3>
+	NO user
+</h3>
+{% endif %}
+<script>
+    $(document).ready(function(){
+        $("form").submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                dataType: "json",
+                type: "POST",
+                data: $("form").serialize(),
+                url: "{{ url_for('edit_user', user_id=user.user_id) }}",
+                success: function(data){
+                    $("#result").removeClass().attr("class", "alert alert-success").html(data.result).show().fadeOut(5000);
+                    $("#edit_form_modal").modal("hide");
+                    var $tr = $("tr[row_id='row-{{ user.user_id }}']");
+                    var user_name = $("form").find("input[name='user_name']").val();
+                    $tr.find("td[field='user_name']").text(user_name);
+                    var first_name = $("form").find("input[name='first_name']").val();
+                    $tr.find("td[field='first_name']").text(first_name);
+                    var last_name = $("form").find("input[name='last_name']").val();
+                    $tr.find("td[field='last_name']").text(last_name);
+                    var email = $("form").find("input[name='email']").val();
+                    $tr.find("td[field='email']").text(email);
+                    $tr.addClass("success");
+                    setTimeout(function(){
+                        $tr.removeClass("success");
+                    }, 2000);
+                }
+            })
+        });
+      });
+</script>
+{% endblock %}

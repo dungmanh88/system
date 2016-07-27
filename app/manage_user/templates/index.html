@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block body %}
+<div id="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">User Management</a>
+            </li>
+            <li><a href="/index">Home</a></li>
+            <li><a id="list_user" href="#">List User</a></li>
+            <li><a id="create_user" href="#">Create New User</a></li>
+        </ul>
+    </div>    
+    <!-- end Sidebar -->
+    <!-- page content wrapper -->
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+                    <div id="content"></div> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end page content wrapper -->
+</div>
+<script>
+    $(document).ready(function(){
+        $("#menu-toggle").click(function(e){
+                e.preventDefault()
+                $("#wrapper").toggleClass("toggled")
+        });
+    
+        $("#list_user").click(function(e){
+                e.preventDefault()
+                $("#content").load("{{ url_for('list_user') }}")
+        });
+
+        $("#create_user").click(function(e){
+                e.preventDefault()
+                $("#content").load("{{ url_for('get_create_user_form') }}")
+        });
+    });
+</script>
+
+{% endblock %}
+
+

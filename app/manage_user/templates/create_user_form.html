@@ -1,0 +1,44 @@
+{% block body %}
+
+ {% for message in get_flashed_messages() %}
+        <h1>{{ message }}</h1>
+ {% endfor %}
+<h2>CREATE NEW USER</h2>
+ <form id="create_form" role="form" action="{{ url_for('create_user') }}" method="post">
+        <div class="form-group">
+            <label for="user_name">UserName:</label>
+            <input type="text" class="form-control" size=30 name="user_name" id="user_name" placeholder="Enter username">
+	</div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" name="password" size="30" id="password" placeholder="Enter password">
+	</div>
+        <div class="form-group">
+            <label for="first_name">FirstName:</label>
+            <input type="text" class="form-control" name="first_name" size="30" id="first_name" placeholder="Enter first name">
+	</div>
+        <div class="form-group">
+            <label for="last_name">LastName:</label>
+            <input type="text" class="form-control" name="last_name" size="30" id="last_name" placeholder="Enter last name">
+	</div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" name="email" size="30" id="email" placeholder="Enter email">
+	</div>
+            <button type="submit" class="btn btn-default">Create User</button>
+    </form>
+<script>
+    $("#create_form").submit(function(e){
+        e.preventDefault()
+        $.ajax({
+            dataType: "json",
+            type: "POST",
+            url: "{{ url_for('create_user') }}",
+            data: $("form").serialize(),
+            success: function(response){
+                $("#result").removeClass().show().attr("class","alert alert-success").html(response.result).fadeOut(5000);
+            }
+        })
+    }); 
+</script>
+{% endblock %}

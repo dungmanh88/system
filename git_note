@@ -1,0 +1,8 @@
+### remove completely file from disk and from memory
+git rm path/to/file
+
+### remove file from memory
+git rm --cache /path/to/file
+
+### add -> commit -> push
+git add . && git commit -m "message" && git push -u origin master

@@ -1,0 +1,18 @@
+{% block body %}
+<h2>USER LIST</h2>
+   {% for user in users %}
+   <ul class="list-group">
+	<li class="list-group-item"> 
+		<ul class="list-group">
+			<li class="list-group-item"> First Name: {{ user.first_name }} </li>
+ 			<li class="list-group-item"> Last Name: {{ user.last_name }} </li>
+			<li class="list-group-item"> User Name: {{ user.user_name }} </li>
+			<li class="list-group-item"> Password: {{ user.password }} </li>
+			<li class="list-group-item"> Email: {{ user.email }} </li>
+		</ul>
+	</li> 
+</ul>
+   {% else %}
+ 	No User
+   {% endfor %}
+{% endblock %}

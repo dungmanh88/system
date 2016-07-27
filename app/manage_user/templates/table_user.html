@@ -1,0 +1,80 @@
+{% block body %}
+<h2>USER LIST</h2>
+        <table id="user_list" class="table table-hover">
+            <thead>
+                <tr>
+                <th>User Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Tools</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr row_id="row-{{ user.user_id }}">
+                    <td field="user_name">{{ user.user_name }}</td>
+                    <td field="first_name">{{ user.first_name }}</td>
+                    <td field="last_name">{{ user.last_name }}</td>
+                    <td field="email">{{ user.email }}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm edit_user" user_id="{{ user.user_id }}">
+                            <span class="glyphicon glyphicon-pencil"></span>EDIT
+                        </a>                        
+                        <a class="btn btn-info btn-sm delete_user" user_id="{{ user.user_id }}">
+                            <span class="glyphicon glyphicon-remove"></span>DELETE
+                        </a>                        
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+<div class="modal fade" id="edit_form_modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edit User</h4>
+            </div>
+            <div class="modal-body">
+                <p>NOTHING TO SHOW</p>
+            </div>
+        </div>  
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $(".edit_user").click(function(e){
+            console.log("get user by id to edit");
+            e.preventDefault();
+            modal_frm=$("#edit_form_modal");
+            // open dialog
+            modal_frm.modal("show"); 
+            // load edit form into dialog
+            item=$(this) 
+            user_id = item.attr("user_id");
+            modal_frm.find('.modal-body').load("/user/get/?user_id=" + user_id);
+        });
+
+        $(".delete_user").click(function(e){ 
+            console.log("delete user by id");
+            e.preventDefault();
+            item=$(this)
+            $.ajax({
+                dataType:"json",
+                data: { user_id: item.attr("user_id") },
+                type: "GET",
+                url: "/user/delete",
+                success: function(response){
+                    console.log("sucessfully delete");
+                    $("#result").removeClass().show().attr("class", "alert alert-success").html(response.result).fadeOut(5000);
+                    console.log(item.parents('tr'))
+                    item.parents('tr').addClass("danger").fadeOut(2000, function(){$(this).remove()});
+                } 
+            });
+        });
+   });
+</script>
+{% endblock %}
