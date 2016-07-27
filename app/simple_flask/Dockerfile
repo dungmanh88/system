@@ -3,10 +3,10 @@ FROM centos:latest
 RUN yum -y install epel-release \
         && yum -y install python34 python-pip python-devel gcc gcc-c++ \
  	&& pip install --upgrade pip \
-	&& pip install flask
+	&& pip install flask uwsgi
 
-COPY ./ /app
-WORKDIR /app
-EXPOSE 5000
+COPY ./ /simple_flask
+WORKDIR /simple_flask
+EXPOSE 9000
 
-CMD ["python", "simple_flask.py"]
+CMD ["uwsgi", "--ini", "wsgi.ini"]
