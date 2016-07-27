@@ -6,3 +6,7 @@ git rm --cache /path/to/file
 
 ### add -> commit -> push
 git add . && git commit -m "message" && git push -u origin master
+
+git config --global user.name "name"
+git config --global user.email "email"
+git config --list
