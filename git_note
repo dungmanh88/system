@@ -13,13 +13,23 @@ git config --list
 
 ### compare the working directory with index
 git diff <file>
+### shows all the diff
+git diff 
 
 ### compare the working directory with local repo
 git diff HEAD <file>
+### shows all the diff
+git diff HEAD
 
 ### compare the index with local repo
 git diff --cached <file>
+### shows all the diff
+git diff --cached
 
+### show the diff between two commit id
+git diff <commit id 1> <commit id 2>
+
+### show all commit ids
 git log
 
 git status
