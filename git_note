@@ -4,14 +4,22 @@ git rm path/to/file
 ### remove file from memory
 git rm --cache /path/to/file
 
-### add -> commit -> push
+### from the working directory, add to index -> commit to local repo -> push to remote repo
 git add . && git commit -m "message" && git push -u origin master
 
 git config --global user.name "name"
 git config --global user.email "email"
 git config --list
 
-### before git add
+### compare the working directory with index
 git diff <file>
 
+### compare the working directory with local repo
+git diff HEAD <file>
+
+### compare the index with local repo
+git diff --cached <file>
+
 git log
+
+git status
