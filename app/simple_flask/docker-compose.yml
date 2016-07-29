@@ -2,18 +2,20 @@ version: '2'
 services:
   web:
     image: nginx
-    hostname: nginx
+    hostname: web.simple.flask
+    domainname: example.com
     ports:
      - "80:80"
     volumes:
-     - /app/simple_flask/nginx/simple_flask.conf:/etc/nginx/conf.d/simple_flask.conf
+     - ./web/nginx/simple_flask.conf:/etc/nginx/conf.d/simple_flask.conf
     depends_on:
      - app
     networks:
      - my-net
   app:
-    image: xavivn/simple_flask
-    hostname: simple_flask
+    build: ./code
+    hostname: app.simple.flask
+    domainname: example.com
     networks:
     - my-net
 networks:
