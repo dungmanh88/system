@@ -4,5 +4,4 @@ netstat -tulpn
 
 ethtool <interface>
 
-
-
+traceroute <IP>
