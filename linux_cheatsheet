@@ -1,7 +1,16 @@
+### Network
 nmap -n <port> -p <remote_ip>
-
 netstat -tulpn
-
 ethtool <interface>
-
 traceroute <IP>
+speedtest-cli
+ping <IP>
+telnet <IP>
+dig @<nameserver> <domainname>
+
+### Check missing dependencies
+yum check dependencies
+
+### Check IO
+ioping <device>
+atop
