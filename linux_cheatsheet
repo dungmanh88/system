@@ -30,6 +30,9 @@ yum repolist
 ### clean cached data
 yum clean all
 
+### history
+tail -f /var/log/yum.log
+
 ====================================================
 
 ### Check IO
