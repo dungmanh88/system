@@ -1,0 +1,10 @@
+#!/bin/bash
+root=${1:-root}
+pass=${2:-"root pass"}
+
+item_list=$(mysql -u $root -p"$pass" -Ane "select concat(char(39), user, char(39), '@', char(39), host, char(39)) as user_host from mysql.user where user != 'root'" | grep -v "user_host")
+
+for item in $item_list; do
+	echo $item
+	mysql -u $root -p"$pass" -Ane "drop user ${item}"
+done
