@@ -18,7 +18,7 @@ tmp_table_size: 128M
 max_heap_table_size: 128M
 sync_binlog: 0
 innodb_log_buffer_size: 8M
-bind-address: 0.0.0.0
+bind_address: 0.0.0.0
 log_slave_updates: 1
 galera_user_name: user
 galera_user_password: secret
