@@ -32,3 +32,12 @@
   - "{{ log }}"
   - "{{ gcache_dir }}"
   - "{{ tmpdir }}"
+
+- name: Create config file
+  template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
+
+- name: set vm.swappiness in sysctl.conf
+  sysctl: name=vm.swappiness value=10 state=present sysctl_set=yes reload=yes ignoreerrors=yes
+
+- name: change ulimit
+  copy: src=ulimit.j2 dest=/etc/security/limits.d/95-mysql.conf
