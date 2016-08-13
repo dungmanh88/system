@@ -24,8 +24,8 @@
   - nethogs
   - iptraf
   - vim
-	- telnet
-	- ntp
+  - telnet
+  - ntp
 - name: Autostop iptables and stop iptables
 	service: name="iptables" enabled=no state=stopped
 - name: Autostart ntpd and start ntpd
