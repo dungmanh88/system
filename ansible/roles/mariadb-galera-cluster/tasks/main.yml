@@ -1,0 +1,8 @@
+- name: Create the lastest MariaDB repo
+  copy: src=MariaDB-lastest.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
+
+- name: Create GPG key for MariaDB repo
+  copy: src=RPM-GPG-KEY-MariaDB dest=/etc/pki/rpm-gpg
+
+- name: Add percona repo
+	yum: name="{{ percona_url }}" state=present

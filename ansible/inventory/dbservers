@@ -1,0 +1,4 @@
+[dbservers]
+192.168.10.121 node_name="node1" server_id=121
+192.168.10.122 node_name="node2" server_id=122
+192.168.10.123 node_name="node3" server_id=123
