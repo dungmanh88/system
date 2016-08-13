@@ -24,3 +24,11 @@
 
 - name: Install MySQL-python lib
   easy_install: name="MySQL-python"
+
+- name: Create dir
+  file: path={{ item }} state=directory owner=mysql group=mysql
+  with_items:
+  - "{{ datadir }}"
+  - "{{ log }}"
+  - "{{ gcache_dir }}"
+  - "{{ tmpdir }}"

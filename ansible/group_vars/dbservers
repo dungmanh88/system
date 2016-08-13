@@ -28,4 +28,3 @@ gcache_name: /var/galera/gcache
 gcache_dir: /var/galera
 wsrep_sst_method: xtrabackup-v2
 wsrep_provider_options: "gcache.size = {{ gcache_size }};gcache.name = {{ gcache_name }};gcache.dir={{ gcache_dir }};gcs.recv_q_hard_limit=16384M;gcs.fc_limit=16;gcs.fc_master_slave=NO;gcs.fc_factor=0.5;evs.keepalive_period = PT3S;evs.suspect_timeout = PT30S;evs.inactive_timeout = PT1M;evs.install_timeout = PT1M;evs.join_retrans_period=PT1S"
-
