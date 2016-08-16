@@ -9,7 +9,7 @@ root_user: root
 root_password: secret
 binlog_format: MIXED
 port: 3306
-expire_logs_days: 3
+expired_logs_days: 3
 max_allowed_packet: 64M
 innodb_log_files_in_group: 2
 innodb_log_file_size: 1280M
