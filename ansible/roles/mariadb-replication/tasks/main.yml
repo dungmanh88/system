@@ -1,0 +1,38 @@
+- name: Create the lastest MariaDB repo
+  copy: src=MariaDB-5.5.44.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
+
+- name: Create GPG key for MariaDB repo
+  copy: src=RPM-GPG-KEY-MariaDB dest=/etc/pki/rpm-gpg
+
+- name: Add percona repo
+  yum: name="{{ percona_url }}" state=present
+
+- name: Clean yum
+  command: yum clean all
+
+- name: Install MariaDB lastest package
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+  - MariaDB-client
+  - MariaDB-server
+  - MariaDB-devel
+  - percona-xtrabackup
+  - percona-toolkit
+
+- name: Create dir
+  file: path={{ item }} state=directory owner=mysql group=mysql
+  with_items:
+  - "{{ datadir }}"
+  - "{{ log }}"
+  - "{{ tmpdir }}"
+  - "{{ slave_load_tmpdir }}"
+  - "{{ binlog }}"
+
+- name: Create config file
+  template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
+
+- name: set vm.swappiness in sysctl.conf
+  sysctl: name=vm.swappiness value=10 state=present sysctl_set=yes reload=yes ignoreerrors=yes
+
+- name: change ulimit
+  copy: src=ulimit.j2 dest=/etc/security/limits.d/95-mysql.conf
