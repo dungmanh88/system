@@ -46,7 +46,7 @@ relay_log_recovery=1
 report_host = {{ ansible_default_ipv4.address }}
 read_only = {{ read_only }}
 slave_net_timeout=900
-skip_slave_start=0
+skip_slave_start={{ skip_slave_start }}
 
 thread_stack            = 256K
 thread_cache_size       = 1024
