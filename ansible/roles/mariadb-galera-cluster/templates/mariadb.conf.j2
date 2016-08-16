@@ -22,7 +22,7 @@
 {% set bootstrap_cluster = 0 -%}
 
 {%- if not bootstrap_cluster %}
-  {%- for node in groups['dbservers'] %}
+  {%- for node in groups['dbservers_mariadb_galera_cluster'] %}
     {%- if hostvars[node].ansible_default_ipv4.address != ansible_default_ipv4.address %}
       {%- set _ = cluster_members.append(hostvars[node].ansible_default_ipv4.address) -%}
     {% endif -%}

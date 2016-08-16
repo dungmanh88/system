@@ -27,6 +27,6 @@
   - telnet
   - ntp
 - name: Autostop iptables and stop iptables
-	service: name="iptables" enabled=no state=stopped
+  service: name="iptables" enabled=no state=stopped
 - name: Autostart ntpd and start ntpd
-	service: name="ntpd" enabled=yes state=restarted
+  service: name="ntpd" enabled=yes state=restarted
