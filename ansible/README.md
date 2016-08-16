@@ -1,3 +1,5 @@
+make sure that you turn off selinux on ansible server and servers in inventory
+
 mkdir -p /etc/.ssh
 copy private key to /etc/.ssh
 ansible -i inventory all -m ping
