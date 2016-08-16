@@ -1,3 +1,5 @@
 - hosts: dbservers_mariadb_galera_cluster
+  vars_files:
+    - group_vars/dbservers_mariadb_galera_cluster
   roles:  
     - role: mariadb-galera-cluster
