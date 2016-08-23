@@ -7,3 +7,9 @@ make sure that you are able to ssh with key from ansible server to server in inv
 
 ansible-playbook -i inventory -s common.yml
 ansible-playbook -i inventory/dbservers -s dbservers.yml
+
+not yet:
+ansible script for centos 7
+ansible script for bacula backup agent
+add route and nameserver for ansible script
+
