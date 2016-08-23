@@ -12,4 +12,4 @@ not yet:
 ansible script for centos 7
 ansible script for bacula backup agent
 add route and nameserver for ansible script
-
+ansible for service zone
