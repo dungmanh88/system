@@ -4,9 +4,6 @@
 - name: Create GPG key for MariaDB repo
   copy: src=RPM-GPG-KEY-MariaDB dest=/etc/pki/rpm-gpg
 
-- name: Add percona repo
-  yum: name="{{ percona_url }}" state=present
-
 - name: Clean yum
   command: yum clean all
 
@@ -16,6 +13,16 @@
   - MariaDB-client
   - MariaDB-server
   - MariaDB-devel
+
+- name: Add percona repo
+  yum: name="{{ percona_url }}" state=present
+
+- name: Clean yum
+  command: yum clean all
+
+- name: Install percona toolkit and xtrabackup
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
   - percona-xtrabackup
   - percona-toolkit
 
