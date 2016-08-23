@@ -9,7 +9,7 @@ ansible-playbook -i inventory -s common.yml
 ansible-playbook -i inventory/dbservers -s dbservers.yml
 
 not yet:
-ansible script for centos 7
+ansible script for centos 7: remi, iptables->firewalld
 ansible script for bacula backup agent
 add route and nameserver for ansible script
 ansible for service zone
