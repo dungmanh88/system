@@ -8,8 +8,10 @@ print("We are going to overwrite", filename)
 input("?")
 print("Opening the file...")
 target = open(filename, "w")
-print("Erase file ", filename)
-target.truncate()
+
+### No need to truncate
+#print("Erase file ", filename)
+#target.truncate()
 
 print("Enter three lines")
 lines = ()
