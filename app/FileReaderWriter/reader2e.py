@@ -4,8 +4,6 @@ script, filename = argv
 
 print("We are going to read the file", filename)
 with open(filename) as target:
-  line = target.readline()
-  while line:
+  for line in target:
     print(line, end='')
-    line = target.readline()
 target.close()
