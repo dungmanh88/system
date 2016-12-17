@@ -3,7 +3,7 @@
 set -e
 export MASTER_HOST=192.168.14.11
 export MINION_IP=192.168.14.51
-export MINION_HOST=minion4
+export MINION_HOST=worker-4
 export WORKER_IP=${MINION_IP}
 export WORKER_FQDN=${MINION_HOST}
 export NETWORK_PLUGIN=""
@@ -26,6 +26,7 @@ export flannel_config_dir=/etc/flannel
 export system_service_dir=/etc/systemd/system
 export manifest_path=${kube_config_dir}/manifests
 export flannel_service_dir=${system_service_dir}/flanneld.service.d
+export docker_service_dir=${system_service_dir}/docker.service.d
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
@@ -66,6 +67,7 @@ function create_kube_dir() {
   echo "CREATE KUBE DIR"
   mkdir -p ${openssl_dir}
   mkdir -p ${kube_config_dir}
+  rm -f ${openssl_dir}/*
   cp ${ca_pem_file} ${openssl_dir}/ca.pem
   cp ${ca_srl_file} ${openssl_dir}/ca.srl
   cp ${ca_key_pem_file} ${openssl_dir}/ca-key.pem
@@ -92,7 +94,7 @@ EOF
   fi
   openssl genrsa -out ${openssl_dir}/${WORKER_FQDN}-worker-key.pem 2048
   openssl req -new -key ${openssl_dir}/${WORKER_FQDN}-worker-key.pem -out ${openssl_dir}/${WORKER_FQDN}-worker.csr -subj "/CN=${WORKER_FQDN}" -config ${openssl_cnf}
-  openssl x509 -req -in ${WORKER_FQDN}-worker.csr -CA ${openssl_dir}/ca.pem -CAkey ${openssl_dir}/ca-key.pem -CAcreateserial -out ${openssl_dir}/${WORKER_FQDN}-worker.pem -days 365 -extensions v3_req -extfile ${openssl_dir}/worker-openssl.cnf
+  openssl x509 -req -in ${openssl_dir}/${WORKER_FQDN}-worker.csr -CA ${openssl_dir}/ca.pem -CAkey ${openssl_dir}/ca-key.pem -CAcreateserial -out ${openssl_dir}/${WORKER_FQDN}-worker.pem -days 365 -extensions v3_req -extfile ${openssl_dir}/worker-openssl.cnf
   echo "create worker.pem"
   ln -s ${openssl_dir}/${WORKER_FQDN}-worker.pem ${openssl_dir}/worker.pem
   echo "create worker-key.pem"
@@ -117,11 +119,16 @@ EOF
   local flannel_service_cnf=${flannel_service_dir}/40-ExecStartPre-symlink.conf
   if [ ! -f ${flannel_service_cnf} ]; then
     echo "create flannel_service_cnf: ${flannel_service_cnf}"
-    cat << EOF > ${flannel_service_cnf}    
+    cat << EOF > ${flannel_service_cnf}
 [Service]
 ExecStartPre=/usr/bin/ln -sf ${flannel_cnf} /run/flannel/options.env
-mkdir -p /etc/systemd/system/docker.service.d
-vi /etc/systemd/system/docker.service.d/40-flannel.conf
+EOF
+  fi
+  mkdir -p ${docker_service_dir}
+  local docker_service_cnf=${docker_service_dir}/40-flannel.conf
+  if [ ! -f ${docker_service_cnf} ]; then
+    echo "create docker_service_cnf: ${docker_service_cnf}"
+    cat << EOF > ${docker_service_cnf}
 [Unit]
 Requires=flanneld.service
 After=flanneld.service
@@ -135,7 +142,7 @@ function install_kubelet() {
   local kubelet_service_cnf=${system_service_dir}/kubelet.service
   if [ ! -f ${kubelet_service_cnf} ]; then
     echo "create kubelet_service_cnf: ${kubelet_service_cnf}"
-    cat << EOF > ${kubelet_service_cnf}    
+    cat << EOF > ${kubelet_service_cnf}
 [Service]
 ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
 ExecStartPre=/usr/bin/mkdir -p /var/log/containers
@@ -174,7 +181,7 @@ function install_kube_proxy() {
   local kube_proxy_cnf=${manifest_path}/kube-proxy.yaml
   if [ ! -f ${kube_proxy_cnf} ]; then
     echo "create kube_proxy_cnf: ${kube_proxy_cnf}"
-    cat << EOF > ${kube_proxy_cnf}    
+    cat << EOF > ${kube_proxy_cnf}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -211,7 +218,7 @@ spec:
         path: "/etc/kubernetes/worker-kubeconfig.yaml"
     - name: "etc-kube-ssl"
       hostPath:
-        path: "/etc/kubernetes/ssl"    
+        path: "/etc/kubernetes/ssl"
 EOF
   fi
   echo "INSTALL KUBE PROXY DONE!!!"
@@ -222,7 +229,7 @@ function install_kube_config() {
   local kube_cnf=${kube_config_dir}/worker-kubeconfig.yaml
   if [ ! -f ${kube_cnf} ]; then
     echo "create kube_cnf: ${kube_cnf}"
-    cat << EOF > ${kube_cnf}      
+    cat << EOF > ${kube_cnf}
 apiVersion: v1
 kind: Config
 clusters:
@@ -246,11 +253,11 @@ EOF
 }
 
 function start_service_all() {
-  for SERVICES in flanneld kubelet; do 
+  for SERVICES in flanneld kubelet; do
     systemctl daemon-reload
     systemctl restart $SERVICES
     systemctl enable $SERVICES
-    systemctl status $SERVICES 
+    systemctl status $SERVICES
   done
 }
 
