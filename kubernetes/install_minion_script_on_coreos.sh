@@ -266,6 +266,7 @@ function main() {
   && install_kube_proxy \
   && install_kube_config \
   && start_service_all
+  echo "PLEASE REBOOT MACHINE AFTER COMPLETING THIS SCRIPT"
 }
 
 main
