@@ -253,3 +253,19 @@ function start_service_all() {
     systemctl status $SERVICES 
   done
 }
+
+function main() {
+  change_minion_hostname \
+  && enable_timedatectl \
+  && disable_selinux \
+  && disable_firewall \
+  && create_kube_dir \
+  && install_certificate \
+  && install_flannel \
+  && install_kubelet \
+  && install_kube_proxy \
+  && install_kube_config \
+  && start_service_all
+}
+
+main
