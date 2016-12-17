@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
 set -e
 export MASTER_HOST=192.168.14.11
 export MINION_IP=192.168.14.51
