@@ -1,0 +1,29 @@
+- hosts: all
+  vars:
+    sudoers:
+      - deployer
+  tasks:
+    - name: Make sure we have a 'wheel' group
+      group:
+        name: wheel
+        state: present
+
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+    - name: Add sudoers users to wheel group
+      user:
+        name: "{{ item }}"
+        groups: wheel
+        append: yes
+      with_items: "{{ sudoers }}"
+
+    - name: Copy ssh key to authorized_keys
+      authorized_key:
+        user: deployer
+        key: "{{ lookup('file', '/etc/ansible/.ssh/id_rsa.pub') }}"
+
