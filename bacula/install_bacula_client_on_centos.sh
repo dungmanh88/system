@@ -58,7 +58,7 @@ function install_ini_script() {
 
 function config_client() {
   echo "CONFIG CLIENT"
-  find /usr/local/bin/bacula/bin/* -maxdepth 0 | grep -v -i -E '(bacula-fd|bacula-ctl-fd|working)' | xargs rm
+  find ${DEFAULT_INSTALLTION}/* -maxdepth 0 | grep -v -i -E '(bacula-fd|bacula-ctl-fd|working)' | xargs rm
   local bacula_client_cnf=${DEFAULT_INSTALLTION}/bacula-fd.conf
   cat << EOF > ${bacula_client_cnf}
 #
