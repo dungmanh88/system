@@ -1,2 +1,2 @@
 # system
-script, research, tutorial, simple doc, funny....
+script, research, tutorial, simple doc, funny.
