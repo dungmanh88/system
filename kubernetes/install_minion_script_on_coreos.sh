@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -e
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
 export MASTER_HOST=192.168.14.11
 interface=`route -n | grep "UG" | awk '{print $8}'`
 export MINION_IP=`ip a | grep "inet" | grep ${interface} | awk '{print $2}' | cut -d "/" -f 1`
@@ -28,8 +31,6 @@ export system_service_dir=/etc/systemd/system
 export manifest_path=${kube_config_dir}/manifests
 export flannel_service_dir=${system_service_dir}/flanneld.service.d
 export docker_service_dir=${system_service_dir}/docker.service.d
-
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 function precheck() {
   cat << EOL
