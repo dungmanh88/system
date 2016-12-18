@@ -13,6 +13,8 @@ BACULA_SERVICE_DIR_PASSWD=pass1
 BACULA_SERVICE_MON_NAME=my-backup-mon
 BACULA_SERVICE_MON_PASSWD=pass2
 BACULA_FILE_DAEMON_NAME=my-backup-fd
+BACULA_DIR_ADDRESS=192.168.10.255
+BACULA_DIR_NAME=backup.me
 
 function install_dependencies() {
   echo "INSTALL DEPENDENCIES"
@@ -95,6 +97,7 @@ Messages {
   director = ${BACULA_SERVICE_DIR_NAME} = all, !skipped, !restored
 }
 EOF
+  echo "${BACULA_DIR_ADDRESS} ${BACULA_DIR_NAME}" >> /etc/hosts
   service bacula-ctl-fd restart
   echo "CONFIG CLIENT DONE!!!"
 }
