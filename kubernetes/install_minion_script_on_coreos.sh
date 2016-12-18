@@ -31,6 +31,26 @@ export docker_service_dir=${system_service_dir}/docker.service.d
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
+function precheck() {
+  cat << EOL
+Make sure: 
+- master_host = ${MASTER_HOST}
+- minion_ip = ${MINION_IP}
+- minion_host = ${MINION_HOST}
+- etcd_endpoints = ${ETCD_ENDPOINTS}
+- dns_service_ip = ${DNS_SERVICE_IP}
+- k8s_ver = ${K8S_VER}
+- ca_pem_file = ${ca_pem_file}
+- ca_key_pem_file = ${ca_key_pem_file}
+- kube_config_dir = ${kube_config_dir}
+- openssl_dir = ${openssl_dir}
+- flannel_config_dir = ${flannel_config_dir}
+- manifest_path = ${manifest_path}
+- flannel_service_dir = ${flannel_service_dir}
+- docker_service_dir = ${docker_service_dir}
+EOL
+}
+
 function change_minion_hostname() {
   echo "CHANGE MINION HOSTNAME"
   hostnamectl set-hostname $MINION_HOST
@@ -276,7 +296,8 @@ function start_service_all() {
 }
 
 function main() {
-  change_minion_hostname \
+  precheck \
+  && change_minion_hostname \
   && enable_timedatectl \
   && disable_selinux \
   && disable_firewall \
