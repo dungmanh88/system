@@ -21,7 +21,7 @@ export ca_key_pem_file=/tmp/ca-key.pem
 export ca_srl_file=/tmp/ca.srl
 
 export kube_config_dir=/etc/kubernetes
-export openssl_dir=/etc/kubernetes/ssl
+export openssl_dir=${kube_config_dir}/ssl
 export flannel_config_dir=/etc/flannel
 export system_service_dir=/etc/systemd/system
 export manifest_path=${kube_config_dir}/manifests
@@ -65,9 +65,9 @@ function disable_firewall() {
 
 function create_kube_dir() {
   echo "CREATE KUBE DIR"
+  rm -rf ${kube_config_dir}
   mkdir -p ${openssl_dir}
   mkdir -p ${kube_config_dir}
-  rm -f ${openssl_dir}/*
   cp ${ca_pem_file} ${openssl_dir}/ca.pem
   cp ${ca_srl_file} ${openssl_dir}/ca.srl
   cp ${ca_key_pem_file} ${openssl_dir}/ca-key.pem
@@ -106,6 +106,7 @@ EOF
 
 function install_flannel() {
   echo "INSTALL FLANNEL"
+  rm -rf ${flannel_config_dir}
   mkdir -p ${flannel_config_dir}
   local flannel_cnf=${flannel_config_dir}/options.env
   if [ ! -f ${flannel_cnf} ]; then
@@ -115,6 +116,7 @@ FLANNELD_IFACE=${WORKER_ADVERTISE_IP}
 FLANNELD_ETCD_ENDPOINTS=${ETCD_ENDPOINTS}
 EOF
   fi
+  rm -rf ${flannel_service_dir} 
   mkdir -p ${flannel_service_dir}
   local flannel_service_cnf=${flannel_service_dir}/40-ExecStartPre-symlink.conf
   if [ ! -f ${flannel_service_cnf} ]; then
@@ -124,6 +126,7 @@ EOF
 ExecStartPre=/usr/bin/ln -sf ${flannel_cnf} /run/flannel/options.env
 EOF
   fi
+  rm -rf ${docker_service_dir}
   mkdir -p ${docker_service_dir}
   local docker_service_cnf=${docker_service_dir}/40-flannel.conf
   if [ ! -f ${docker_service_cnf} ]; then
@@ -140,6 +143,7 @@ EOF
 function install_kubelet() {
   echo "INSTALL KUBELET"
   local kubelet_service_cnf=${system_service_dir}/kubelet.service
+  rm -f ${kubelet_service_cnf}
   if [ ! -f ${kubelet_service_cnf} ]; then
     echo "create kubelet_service_cnf: ${kubelet_service_cnf}"
     cat << EOF > ${kubelet_service_cnf}
