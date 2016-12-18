@@ -226,11 +226,11 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-proxy
-    image: quay.io/coreos/hyperkube:v1.4.5_coreos.0
+    image: quay.io/coreos/hyperkube:${K8S_VER}
     command:
     - /hyperkube
     - proxy
-    - --master=https://103.53.171.210
+    - --master=https://${MASTER_HOST}
     - --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml
     - --proxy-mode=iptables
     securityContext:
