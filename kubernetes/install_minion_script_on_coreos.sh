@@ -4,7 +4,7 @@ set -e
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-export MASTER_HOST=192.168.14.11
+export MASTER_HOST=192.168.10.11
 interface=`route -n | grep "UG" | awk '{print $8}'`
 export MINION_IP=`ip a | grep "inet" | grep ${interface} | awk '{print $2}' | cut -d "/" -f 1`
 export MINION_HOST=worker-4
@@ -12,7 +12,7 @@ export WORKER_IP=${MINION_IP}
 export WORKER_FQDN=${MINION_HOST}
 export NETWORK_PLUGIN=""
 
-export ETCD_ENDPOINTS=http://192.168.14.11:2379
+export ETCD_ENDPOINTS=http://192.168.10.11:2379
 export WORKER_PUBLIC_IP=${MINION_IP}
 export WORKER_ADVERTISE_IP=${MINION_IP}
 
