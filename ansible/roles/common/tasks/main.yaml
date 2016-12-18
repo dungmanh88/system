@@ -1,0 +1,24 @@
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Config temporary gateway
+  command: route add default gw "{{ gateway }}"
+  ignore_errors: yes
+
+- name: Config nameserver
+  blockinfile:
+    dest: /etc/resolv.conf
+    block: |
+      namesevrer {{ nameserver1 }}
+      nameserver {{ nameserver2 }}
+
+- name: Install epel-release
+  yum: name="epel-release" state=latest update_cache=true  
+
+#- name: Install monitoring and debuging package
+
+#- name: Disable selinux
+
+#- name: Disable firewall
+
