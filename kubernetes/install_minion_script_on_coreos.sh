@@ -2,7 +2,8 @@
 
 set -e
 export MASTER_HOST=192.168.14.11
-export MINION_IP=192.168.14.51
+interface=`route -n | grep "UG" | awk '{print $8}'`
+export MINION_IP=`ip a | grep "inet" | grep ${interface} | awk '{print $2}' | cut -d "/" -f 1`
 export MINION_HOST=worker-4
 export WORKER_IP=${MINION_IP}
 export WORKER_FQDN=${MINION_HOST}
@@ -68,6 +69,15 @@ function create_kube_dir() {
   rm -rf ${kube_config_dir}
   mkdir -p ${openssl_dir}
   mkdir -p ${kube_config_dir}
+  if [ ! -f ${ca_pem_file} ]; then
+    echo "I don'f find /tmp/ca.pem"
+    exit 1
+  elif [ ! -f ${ca_key_pem_file} ]; then
+    echo "I don't find /tmp/ca-key.pem"
+    exit 1
+  elif [ ! -f ${ca_srl_file} ]; then
+    echo "I don't find /tmp/ca.srl"
+  fi
   cp ${ca_pem_file} ${openssl_dir}/ca.pem
   cp ${ca_srl_file} ${openssl_dir}/ca.srl
   cp ${ca_key_pem_file} ${openssl_dir}/ca-key.pem
