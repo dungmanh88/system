@@ -1,15 +1,3 @@
 [test]
 test2 ansible_host=192.168.10.122 hostname=test2
 test3 ansible_host=192.168.10.123 hostname=test3
-
-[all:vars]
-ansible_connection=ssh
-#ansible_ssh_user=root
-#ansible_ssh_pass=passwd
-ansible_ssh_user=deployer
-ansible_port=22
-nameserver1=8.8.8.8
-nameserver2=8.8.4.4
-
-[test:vars]
-gateway=192.168.10.1
