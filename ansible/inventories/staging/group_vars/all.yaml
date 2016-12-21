@@ -1,5 +1,0 @@
-ansible_connection: ssh
-#ansible_ssh_user: root
-#ansible_ssh_pass: passwd
-ansible_ssh_user: deployer
-ansible_port: 22
