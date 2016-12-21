@@ -1,7 +1,15 @@
+- include_vars: vault.yaml
 - name: Set hostname
   hostname:
     name: "{{ hostname }}"
 
+- name: Config /etc/hosts follow hostname
+  lineinfile:
+    dest: /etc/hosts
+    state: present
+    regexp: '^127\.0\.0\.1'
+    line: '127.0.0.1 "{{ hostname }}'
+    
 - name: Config temporary gateway
   command: route add default gw "{{ gateway }}"
   ignore_errors: yes
@@ -10,15 +18,54 @@
   blockinfile:
     dest: /etc/resolv.conf
     block: |
-      namesevrer {{ nameserver1 }}
-      nameserver {{ nameserver2 }}
+      namesevrer {{ nameservers.ns1 }}
+      nameserver {{ nameservers.ns2 }}
+      nameserver {{ nameservers.ns3 }}
+      nameserver {{ nameservers.ns4 }}
 
 - name: Install epel-release
   yum: name="epel-release" state=latest update_cache=true  
 
-#- name: Install monitoring and debuging package
+- name: Install monitoring and debuging package
+  yum: name="{{ item }}" update_cache=yes
+  with_items: "{{ packages }}"
 
-#- name: Disable selinux
+- name: Disable selinux
+  selinux: state=disabled
 
-#- name: Disable firewall
+- name: Disable firewall
+  service: name="firewalld" enabled=no state=stopped
 
+- name: Enable ntpd
+  service: name="ntpd" enabled=yes state=restarted
+
+- name: Create admins group
+  group:
+    name: "{{ sudoers.sudo_group }}"
+    state: present
+
+- name: Set cmd alias for /etc/sudoers
+  blockinfile:
+    dest: /etc/sudoers
+    state: present
+    block: "{{ sudoers.cmd_alias }}"
+
+- name: Set privileges for admins group
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%admins'
+    line: '%admins {{ sudoers.cmd }}'
+
+- name: Create administrator accounts
+  user:
+    name: "{{ item.name }}" 
+    password: "{{ item.password }}"
+    comment: "{{ item.full_name }}"
+    shell: /bin/bash 
+    groups: "{{ sudoers.sudo_group }}"
+    append: yes 
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  with_items: "{{ accounts }}"

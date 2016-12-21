@@ -1,0 +1,49 @@
+accounts:  
+ - name: dungnm
+   password: "{{ vault_dungnm_passwd }}"
+   full_name: Nguyen Manh Dung
+
+nameservers: 
+   ns1: 8.8.8.8
+   ns2: 8.8.4.4
+   ns3: 208.67.222.222
+   ns4: 208.67.220.220
+
+packages:
+   - gcc
+   - gcc-c++
+   - python-devel
+   - mariadb-devel
+   - mariadb
+   - openssl-devel
+   - zlib-devel
+   - wget
+   - telnet
+   - sysbench
+   - atop
+   - ioping
+   - iptraf
+   - vim
+   - ntp
+   - nethogs
+   - lshw
+   - smartmontools
+   - dmidecode
+   - fio
+   - iftop
+   - net-tools 
+
+sudoers: 
+   sudo_group: admins
+   cmd_alias: |
+     Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
+     Cmnd_Alias  NSHELLS = /bin/sh,/bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
+     Cmnd_Alias  NSU = /bin/su
+     Cmnd_Alias  NDD = /bin/dd
+     Cmnd_Alias  NLESS = /usr/bin/less
+     Cmnd_Alias  NVISUDO = /usr/sbin/visudo
+   cmd: |
+     ALL=(ALL)   ALL, !NSHELLS, !NSU, !NVISUDO, !SHUTDOWN, !NDD
+
+
+
