@@ -3,11 +3,18 @@ accounts:
    password: "{{ vault_dungnm_passwd }}"
    full_name: Nguyen Manh Dung
 
-nameservers: 
-   ns1: 8.8.8.8
-   ns2: 8.8.4.4
-   ns3: 208.67.222.222
-   ns4: 208.67.220.220
+nameservers: |
+   nameserver 8.8.8.8
+   nameserver 8.8.4.4
+   nameserver 208.67.222.222
+   nameserver 208.67.220.220
+
+repos:
+   - distribution: CentOS
+     distribution_major_version: 7
+     url: 
+       - http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+       - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 
 packages:
    - gcc

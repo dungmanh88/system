@@ -8,23 +8,50 @@
     dest: /etc/hosts
     state: present
     regexp: '^127\.0\.0\.1'
-    line: '127.0.0.1 "{{ hostname }}'
+    line: '127.0.0.1 {{ hostname }}'
     
 - name: Config temporary gateway
-  command: route add default gw "{{ gateway }}"
+  command: route add default gw "{{ gateway.ip }}"
   ignore_errors: yes
+
+- name: Config persistent gateway
+  lineinfile:
+    dest: /etc/sysconfig/network
+    state: present
+    regexp: '^GATEWAY='
+    line: 'GATEWAY={{ gateway.ip }}'
+  when: gateway.keep
 
 - name: Config nameserver
   blockinfile:
     dest: /etc/resolv.conf
     block: |
-      namesevrer {{ nameservers.ns1 }}
-      nameserver {{ nameservers.ns2 }}
-      nameserver {{ nameservers.ns3 }}
-      nameserver {{ nameservers.ns4 }}
+      {{ nameservers }}
 
 - name: Install epel-release
-  yum: name="epel-release" state=latest update_cache=true  
+  yum: name="epel-release" update_cache=true  
+
+#- name: Debug
+#  debug: msg="URL= {{ item.url }}"
+#  with_items: "{{ repos }}"
+
+- name: Install elrepo
+  yum:
+    name: "{{ item.url.0 }}"
+    update_cache: true
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
+
+- name: Install remi repo
+  yum:
+    name: "{{ item.url.1 }}"
+    update_cache: true
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
 
 - name: Install monitoring and debuging package
   yum: name="{{ item }}" update_cache=yes
@@ -69,3 +96,15 @@
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
   with_items: "{{ accounts }}"
+
+- name: Remove temporary gateway
+  command: route del default gw "{{ gateway.ip }}"
+  ignore_errors: yes
+  when: not gateway.keep
+
+- name: Remove persistent gateway
+  lineinfile:
+    dest: /etc/sysconfig/network
+    state: absent
+    regexp: '^GATEWAY='
+  when: not gateway.keep
