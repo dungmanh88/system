@@ -13,13 +13,19 @@
   template: src=mongod.conf.j2 dest=/etc/mongod.conf backup=yes
 
 - name: Change ulimit
-  copy: src=mongodb_ulimit.j2 dest=/etc/security/limits.d/90-mongodb.conf  
+  copy: src=mongod_ulimit.j2 dest=/etc/security/limits.d/90-mongodb.conf  
 
 - name: Create transparent huge page script
   copy: src=disable_transparent_hugepages.j2 dest=/etc/init.d/disable-transparent-hugepages
   
 - name: Change mode transparent huge page script
   file: path=/etc/init.d/disable-transparent-hugepages mode=755
+
+- name: Create new profile
+  file: path=/etc/tuned/no-thp state=directory mode=0755
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
 
 - name: Create tuned.conf
   copy: src=tuned.conf.j2 dest=/etc/tuned/no-thp/tuned.conf
@@ -33,4 +39,20 @@
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
 
+- name: Create /etc/systemd/system/mongod.service.d
+  file: path=/etc/systemd/system/mongod.service.d state=directory mode=0755  
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
 
+- name: Customize mongod service script
+  copy: src=mongod_service_limits.conf.j2 dest=/etc/systemd/system/mongod.service.d/10_limits.conf 
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: Enable and start transparent huge page script
+  service: name=disable-transparent-hugepages enabled=yes state=restarted
+
+- name: Enable and start mongod
+  service: name=mongod enabled=yes state=restarted

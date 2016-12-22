@@ -19,7 +19,7 @@ repos:
      distribution_major_version: 6
 
 os:
-  distribution_centos
+  distribution_centos:
     name: CentOS
     version6: 6
     version7: 7  
@@ -47,6 +47,8 @@ packages:
    - fio
    - iftop
    - net-tools 
+   - tmux
+   - tcpdump
 
 sudoers: 
    sudo_group: admins

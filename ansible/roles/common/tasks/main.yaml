@@ -29,7 +29,7 @@
       {{ nameservers }}
 
 #- name: Install epel-release
-#  yum: name="epel-release" update_cache=true  
+#  yum: name="epel-release" update_cache=yes
 
 #- name: Debug
 #  debug: msg="URL= {{ item.url }}"
@@ -38,7 +38,7 @@
 #- name: Install elrepo
 #  yum:
 #    name: "{{ item.url.0 }}"
-#    update_cache: true
+#    update_cache: yes
 #  when:
 #    - ansible_distribution == "{{ item.distribution }}"
 #    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
@@ -47,7 +47,7 @@
 #- name: Install remi repo
 #  yum:
 #    name: "{{ item.url.1 }}"
-#    update_cache: true
+#    update_cache: yes
 #  when:
 #    - ansible_distribution == "{{ item.distribution }}"
 #    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"

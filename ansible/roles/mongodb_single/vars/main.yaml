@@ -12,3 +12,9 @@ config:
     authorization: enabled
   setParameter:
     enableLocalhostAuthBypass: 0
+
+os:
+  distribution_centos:
+    name: CentOS
+    version6: 6
+    version7: 7
