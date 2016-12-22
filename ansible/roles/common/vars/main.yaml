@@ -15,7 +15,15 @@ repos:
      url: 
        - http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
        - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+   - distribution: CentOS
+     distribution_major_version: 6
 
+os:
+  distribution_centos
+    name: CentOS
+    version6: 6
+    version7: 7  
+     
 packages:
    - gcc
    - gcc-c++
@@ -52,5 +60,6 @@ sudoers:
    cmd: |
      ALL=(ALL)   ALL, !NSHELLS, !NSU, !NVISUDO, !SHUTDOWN, !NDD
 
-
-
+sysctl:
+   vm:
+     swappiness: 10

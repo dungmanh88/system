@@ -1,0 +1,6 @@
+mongodb_single_default:
+  config:
+    net:
+      port: 27017
+  install:
+    version: 3

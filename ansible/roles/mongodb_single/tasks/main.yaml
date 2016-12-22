@@ -1,0 +1,36 @@
+- name: Install MongoDB 2x repo
+  copy: src=MongoDB2.repo.j2 dest=/etc/yum.repos.d/MongoDB.repo
+  when: mongodb_single_default.install.version == 2
+
+- name: Install MongoDB 3x repo
+  copy: src=MongoDB3.repo.j2 dest=/etc/yum.repos.d/MongoDB.repo
+  when: mongodb_single_default.install.version == 3
+
+- name: Install MongoDB
+  yum: name=mongodb-org update_cache=yes 
+
+- name: Config MongoDB
+  template: src=mongod.conf.j2 dest=/etc/mongod.conf backup=yes
+
+- name: Change ulimit
+  copy: src=mongodb_ulimit.j2 dest=/etc/security/limits.d/90-mongodb.conf  
+
+- name: Create transparent huge page script
+  copy: src=disable_transparent_hugepages.j2 dest=/etc/init.d/disable-transparent-hugepages
+  
+- name: Change mode transparent huge page script
+  file: path=/etc/init.d/disable-transparent-hugepages mode=755
+
+- name: Create tuned.conf
+  copy: src=tuned.conf.j2 dest=/etc/tuned/no-thp/tuned.conf
+  when: 
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: Enable new profile
+  command: tuned-adm profile no-thp
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+

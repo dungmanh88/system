@@ -1,0 +1,24 @@
+systemLog:
+  destination: file
+  logAppend: true
+  path: {{ config.systemLog.path }}
+
+storage:
+  dbPath: {{ config.storage.dbPath }}
+  journal:
+    enabled: true
+
+processManagement:
+  fork: true
+  pidFilePath: {{ config.processManagement.pidFilePath }}
+
+net:
+  port: {{ config.net.port }}
+  bindIp: {{ config.net.bindIp }}
+
+security:
+  authorization: {{ config.security.authorization }}
+
+setParameter:
+  enableLocalhostAuthBypass: {{ config.setParameter.enableLocalhostAuthBypass }}
+
