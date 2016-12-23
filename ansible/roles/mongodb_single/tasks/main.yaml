@@ -26,7 +26,7 @@
 
 - name: Config MongoDB
   template: src=mongod.conf.j2 dest=/etc/mongod.conf backup=yes
-  tags: reload_conf
+  tags: reconfig
 
 - name: Change ulimit
   copy: src=mongod_ulimit.j2 dest=/etc/security/limits.d/90-mongodb.conf  
@@ -75,12 +75,14 @@
   when:
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version6 }}"
+  tags: restart_mongod
 
 - name: Enable and start mongod on centos 7
   systemd: name=mongod daemon_reload=yes state=restarted enabled=yes
   when:
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+  tags: restart_mongod
 
 - name: Create admin users
   mongodb_user:
