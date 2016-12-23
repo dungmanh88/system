@@ -1,16 +1,32 @@
+- include_vars: vault/main.yaml
+- name: Test get msg
+  debug: msg="read {{ os.distribution_centos.name }} install version {{ version }}"
+
 - name: Install MongoDB 2x repo
   copy: src=MongoDB2.repo.j2 dest=/etc/yum.repos.d/MongoDB.repo
-  when: mongodb_single_default.install.version == 2
+  when: version == 2
 
 - name: Install MongoDB 3x repo
   copy: src=MongoDB3.repo.j2 dest=/etc/yum.repos.d/MongoDB.repo
-  when: mongodb_single_default.install.version == 3
+  when: version == 3
 
 - name: Install MongoDB
   yum: name=mongodb-org update_cache=yes 
 
+- name: Get pip
+  get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/tmp/get-pip.py mode=0644
+ 
+- name: Install pip
+  command: /usr/bin/python get-pip.py
+  args:
+    chdir: /tmp
+
+- name: Install pymongo
+  pip: name=pymongo 
+
 - name: Config MongoDB
   template: src=mongod.conf.j2 dest=/etc/mongod.conf backup=yes
+  tags: reload_conf
 
 - name: Change ulimit
   copy: src=mongod_ulimit.j2 dest=/etc/security/limits.d/90-mongodb.conf  
@@ -54,5 +70,25 @@
 - name: Enable and start transparent huge page script
   service: name=disable-transparent-hugepages enabled=yes state=restarted
 
-- name: Enable and start mongod
+- name: Enable and start mongod on centos 6
   service: name=mongod enabled=yes state=restarted
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version6 }}"
+
+- name: Enable and start mongod on centos 7
+  systemd: name=mongod daemon_reload=yes state=restarted enabled=yes
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: Create admin users
+  mongodb_user:
+    database: "{{ item.db }}"
+    name: "{{ item.name }}"
+    password: "{{ item.passwd }}"
+    roles: "{{ item.roles }}"
+    login_host: localhost
+    login_port: "{{ config.net.port }}"
+  with_items: "{{ admin_users }}"
+  ignore_errors: yes

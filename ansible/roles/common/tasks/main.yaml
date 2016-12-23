@@ -1,4 +1,4 @@
-- include_vars: vault.yaml
+- include_vars: vault/main.yaml
 - name: Set hostname
   hostname:
     name: "{{ hostname }}"
@@ -11,7 +11,7 @@
     line: '127.0.0.1 {{ hostname }}'
     
 - name: Config temporary gateway
-  command: route add default gw "{{ gateway.ip }}"
+  command: route add default gw "{{ gateway_ip }}"
   ignore_errors: yes
 
 - name: Config persistent gateway
@@ -19,8 +19,8 @@
     dest: /etc/sysconfig/network
     state: present
     regexp: '^GATEWAY='
-    line: 'GATEWAY={{ gateway.ip }}'
-  when: gateway.keep
+    line: 'GATEWAY={{ gateway_ip }}'
+  when: gateway_persistent
 
 - name: Config nameserver
   blockinfile:
@@ -28,34 +28,34 @@
     block: |
       {{ nameservers }}
 
-#- name: Install epel-release
-#  yum: name="epel-release" update_cache=yes
+- name: Install epel-release
+  yum: name="epel-release" update_cache=yes
 
 #- name: Debug
 #  debug: msg="URL= {{ item.url }}"
 #  with_items: "{{ repos }}"
 
-#- name: Install elrepo
-#  yum:
-#    name: "{{ item.url.0 }}"
-#    update_cache: yes
-#  when:
-#    - ansible_distribution == "{{ item.distribution }}"
-#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-#  with_items: "{{ repos }}"
+- name: Install elrepo
+  yum:
+    name: "{{ item.url.0 }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
 
-#- name: Install remi repo
-#  yum:
-#    name: "{{ item.url.1 }}"
-#    update_cache: yes
-#  when:
-#    - ansible_distribution == "{{ item.distribution }}"
-#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-#  with_items: "{{ repos }}"
+- name: Install remi repo
+  yum:
+    name: "{{ item.url.1 }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
 
-#- name: Install monitoring and debuging package
-#  yum: name="{{ item }}" update_cache=yes
-#  with_items: "{{ packages }}"
+- name: Install monitoring and debuging package
+  yum: name="{{ item }}" update_cache=yes
+  with_items: "{{ packages }}"
 
 - name: Disable selinux
   selinux: state=disabled
@@ -87,7 +87,7 @@
 - name: Create administrator accounts
   user:
     name: "{{ item.name }}" 
-    password: "{{ item.password }}"
+    password: "{{ item.passwd }}"
     comment: "{{ item.full_name }}"
     shell: /bin/bash 
     groups: "{{ sudoers.sudo_group }}"
@@ -101,13 +101,13 @@
   sysctl: name=vm.swappiness value="{{ sysctl.vm.swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
 
 - name: Remove temporary gateway
-  command: route del default gw "{{ gateway.ip }}"
+  command: route del default gw "{{ gateway_ip }}"
   ignore_errors: yes
-  when: not gateway.keep
+  when: not gateway_persistent
 
 - name: Remove persistent gateway
   lineinfile:
     dest: /etc/sysconfig/network
     state: absent
     regexp: '^GATEWAY='
-  when: not gateway.keep
+  when: not gateway_persistent

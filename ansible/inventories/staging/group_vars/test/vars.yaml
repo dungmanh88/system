@@ -1,3 +1,4 @@
-gateway:
-  ip: 192.168.10.1
-  keep: true
+gateway_ip: 192.168.10.1
+gateway_persistent: true
+
+default_mongodb_port: 38128

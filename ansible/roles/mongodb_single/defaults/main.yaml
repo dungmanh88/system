@@ -1,6 +1,6 @@
-mongodb_single_default:
-  config:
-    net:
-      port: 27017
-  install:
-    version: 3
+default_mongodb_port: 27017
+default_mongodb_version: 3
+
+default_mongodb_root_passwd: "{{ vault_mongodb_root_passwd }}"
+default_mongodb_admin_passwd: "{{ vault_mongodb_admin_passwd }}"
+default_mongodb_dumper_passwd: "{{ vault_mongodb_dumper_passwd }}"
