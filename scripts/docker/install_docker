@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+yum -y update && curl -fsSL https://get.docker.com/ | sh &&  systemctl enable docker.service && systemctl start docker
