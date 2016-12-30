@@ -1,0 +1,2 @@
+If considering extending this example for e.g. file transfers, keep in mind that UDP is not reliable. So you'll have to handle packets getting lost and packets arriving out of order. In effect, to get something reliable you'll need to implement something similar to TCP on top of UDP, and you might want to consider using TCP instead. 
+Thank you
