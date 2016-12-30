@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+function install_lsyncd() {
+  yum -y install epel-release
+  yum -y install lsyncd
+  service lsyncd start
+  chkconfig lsyncd on
+}
+
+function gen_sample_lsyncd_conf() {
+  local lsyncd_cnf=/etc/lsyncd.conf
+  cat << EOF > ${lsyncd_cnf}
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd/lsyncd.status",
+}
+
+sync {
+  default.rsyncssh,
+  delete = false,
+  source = "/source/to/copy",
+  host = "192.168.10.122",
+  targetdir = "/dest",
+  delay = 3,
+  maxProcesses = 4,
+  rsync = {
+    perms = true,
+    owner = true
+  },
+  ssh = {
+    port = 22
+  }
+}
+EOF
+}
+
+function gen_root_ssh_key() {
+  mkdir -p /root/.ssh
+  ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
+}
+
+function main() {
+  install_lsyncd
+  gen_sample_lsyncd_conf
+  gen_root_ssh_key
+}
+
+main
