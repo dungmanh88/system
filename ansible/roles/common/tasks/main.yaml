@@ -28,34 +28,34 @@
     block: |
       {{ nameservers }}
 
-- name: Install epel-release
-  yum: name="epel-release" update_cache=yes
+#- name: Install epel-release
+#  yum: name="epel-release" update_cache=yes
 
 #- name: Debug
 #  debug: msg="URL= {{ item.url }}"
 #  with_items: "{{ repos }}"
 
-- name: Install elrepo
-  yum:
-    name: "{{ item.url.0 }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+#- name: Install elrepo
+#  yum:
+#    name: "{{ item.url.0 }}"
+#    update_cache: yes
+#  when:
+#    - ansible_distribution == "{{ item.distribution }}"
+#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+#  with_items: "{{ repos }}"
 
-- name: Install remi repo
-  yum:
-    name: "{{ item.url.1 }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+#- name: Install remi repo
+#  yum:
+#    name: "{{ item.url.1 }}"
+#    update_cache: yes
+#  when:
+#    - ansible_distribution == "{{ item.distribution }}"
+#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+#  with_items: "{{ repos }}"
 
-- name: Install monitoring and debuging package
-  yum: name="{{ item }}" update_cache=yes
-  with_items: "{{ packages }}"
+#- name: Install monitoring and debuging package
+#  yum: name="{{ item }}" update_cache=yes
+#  with_items: "{{ packages }}"
 
 - name: Disable selinux
   selinux: state=disabled
@@ -76,13 +76,15 @@
     dest: /etc/sudoers
     state: present
     block: "{{ sudoers.cmd_alias }}"
+    validate: 'visudo -cf %s'
 
 - name: Set privileges for admins group
   lineinfile:
     dest: /etc/sudoers
     state: present
-    regexp: '^%admins'
-    line: '%admins {{ sudoers.cmd }}'
+    regexp: '^%{{ sudoers.sudo_group }}'
+    line: '%{{ sudoers.sudo_group }} {{ sudoers.cmd }}'
+    validate: 'visudo -cf %s'
 
 - name: Create administrator accounts
   user:
