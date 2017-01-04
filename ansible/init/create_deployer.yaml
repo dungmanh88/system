@@ -1,23 +1,16 @@
 - name: Setup deployer user
   hosts: all
   vars:
-    ansible_ssh:
-      group: ansible
-      users:
-        - name: ansible
-          passwd: "{{ vault_ansible_passwd }}"
     ansible_deployer:
       group: wheel
       users:
         - name: deployer
   tasks:
-    - include_vars: vault.yaml
     - name: Make sure we have a 'ansible' and 'wheel' group
       group:
         name: "{{ item }}"
         state: present
       with_items:
-        - "{{ ansible_ssh.group }}"
         - "{{ ansible_deployer.group }}"
 
     - name: Allow 'wheel' group to have passwordless sudo
@@ -28,14 +21,6 @@
         line: '%{{ ansible_deployer.group }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
-    - name: Allow 'ansible' group to have passwordless sudo
-      lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: '^%{{ ansible_ssh.group }}'
-        line: '%{{ ansible_ssh.group }} ALL=/usr/bin/su'
-        validate: 'visudo -cf %s'
-
     - name: Add sudoers users to wheel group
       user:
         name: "{{ item.name }}"
@@ -43,17 +28,9 @@
         append: yes
       with_items: "{{ ansible_deployer.users }}"
 
-    - name: Add sudoers user to ansible group
-      user:
-        name: "{{ item.name }}"
-        password: "{{ item.passwd }}"
-        groups: "{{ ansible_ssh.group }}"
-        append: yes
-      with_items: "{{ ansible_ssh.users }}"
-
     - name: Copy ssh key to authorized_keys
       authorized_key:
         user: "{{ item.name }}"
         key: "{{ lookup('file', '/etc/.ssh/ansible_id_rsa.pub') }}"
-      with_items: "{{ ansible_ssh.users }}"
+      with_items: "{{ ansible_deployer.users }}"
 
