@@ -21,7 +21,17 @@ def login_required(f):
 def home():
     g.db = connect_db()
     cur = g.db.execute("select * from posts")
-    posts = [ dict(title=row[0], description=row[1]) for row in cur.fetchall() ]
+    
+    post_list=[]
+    for row in cur.fetchall():
+        post={}
+        post["title"] = row[0]
+        post["description"] = row[1]
+        post_list.append(post)
+
+#    print post_list
+#    posts = [ dict(title=row[0], description=row[1]) for row in cur.fetchall() ]
+    posts = post_list
     cur.close()
     g.db.close()
     return render_template("index.html", posts=posts)
