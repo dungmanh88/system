@@ -7,7 +7,7 @@ admins:
       full_name: "{{ vault_dungnm_full_name }}"
   cmd_alias: |
     Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
-    Cmnd_Alias  NSHELLS = /bin/sh,/bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
+    Cmnd_Alias  NSHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
     Cmnd_Alias  NSU = /bin/su 
     Cmnd_Alias  NDD = /bin/dd 
     Cmnd_Alias  NLESS = /usr/bin/less

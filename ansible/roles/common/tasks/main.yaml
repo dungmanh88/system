@@ -70,14 +70,14 @@
     name: "{{ admins.group }}"
     state: present
 
-- name: Create sudoers for admins group
-  template:
-    src: admins.conf.j2
-    dest: "{{ admins.file }}"
-    owner: root
-    group: root
-    mode: 0440
-    validate: 'visudo -cf %s' 
+#- name: Create sudoers for admins group
+#  template:
+#    src: admins.conf.j2
+#    dest: "{{ admins.file }}"
+#    owner: root
+#    group: root
+#    mode: 0440
+#    validate: 'visudo -cf %s' 
 
 - name: Create administrator accounts
   user:
