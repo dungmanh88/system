@@ -1,5 +1,5 @@
 accounts:  
- - name: "{{ vault_dungnm_user }}"
+ - name: "{{ vault_dungnm_name }}"
    passwd: "{{ vault_dungnm_passwd }}"
    full_name: "{{ vault_dungnm_full_name }}"
 

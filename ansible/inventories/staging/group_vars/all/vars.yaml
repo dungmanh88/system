@@ -1,5 +1,14 @@
 ansible_connection: ssh
+### For fresh servers
 #ansible_ssh_user: "{{ vault_default_ansible_ssh_user }}"
 #ansible_ssh_pass: "{{ vault_default_ansible_ssh_pass }}"
-ansible_ssh_user: "{{ vault_ansible_ssh_user }}"
+### For running servers
+#ansible_ssh_user: "{{ vault_ansible_ssh_user }}"
+### For modifying on existing servers
+ansible_ssh_user: "{{ vault_init_ansible_ssh_user }}"
 #ansible_port: 22
+### For privilege escalaton
+### becoming to root
+ansible_become: true
+ansible_become_method: sudo
+ansible_become_pass: "{{ ansible_ssh_pass }}"

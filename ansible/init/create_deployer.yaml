@@ -1,36 +1,42 @@
 - name: Setup deployer user
   hosts: all
-  vars:
-    ansible_deployer:
-      group: wheel
-      users:
-        - name: deployer
-  tasks:
-    - name: Make sure we have a 'ansible' and 'wheel' group
-      group:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - "{{ ansible_deployer.group }}"
 
-    - name: Allow 'wheel' group to have passwordless sudo
-      lineinfile:
-        dest: /etc/sudoers
+  vars:
+    ansible_deployers:
+      file: /etc/sudoers.d/ansible
+      group: "{{ vault_deployer_group }}"
+      users:
+        - name: "{{ vault_deployer_name }}"
+          passwd: "{{ vault_deployer_passwd }}"
+          full_name: "{{ vault_deployer_full_name }}"
+  tasks:
+    - include_vars: vault.yaml
+    - name: Make sure we have deployer group
+      group:
+        name: "{{ ansible_deployers.group }}"
         state: present
-        regexp: '^%{{ ansible_deployer.group }}'
-        line: '%{{ ansible_deployer.group }} ALL=(ALL) NOPASSWD: ALL'
+
+    - name: Create sudoers for deployer group
+      template:
+        src: ansible.conf.j2
+        dest: "{{ ansible_deployers.file}}"
+        owner: root
+        group: root
+        mode: 0440
         validate: 'visudo -cf %s'
 
-    - name: Add sudoers users to wheel group
+    - name: Add deployer user to deployer group
       user:
         name: "{{ item.name }}"
-        groups: "{{ ansible_deployer.group }}"
+        password: "{{ item.passwd }}"
+        comment: "{{ item.full_name }}"
+        groups: "{{ ansible_deployers.group }}"
         append: yes
-      with_items: "{{ ansible_deployer.users }}"
+      with_items: "{{ ansible_deployers.users }}"
 
     - name: Copy ssh key to authorized_keys
       authorized_key:
         user: "{{ item.name }}"
         key: "{{ lookup('file', '/etc/.ssh/ansible_id_rsa.pub') }}"
-      with_items: "{{ ansible_deployer.users }}"
+      with_items: "{{ ansible_deployers.users }}"
 

@@ -1,0 +1,4 @@
+- hosts: server
+  tasks:
+    - name: Add user
+      user: name=johnd password=test
