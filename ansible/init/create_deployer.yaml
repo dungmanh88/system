@@ -10,7 +10,6 @@
           passwd: "{{ vault_deployer_passwd }}"
           full_name: "{{ vault_deployer_full_name }}"
   tasks:
-    - include_vars: vault.yaml
     - name: Make sure we have deployer group
       group:
         name: "{{ ansible_deployers.group }}"
@@ -19,7 +18,7 @@
     - name: Create sudoers for deployer group
       template:
         src: ansible.conf.j2
-        dest: "{{ ansible_deployers.file}}"
+        dest: "{{ ansible_deployers.file }}"
         owner: root
         group: root
         mode: 0440
@@ -33,6 +32,26 @@
         groups: "{{ ansible_deployers.group }}"
         append: yes
       with_items: "{{ ansible_deployers.users }}"
+
+    - name: Check if filter user in sshd
+      command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
+      register: check_sshd
+      ignore_errors: yes
+      changed_when: False
+      check_mode: no
+
+    - name: Allow user deployer in sshd
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        line: 'AllowUsers {{ item.name }}'
+        state: present
+        validate: '/usr/sbin/sshd -T -t -f %s'
+      with_items: "{{ ansible_deployers.users }}"
+      when: check_sshd.rc == 0
+
+    - name: Restart sshd
+      service: name="sshd" enabled=yes state=restarted
+      when: check_sshd.rc == 0
 
     - name: Copy ssh key to authorized_keys
       authorized_key:

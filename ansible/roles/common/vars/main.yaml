@@ -1,7 +1,18 @@
-accounts:  
- - name: "{{ vault_dungnm_name }}"
-   passwd: "{{ vault_dungnm_passwd }}"
-   full_name: "{{ vault_dungnm_full_name }}"
+admins:
+  group: "{{ vault_admin_group }}"
+  file: /etc/sudoers.d/admins
+  users:
+    - name: "{{ vault_dungnm_name }}"
+      passwd: "{{ vault_dungnm_passwd }}"
+      full_name: "{{ vault_dungnm_full_name }}"
+  cmd_alias: |
+    Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
+    Cmnd_Alias  NSHELLS = /bin/sh,/bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
+    Cmnd_Alias  NSU = /bin/su 
+    Cmnd_Alias  NDD = /bin/dd 
+    Cmnd_Alias  NLESS = /usr/bin/less
+    Cmnd_Alias  NVISUDO = /usr/sbin/visudo
+  cmd: ALL=(ALL) ALL, !NSHELLS, !NSU, !NVISUDO, !SHUTDOWN, !NDD, !NLESS
 
 nameservers: |
    nameserver 8.8.8.8
@@ -58,19 +69,3 @@ packages:
    - net-tools 
    - tmux
    - tcpdump
-
-sudoers: 
-   sudo_group: admins
-   cmd_alias: |
-     Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
-     Cmnd_Alias  NSHELLS = /bin/sh,/bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
-     Cmnd_Alias  NSU = /bin/su
-     Cmnd_Alias  NDD = /bin/dd
-     Cmnd_Alias  NLESS = /usr/bin/less
-     Cmnd_Alias  NVISUDO = /usr/sbin/visudo
-   cmd: |
-     ALL=(ALL)   ALL, !NSHELLS, !NSU, !NVISUDO, !SHUTDOWN, !NDD
-
-sysctl:
-   vm:
-     swappiness: 10

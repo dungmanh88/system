@@ -28,34 +28,33 @@
     block: |
       {{ nameservers }}
 
-- name: Install epel-release
-  yum: name="epel-release" update_cache=yes
+#- name: Install epel-release
+#  yum: name="epel-release" update_cache=yes
 
 - name: Debug
-  debug: msg="URL= {{ item.url }}"
-  with_items: "{{ repos }}"
+  debug: msg="ansible_ssh_user= {{ ansible_ssh_user }}"
 
-- name: Install elrepo
-  yum:
-    name: "{{ item.url.0 }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+#- name: Install elrepo
+#  yum:
+#    name: "{{ item.url.0 }}"
+#    update_cache: yes
+#  when:
+#    - ansible_distribution == "{{ item.distribution }}"
+#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+#  with_items: "{{ repos }}"
 
-- name: Install remi repo
-  yum:
-    name: "{{ item.url.1 }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+#- name: Install remi repo
+#  yum:
+#    name: "{{ item.url.1 }}"
+#    update_cache: yes
+#  when:
+#    - ansible_distribution == "{{ item.distribution }}"
+#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+#  with_items: "{{ repos }}"
 
-- name: Install monitoring and debuging package
-  yum: name="{{ item }}" update_cache=yes
-  with_items: "{{ packages }}"
+#- name: Install monitoring and debuging package
+#  yum: name="{{ item }}" update_cache=yes
+#  with_items: "{{ packages }}"
 
 - name: Disable selinux
   selinux: state=disabled
@@ -68,23 +67,17 @@
 
 - name: Create admins group
   group:
-    name: "{{ sudoers.sudo_group }}"
+    name: "{{ admins.group }}"
     state: present
 
-- name: Set cmd alias for /etc/sudoers
-  blockinfile:
-    dest: /etc/sudoers
-    state: present
-    block: "{{ sudoers.cmd_alias }}"
-    validate: 'visudo -cf %s'
-
-- name: Set privileges for admins group
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    regexp: '^%{{ sudoers.sudo_group }}'
-    line: '%{{ sudoers.sudo_group }} {{ sudoers.cmd }}'
-    validate: 'visudo -cf %s'
+- name: Create sudoers for admins group
+  template:
+    src: admins.conf.j2
+    dest: "{{ admins.file }}"
+    owner: root
+    group: root
+    mode: 0440
+    validate: 'visudo -cf %s' 
 
 - name: Create administrator accounts
   user:
@@ -92,15 +85,32 @@
     password: "{{ item.passwd }}"
     comment: "{{ item.full_name }}"
     shell: /bin/bash 
-    groups: "{{ sudoers.sudo_group }}"
+    groups: "{{ admins.group }}"
     append: yes 
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
-  with_items: "{{ accounts }}"
+  with_items: "{{ admins.users }}"
 
-- name: set vm.swappiness in sysctl.conf
-  sysctl: name=vm.swappiness value="{{ sysctl.vm.swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
+- name: Check if filter user in sshd 
+  command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
+  register: check_sshd
+  ignore_errors: yes
+  changed_when: False
+  check_mode: no
+
+- name: Allow user deployer in sshd 
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'AllowUsers {{ item.name }}'
+    state: present 
+    validate: '/usr/sbin/sshd -T -t -f %s'
+  with_items: "{{ admins.users }}"
+  when: check_sshd.rc == 0
+
+- name: Restart sshd
+  service: name="sshd" enabled=yes state=restarted
+  when: check_sshd.rc == 0
 
 - name: Remove temporary gateway
   command: route del default gw "{{ gateway_ip }}"

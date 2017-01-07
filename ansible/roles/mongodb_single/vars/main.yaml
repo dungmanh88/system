@@ -22,6 +22,10 @@ os:
     version6: 6
     version5: 5
 
+sysctl:
+  vm:
+    swappiness: 10
+
 ### first, disable security and enable localhost auth bypass then revert these options.
 admin_users:
   - name: "{{ vault_mongodb_root_user }}"
