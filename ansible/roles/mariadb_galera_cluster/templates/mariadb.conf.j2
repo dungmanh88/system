@@ -1,0 +1,90 @@
+[server]
+
+[mysqld]
+
+[galera]
+{% set cluster_members = [] -%}
+{%- for node in groups['test'] %}
+    {%- if hostvars[node].ansible_default_ipv4.address != ansible_default_ipv4.address %}
+      {%- set _ = cluster_members.append(hostvars[node].ansible_default_ipv4.address) -%}
+    {% endif -%}
+{% endfor -%}
+
+wsrep_sst_method = xtrabackup-v2
+wsrep_sst_auth = {{ galera_user.name }}:{{ galera_user.passwd }}
+wsrep_cluster_name = {{ galera.wsrep_cluster_name }}
+wsrep_provider = {{ galera.wsrep_provider }}
+wsrep_node_name = {{ galera.wsrep_node_name }}
+wsrep_cluster_address=gcomm://{{ ",".join(cluster_members) }}
+
+wsrep_slave_threads = {{ galera.wsrep_slave_threads }}
+wsrep_provider_options = "{{ galera.wsrep_provider_options }}"
+
+wsrep_node_address = {{ ansible_default_ipv4.address }}
+wsrep_sst_receive_address = {{ ansible_default_ipv4.address }}
+
+wsrep_log_conflicts = {{ galera.wsrep_log_conflicts }}
+wsrep_certify_nonPK = {{ galera.wsrep_certify_nonPK }}
+wsrep_recover = {{ galera.wsrep_recover }}
+wsrep_retry_autocommit = {{ galera.wsrep_retry_autocommit }}
+
+
+[embedded]
+
+[mariadb]
+### basic ###
+user = mysql
+datadir = {{ dir.datadir }}
+socket = {{ mysqld.socket }}
+port = {{ mysqld.port }}
+skip_name_resolve = {{ mysqld.skip_name_resolve }}
+max_allowed_packet = {{ mysqld.max_allowed_packet }}
+
+### innodb ###
+default_storage_engine = InnoDB
+innodb_autoinc_lock_mode = {{ mysqld.innodb_autoinc_lock_mode }}
+innodb_doublewrite = {{ mysqld.innodb_doublewrite }}
+innodb_flush_log_at_trx_commit = {{ mysqld.innodb_flush_log_at_trx_commit }}
+innodb_buffer_pool_size = {{ mysqld.innodb_buffer_pool_size }}
+innodb_buffer_pool_instances = {{ mysqld.innodb_buffer_pool_instances }}
+innodb_file_per_table = 1
+innodb_flush_method = {{ mysqld.innodb_flush_method }}
+innodb_log_buffer_size = {{ mysqld.innodb_log_buffer_size }}
+
+### query cache ###
+query_cache_size = 0
+query_cache_type = 0
+
+### timeout ###
+wait_timeout = {{ mysqld.wait_timeout }}
+interactive_timeout = {{ mysqld.interactive_timeout }}
+connect_timeout = {{ mysqld.connect_timeout }}
+
+### temporary tables ###
+tmp_table_size = {{ mysqld.tmp_table_size }}
+max_heap_table_size = {{ mysqld.max_heap_table_size }}
+tmpdir = {{ mysqld.tmpdir }}
+
+### thread pool ###
+thread_handling = {{ mysqld.thread_handling }}
+thread_pool_size = {{ mysqld.thread_pool_size }}
+extra_port = {{ mysqld.extra_port }}
+extra_max_connections = {{ mysqld.extra_max_connections }}
+max_connections = {{ mysqld.max_connections }}
+
+### log ###
+log_output = {{ mysqld.log_output }}
+log_error = {{ mysqld.log_error }}
+slow_query_log = 1
+log_queries_not_using_indexes = {{ mysqld.log_queries_not_using_indexes }}
+log_warnings = {{ mysqld.log_warnings }}
+long_query_time = {{ mysqld.long_query_time }}
+slow_query_log_file = {{ mysqld.slow_query_log_file }}
+general_log = 0
+general_log_file = {{ mysqld.general_log_file }}
+
+[mariadb-{{ base_version }}]
+
+[xtrabackup]
+datadir = {{ dir.datadir }}
+streamfmt = xbstream

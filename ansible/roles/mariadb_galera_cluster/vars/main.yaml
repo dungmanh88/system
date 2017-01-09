@@ -1,0 +1,29 @@
+galeradir: /data/galera/
+options:
+  gcache_size: "{{ default_gcache_size }}"
+  gcs_recv_q_hard_limit: "{{ default_gcs_recv_q_hard_limit }}"
+  gcs_fc_limit: "{{ default_gcs_fc_limit }}"
+  gcs_fc_master_slave: "{{ default_gcs_fc_master_slave }}"
+  gcs_fc_factor: "{{ default_gcs_fc_factor }}"
+galera:
+  wsrep_cluster_name: "{{ default_wsrep_cluster_name }}"
+  wsrep_provider: /usr/lib64/galera/libgalera_smm.so
+  wsrep_slave_threads: "{{ default_wsrep_slave_threads }}"
+  wsrep_node_name: "{{ default_wsrep_node_name }}"
+  wsrep_provider_options: "gcache.size={{ options.gcache_size }};gcache.name = {{ galeradir }}/galera.cache;gcache.dir={{ galeradir }};gcs.recv_q_hard_limit={{ options.gcs_recv_q_hard_limit }};gcs.fc_limit={{ options.gcs_fc_limit }};gcs.fc_master_slave={{ options.gcs_fc_master_slave }};gcs.fc_factor={{ options.gcs_fc_factor }}"
+  wsrep_log_conflicts: ON
+  wsrep_certify_nonPK: ON
+  wsrep_recover: OFF
+  wsrep_retry_autocommit: 3
+
+os:
+  distribution_centos:
+    name: CentOS
+    version7: 7
+    version6: 6
+    version5: 5
+
+galera_user:
+  name: "{{ vault_mysqld_galera_user }}"
+  passwd: "{{ default_mysqld_galera_passwd }}"
+  priv: "{{ vault_mysqld_galera_priv }}"

@@ -1,0 +1,40 @@
+- include_vars: vault/main.yaml
+  tags: include
+
+- debug:
+    msg: "debug = {{ default_mysqld_root_passwd }}"
+
+- name: Install galera
+  yum: name="{{ item }}" update_cache=yes 
+  with_items:
+  - galera
+  - socat
+
+- name: Create file galera dir
+  file: path="{{ galeradir }}" state=directory owner=mysql group=mysql
+
+- name: Enable and start mariadb
+  service: name=mysql enabled=yes state=restarted
+  tags: restart_mariadb
+
+- name: Create user galera
+  mysql_user:
+    login_user: "{{ admin_user.name }}"
+    login_port: "{{ mysqld.port }}"
+    login_password: "{{ admin_user.passwd }}"
+    name: "{{ galera_user.name }}"
+    password: "{{ galera_user.passwd }}"
+    priv: "{{ galera_user.priv }}"
+    state: present 
+  ignore_errors: yes
+  tags: create_galera_user
+
+- name: Config MariaDB 
+  template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
+  tags: reconfig
+
+- name: Check mariadb status
+  command: service mysql status
+  tags: check_service
+
+

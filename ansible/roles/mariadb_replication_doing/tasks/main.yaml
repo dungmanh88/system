@@ -1,6 +1,4 @@
 - include_vars: vault/main.yaml
-  tags: include
-
 - name: Test get msg
   debug: msg="read {{ os.distribution_centos.name }} install version {{ version }}"
 

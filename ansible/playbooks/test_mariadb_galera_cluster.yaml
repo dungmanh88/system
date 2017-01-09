@@ -1,0 +1,4 @@
+- name: Deploy galera cluster
+  hosts: test
+  roles:
+  - role: mariadb_galera_cluster

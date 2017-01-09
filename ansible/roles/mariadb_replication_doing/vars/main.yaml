@@ -1,0 +1,16 @@
+config:
+  mysqld:
+    ### Replication ###
+    sync_binlog: "{{ default_mysqld_sync_binlog }}"
+    sync_relay_log: 1
+    gtid_domain_id: "{{ default_mysqld_gtid_domain_id }}"
+    expire_logs_days: "{{ default_mysqld_expire_logs_days }}"
+    report_host: "{{ default_mysqld_report_host }}"
+    log_bin: "{{ config.mysqld.report_host }}"
+    log_bin_index: "{{ config.mysqld.report_host }}".log.index
+    relay_log: "{{ config.mysqld.report_hosts }}"-relay-bin
+    relay_log_index: "{{ config.mysqld.report_host }}"-relay-bin.index
+    server_id: "{{ default_mysqld_server_id }}"
+    log_slave_updates: 1
+    binlog_format: ROW
+    max_binlog_size: 200M

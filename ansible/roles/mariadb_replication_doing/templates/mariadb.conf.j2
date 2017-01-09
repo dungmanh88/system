@@ -1,0 +1,85 @@
+[server]
+
+[mysqld]
+
+[embedded]
+
+[mariadb]
+### basic ###
+user=mysql
+datadir=/var/lib/mysql
+log_error=/var/log/mysqld/mysql_error.log
+socket=/var/lib/mysql/mysql.sock
+port=3306
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+innodb_doublewrite=1
+innodb_flush_log_at_trx_commit=1
+skip_name_resolve=1
+log_output=FILE
+max_allowed_packet=32M
+
+### innodb ###
+innodb_buffer_pool_size = 5730M # Go up to 80% of your available RAM
+innodb_buffer_pool_instances = 4
+innodb_file_per_table = 1 # Is the recommended way nowadays
+
+innodb_flush_method=O_DIRECT
+innodb_log_buffer_size= 16M
+
+query_cache_size        = 0
+query_cache_type        = 0
+
+### timeout ###
+wait_timeout=30 ### TBD
+interactive_timeout=30
+connect_timeout=30
+
+### temporary tables ###
+tmp_table_size=64M
+max_heap_table_size=64M
+tmpdir=/var/log/mysql/tmp
+
+### thread pool ###
+thread_handling=pool-of-threads
+thread_pool_size=4
+extra_port=6033
+extra_max_connections=10
+max_connections=256
+
+### slow query ###
+slow_query_log=1
+log_queries_not_using_indexes=0
+log_warnings=2
+long_query_time = 2
+slow_query_log_file = /var/log/mysqld/mysql_slow.log
+
+### general log ###
+# for debugging
+general_log=0
+general_log_file=/var/log/mysqld/mysql_general.log
+
+### replication ###
+gtid_domain_id=19
+expire_logs_days=7
+log_bin=appota-report-bin
+relay_log=appota-report-relay-bin
+relay_log_index=appota-report-relay-bin.index
+server_id=144
+slave_net_timeout=60
+binlog_format=ROW
+report_host=appota-report
+report_port=3306
+sync_binlog=1
+sync_relay_log=1
+max_binlog_size=200M
+
+# This group is only read by MariaDB-10.0 servers.
+# If you use the same .cnf file for MariaDB of different versions,
+# use this group for options that older servers don't understand
+[mariadb-10.0]
+
+[xtrabackup]
+datadir = /var/lib/mysql
+streamfmt=xbstream
+
