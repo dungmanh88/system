@@ -98,19 +98,49 @@
   service: name=mysql enabled=yes state=restarted
   tags: restart_mariadb
 
-- name: Update passwd
+- name: Remove anonymous user
+  mysql_user:
+    login_user: "{{ admin_user.name }}"
+    login_port: "{{ mysqld.port }}"
+    login_password: ''
+    name: ''
+    host_all: yes
+    state: absent
+  ignore_errors: yes
+
+- name: Remove test db
+  mysql_db:
+    login_user: "{{ admin_user.name }}"
+    login_port: "{{ mysqld.port }}"
+    login_password: ''
+    name: test
+    state: absent
+  ignore_errors: yes
+
+- name: Disallow remote login for root
+  mysql_user:
+    login_user: "{{ admin_user.name }}"
+    login_port: "{{ mysqld.port }}"
+    login_password: ''
+    name: "{{ admin_user.name }}"
+    state: absent
+    host: "{{ ansible_hostname }}"
+  ignore_errors: yes
+
+- name: Set root passwd
   mysql_user:
     name: "{{ admin_user.name }}"
     password: "{{ admin_user.passwd }}"
     priv: "{{ admin_user.priv }}"
-    state: present
+    state: present 
     login_user: "{{ admin_user.name }}"
     login_port: "{{ mysqld.port }}"
+    login_password: ''
     login_host: localhost
     host: "{{ item }}"
   with_items: 
     - 127.0.0.1
-    - ::1
+    - ::1   
     - localhost
   ignore_errors: yes
 
