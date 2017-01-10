@@ -1,0 +1,5 @@
+pmm:
+  version: pmm-server:1.0.7
+  user_name: "{{ vault_pmm_user_name }}"
+  user_passwd: "{{ vault_pmm_user_passwd }}"
+

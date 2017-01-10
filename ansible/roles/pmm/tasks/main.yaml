@@ -1,0 +1,17 @@
+- include_vars: vault/main.yaml
+  tags: include
+
+- name: Copy pmm server script
+  template: src=deploy_pmm_server.sh.j2 dest=/tmp/deploy_pmm_server.sh mode=0744 owner=root group=root
+
+- name: Copy pmm client script
+  template: src=deploy_pmm_client.sh.j2 dest=/tmp/deploy_pmm_client.sh mode=0744 owner=root group=root
+
+- name: Install pmm server
+  command: /tmp/deploy_pmm_server.sh 
+
+- name: Install pmm client
+  command: /tmp/deploy_pmm_client.sh
+  
+  
+

@@ -1,0 +1,4 @@
+- name: Deploy pmm
+  hosts: test
+  roles:
+  - role: pmm
