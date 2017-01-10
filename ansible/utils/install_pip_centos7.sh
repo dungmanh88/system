@@ -8,10 +8,9 @@ cd /tmp
 if [ ! -f /tmp/get-pip.py ]; then
     wget https://bootstrap.pypa.io/get-pip.py 
 fi
-python get-pip.py \
-
 ### support ansible vault
-&& pip install cryptography \
-
+# then
 ### generate crypted passwords for the user module
+python get-pip.py \
+&& pip install cryptography \
 && pip install passlib
