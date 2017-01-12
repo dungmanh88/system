@@ -7,8 +7,6 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 function install_lsyncd() {
   yum -y install epel-release
   yum -y install lsyncd
-  service lsyncd start
-  chkconfig lsyncd on
 }
 
 function gen_sample_lsyncd_conf() {
@@ -47,6 +45,8 @@ function main() {
   install_lsyncd
   gen_sample_lsyncd_conf
   gen_root_ssh_key
+  service lsyncd start
+  chkconfig lsyncd on
 }
 
 main
