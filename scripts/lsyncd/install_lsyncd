@@ -45,8 +45,8 @@ function main() {
   install_lsyncd
   gen_sample_lsyncd_conf
   gen_root_ssh_key
-  service lsyncd start
   chkconfig lsyncd on
+  service lsyncd start
 }
 
 main
