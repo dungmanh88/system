@@ -1,0 +1,18 @@
+service mysqlchk
+{
+  flags = REUSE
+  socket_type = stream
+  port = {{ monitor.port }}
+  wait = no
+  user = nobody
+  {% if monitor_what == "galera" %}
+server = /usr/local/bin/galeracheck.sh
+  {% elif monitor_what == "replication" %}
+server = /usr/local/bin/replicationcheck.sh
+  {% endif %}
+log_on_failure += USERID
+  disable = no
+  only_from = 0.0.0.0/0
+  per_source = UNLIMITED
+}
+

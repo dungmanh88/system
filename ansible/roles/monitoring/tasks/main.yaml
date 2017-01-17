@@ -1,0 +1,42 @@
+- include_vars: vault/main.yaml
+
+- name: Throw error if monitor_what is replication and is_monitor_replication is 0
+  fail: msg="I will not install mysql replication monitoring on this server"
+  when: 
+  - monitor_what == "replication"
+  - is_monitor_replication == 0
+
+- name: Install xinetd
+  yum: name=xinetd update_cache=yes
+  
+- name: Install script
+  template:
+    src: galeracheck.sh.j2
+    dest: /usr/local/bin/galeracheck.sh
+    owner: nobody
+    group: nobody
+    mode: 0744
+  when: monitor_what == "galera"
+
+- name: Install script
+  template:
+    src: replicationcheck.sh.j2
+    dest: /usr/local/bin/replicationcheck.sh
+    owner: nobody
+    group: nobody
+    mode: 0744
+  when: 
+  - monitor_what == "replication"
+  - is_monitor_replication == 1
+
+- name: Install mysqlchk in xinetd.d
+  template: src=mysqlchk.j2 dest=/etc/xinetd.d/mysqlchk owner=root group=root mode=0644 
+
+- name: Add service into /etc/services
+  lineinfile:
+    dest: /etc/services
+    line: 'mysqlchk {{ monitor.port }}/tcp'
+    state: present
+
+- name: enable and restart xinetd
+  service: name=xinetd enabled=yes state=restarted

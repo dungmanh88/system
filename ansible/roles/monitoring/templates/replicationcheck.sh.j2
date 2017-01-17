@@ -1,0 +1,45 @@
+#!/bin/bash
+
+SECONDS_BEHIND_MASTER=300
+
+MYSQL_HOST="{{ checker.host }}"
+MYSQL_PORT="{{ checker.port }}"
+MYSQL_USERNAME="{{ checker.name }}"
+MYSQL_PASSWORD="{{ checker.passwd }}"
+
+echo=`which echo`
+mysql=`which mysql`
+cut=`which cut`
+tr=`which tr`
+grep=`which grep`
+
+QUERY=`$mysql --host $MYSQL_HOST --port $MYSQL_PORT --user $MYSQL_USERNAME -p"$MYSQL_PASSWORD" -e'show slave status\G' 2>/dev/null`
+SECOND_BEHIND=`echo "$QUERY" | grep Seconds_Behind_Master | cut -f2 -d':' | tr -d ' '`
+
+function set_health() {
+    if [ "$1" == "ok" ]; then
+        $echo -e "HTTP/1.1 200 OK\r\n"
+        $echo -e "Content-Type: Content-Type: text/plain\r\n"
+        $echo -e "\r\n"
+        $echo -e "MySQL is ALIVE.\r\n"
+        $echo -e "\r\n"
+    else
+        $echo -e "HTTP/1.1 503 Service Unavailable\r\n"
+        $echo -e "Content-Type: Content-Type: text/plain\r\n"
+        $echo -e "\r\n"
+        $echo -e "MySQL is DEAD.\r\n"
+        $echo -e "\r\n"
+    fi
+}
+
+if [[ ! -n $SECOND_BEHIND || "$SECOND_BEHIND" == "NULL" ]]; then
+    set_health fail
+    exit
+fi
+
+if [ $(($SECOND_BEHIND + 0)) -gt $SECONDS_BEHIND_MASTER ]; then
+    set_health fail
+    exit
+fi
+
+set_health ok

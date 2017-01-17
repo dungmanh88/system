@@ -1,14 +1,33 @@
 - include_vars: vault/main.yaml
   tags: include
 
-- debug:
-    msg: "debug = {{ default_mysqld_root_passwd }}"
+- name: Remove MariaDB server single
+  yum: name="{{ item }}" state=absent
+  with_items:
+  - MariaDB-server
+  - MariaDB-client
+  - MariaDB-devel
+  when: base_version != "10.1"
 
 - name: Install galera
   yum: name="{{ item }}" update_cache=yes 
   with_items:
   - galera
   - socat
+  - MariaDB-client
+  - MariaDB-Galera-server
+  - MariaDB-devel
+  when: base_version != "10.1"
+
+- name: Install galera
+  yum: name="{{ item }}" update_cache=yes
+  with_items:
+  - galera
+  - socat
+  - MariaDB-client
+  - MariaDB-server
+  - MariaDB-devel
+  when: base_version == "10.1"
 
 - name: Create file galera dir
   file: path="{{ galeradir }}" state=directory owner=mysql group=mysql
@@ -37,4 +56,5 @@
   command: service mysql status
   tags: check_service
 
-
+- name: Hello world
+  debug: msg="You should start mysql cluster by hand. You could choose the init node"

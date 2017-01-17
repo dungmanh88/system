@@ -3,7 +3,7 @@ default_gcs_recv_q_hard_limit: 16M
 default_gcs_fc_limit: 16
 default_gcs_fc_master_slave: NO
 default_gcs_fc_factor: 0.5
-default_wsrep_cluster_name: Test
+default_wsrep_cluster_name: NA
 default_wsrep_slave_threads: 4
 default_mysqld_galera_passwd: "{{ vault_mysqld_galera_passwd }}"
 default_wsrep_node_name: NA

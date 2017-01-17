@@ -1,7 +1,8 @@
 dir:
-  datadir: "{{ default_mysqld_datadir }}"
+  datadir: /var/lib/mysql
   logdir: "{{ default_mysqld_logdir }}"
-
+  tmpdir: "{{ default_mysqld_tmpdir }}"
+  datadir_origin: "{{ default_mysqld_datadir_origin }}"
 mysqld:
   ### Basic ###
   socket: "{{ dir.datadir }}/mysql.sock"
@@ -29,7 +30,7 @@ mysqld:
   ### Temporary ###
   tmp_table_size: "{{ default_mysqld_tmp_table_size }}"
   max_heap_table_size: "{{ default_mysqld_max_heap_table_size }}"
-  tmpdir: "{{ dir.logdir }}/tmp"
+  tmpdir: "{{ dir.tmpdir }}/tmp"
   ### Log ###
   log_output: FILE
   log_queries_not_using_indexes: "{{ default_mysqld_log_queries_not_using_indexes }}"
@@ -41,12 +42,18 @@ mysqld:
   ### Redo log ###
   innodb_log_files_in_group: "{{ default_mysqld_innodb_log_files_in_group }}"
   innodb_log_file_size: "{{ default_mysqld_innodb_log_file_size }}"
-  max_binlog_size: 200M
   ### Thread pool ###
   thread_handling: pool-of-threads
   thread_pool_size: "{{ default_mysqld_thread_pool_size }}"
   extra_port: "{{ default_mysqld_extra_port }}"
   extra_max_connections: "{{ default_mysqld_extra_max_connections }}"
+  ### Replication ###
+  gtid_domain_id: "{{ default_mysqld_gtid_domain_id }}"
+  report_host: "{{ default_mysqld_report_host }}"
+  report_port: "{{ default_mysqld_port }}"
+  expire_logs_days: "{{ default_mysqld_expire_logs_days }}"
+  server_id: "{{ default_mysqld_server_id }}"
+  max_binlog_size: 200M
 
 version: "{{ default_mariadb_version }}"
 base_version: "{{ default_mariadb_base_version }}"

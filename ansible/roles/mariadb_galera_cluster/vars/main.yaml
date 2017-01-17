@@ -11,9 +11,9 @@ galera:
   wsrep_slave_threads: "{{ default_wsrep_slave_threads }}"
   wsrep_node_name: "{{ default_wsrep_node_name }}"
   wsrep_provider_options: "gcache.size={{ options.gcache_size }};gcache.name = {{ galeradir }}/galera.cache;gcache.dir={{ galeradir }};gcs.recv_q_hard_limit={{ options.gcs_recv_q_hard_limit }};gcs.fc_limit={{ options.gcs_fc_limit }};gcs.fc_master_slave={{ options.gcs_fc_master_slave }};gcs.fc_factor={{ options.gcs_fc_factor }}"
-  wsrep_log_conflicts: ON
-  wsrep_certify_nonPK: ON
-  wsrep_recover: OFF
+  wsrep_log_conflicts: "ON"
+  wsrep_certify_nonPK: "ON"
+  wsrep_recover: "OFF"
   wsrep_retry_autocommit: 3
 
 os:

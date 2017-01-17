@@ -1,0 +1,114 @@
+#!/bin/bash
+
+set -e
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+BACULA_VERSION={{ bacula_version }}
+BACULA_DOWNLOAD="{{ bacula.url }}"
+TEMP_INSTALLATION=/tmp
+DEFAULT_INSTALLTION=/usr/local/bin/bacula/bin
+BACULA_SERVICE_DIR_NAME={{ bacula.dir_name }}
+BACULA_SERVICE_DIR_PASSWD={{ bacula.dir_passwd }}
+BACULA_SERVICE_MON_NAME={{ bacula.mon_name }}
+BACULA_SERVICE_MON_PASSWD={{ bacula.mon_passwd }}
+BACULA_FILE_DAEMON_NAME={{ bacula.fd_name }}
+BACULA_DIR_ADDRESS={{ bacula.server_ip }}
+BACULA_DIR_NAME={{ bacula.server_name }}
+
+function install_dependencies() {
+  echo "INSTALL DEPENDENCIES"
+  yum -y install zlib zlib-devel openssl openssl-devel gcc gcc-c++
+  echo "INSTALL DEPENDENCIES DONE!!!"
+}
+
+function download_and_extract_package() {
+  echo "DOWNLOAD AND EXTRACT"
+  rm -rf ${TEMP_INSTALLATION}/bacula-${BACULA_VERSION}.tar.gz
+  rm -rf ${TEMP_INSTALLATION}//bacula-${BACULA_VERSION}
+  cd ${TEMP_INSTALLATION}
+  curl -OL ${BACULA_DOWNLOAD}
+  tar xvzf bacula-${BACULA_VERSION}.tar.gz
+  echo "DOWNLOAD AND EXTRACT DONE!!!"
+}
+
+function install_package() {
+  echo "INSTALLING"
+  cd ${TEMP_INSTALLATION}/bacula-${BACULA_VERSION}
+  CFLAGS="-g -O2"
+ ./configure \
+            --sbindir=/usr/local/bin/bacula/bin \
+            --sysconfdir=/usr/local/bin/bacula/bin \
+            --with-pid-dir=/usr/local/bin/bacula/bin/working \
+            --with-subsys-dir=/usr/local/bin/bacula/bin/working \
+            --enable-smartalloc \
+            --enable-client-only \
+            --with-working-dir=/usr/local/bin/bacula/bin/working && make && make install
+  echo "INSTALL DONE!!!"
+}
+
+function install_ini_script() {
+  echo "INSTALL INIT SCRIPT"
+  cp ${DEFAULT_INSTALLTION}/bacula-ctl-fd /etc/init.d/
+  sed -i '2i# chkconfig: - 30 60 2' /etc/init.d/bacula-ctl-fd
+  chkconfig bacula-ctl-fd on
+  service bacula-ctl-fd start
+  echo "INSTALL INIT SCRIPT DONE!!!"
+}
+
+function config_client() {
+  echo "CONFIG CLIENT"
+  find ${DEFAULT_INSTALLTION}/* -maxdepth 0 | grep -v -i -E '(bacula-fd|bacula-ctl-fd|working)' | xargs rm
+  local bacula_client_cnf=${DEFAULT_INSTALLTION}/bacula-fd.conf
+  cat << EOF > ${bacula_client_cnf}
+#
+# List Directors who are permitted to contact this File daemon
+#
+Director {
+  Name = ${BACULA_SERVICE_DIR_NAME}
+  Password = "${BACULA_SERVICE_DIR_PASSWD}"
+}
+
+#
+# Restricted Director, used by tray-monitor to get the
+#   status of the file daemon
+#
+Director {
+  Name = ${BACULA_SERVICE_MON_NAME}
+  Password = "${BACULA_SERVICE_MON_PASSWD}"
+  Monitor = yes
+}
+
+#
+# "Global" File daemon configuration specifications
+#
+FileDaemon {                          # this is me
+  Name = ${BACULA_FILE_DAEMON_NAME}
+  FDport = 9102                  # where we listen for the director
+  WorkingDirectory = /usr/local/bin/bacula/bin/working
+  Pid Directory = /usr/local/bin/bacula/bin/working
+  Maximum Concurrent Jobs = 20
+# Plugin Directory = /usr/lib64
+}
+
+# Send all messages except skipped files back to Director
+Messages {
+  Name = Standard
+  director = ${BACULA_SERVICE_DIR_NAME} = all, !skipped, !restored
+}
+EOF
+  echo "${BACULA_DIR_ADDRESS} ${BACULA_DIR_NAME}" >> /etc/hosts
+  service bacula-ctl-fd restart
+  echo "CONFIG CLIENT DONE!!!"
+}
+
+function main() {
+  install_dependencies \
+  && download_and_extract_package \
+  && install_package \
+  && install_ini_script \
+  && config_client
+}
+
+main
+

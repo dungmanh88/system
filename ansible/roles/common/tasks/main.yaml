@@ -1,14 +1,16 @@
 - include_vars: vault/main.yaml
-- name: Set hostname
-  hostname:
-    name: "{{ hostname }}"
+#- name: Set hostname
+#  hostname:
+#    name: "{{ hostname }}"
 
-- name: Config /etc/hosts follow hostname
-  lineinfile:
-    dest: /etc/hosts
-    state: present
-    regexp: '^127\.0\.0\.1'
-    line: '127.0.0.1 {{ hostname }}'
+#- name: Config /etc/hosts follow hostname
+#  lineinfile:
+#    dest: /etc/hosts
+#    state: present
+#    line: '{{ item }}'
+#  with_items:
+#    - "127.0.0.1 {{ hostname }}"
+#    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
     
 - name: Config temporary gateway
   command: route add default gw "{{ gateway_ip }}"
@@ -28,39 +30,59 @@
     block: |
       {{ nameservers }}
 
-#- name: Install epel-release
-#  yum: name="epel-release" update_cache=yes
+- name: Install epel-release
+  yum: name="epel-release" update_cache=yes
 
 - name: Debug
   debug: msg="ansible_ssh_user= {{ ansible_ssh_user }}"
 
-#- name: Install elrepo
-#  yum:
-#    name: "{{ item.url.0 }}"
-#    update_cache: yes
-#  when:
-#    - ansible_distribution == "{{ item.distribution }}"
-#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-#  with_items: "{{ repos }}"
+- name: Install elrepo
+  yum:
+    name: "{{ item.url.0 }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
 
-#- name: Install remi repo
-#  yum:
-#    name: "{{ item.url.1 }}"
-#    update_cache: yes
-#  when:
-#    - ansible_distribution == "{{ item.distribution }}"
-#    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-#  with_items: "{{ repos }}"
+- name: Install remi repo
+  yum:
+    name: "{{ item.url.1 }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ item.distribution }}"
+    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
+  with_items: "{{ repos }}"
 
-#- name: Install monitoring and debuging package
-#  yum: name="{{ item }}" update_cache=yes
-#  with_items: "{{ packages }}"
+- name: Get pip 
+  get_url: url="{{ pip_url }}" dest=/tmp/get-pip.py mode=0644
+ 
+- name: Install pip
+  command: /usr/bin/python get-pip.py
+  args:
+    chdir: /tmp
+
+- name: Install libselinux-python
+  yum: name=libselinux-python
+
+- name: Install monitoring and debuging package
+  yum: name="{{ item }}" update_cache=yes
+  with_items: "{{ packages }}"
 
 - name: Disable selinux
   selinux: state=disabled
 
 - name: Disable firewall
   service: name="firewalld" enabled=no state=stopped
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: Disable firewall
+  service: name="iptables" enabled=no state=stopped
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version6 }}"
 
 - name: Enable ntpd
   service: name="ntpd" enabled=yes state=restarted
@@ -99,7 +121,7 @@
   changed_when: False
   check_mode: no
 
-- name: Allow user deployer in sshd 
+- name: Allow user in sshd 
   lineinfile:
     dest: /etc/ssh/sshd_config
     line: 'AllowUsers {{ item.name }}'
@@ -111,6 +133,21 @@
 - name: Restart sshd
   service: name="sshd" enabled=yes state=restarted
   when: check_sshd.rc == 0
+
+- name: Change passwd root and disable root login
+  user:
+    name: "{{ root.name }}"
+    password: "{{ root.recovery_passwd }}"
+    shell: /sbin/nologin
+  
+- name: Disallow root SSH access
+  lineinfile: 
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+    validate: '/usr/sbin/sshd -T -t -f %s'
+  notify: reload sshd
 
 - name: Remove temporary gateway
   command: route del default gw "{{ gateway_ip }}"

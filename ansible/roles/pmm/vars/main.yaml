@@ -1,5 +1,19 @@
 pmm:
-  version: pmm-server:1.0.7
-  user_name: "{{ vault_pmm_user_name }}"
-  user_passwd: "{{ vault_pmm_user_passwd }}"
+  url: http://www.percona.com/downloads/percona-release/redhat/0.1-4/percona-release-0.1-4.noarch.rpm
+  server: "{{ default_pmm_server }}"
+  user: "{{ vault_pmm_user }}"
+  passwd: "{{ vault_pmm_passwd }}"
+  mysql:
+    user: "{{ default_pmm_mysql_user }}"
+    passwd: "{{ default_pmm_mysql_passwd }}"
+    port: "{{ default_pmm_mysql_port }}"
+    host: 127.0.0.1
+  mongo:
+    user: "{{ default_pmm_mongo_user }}"
+    passwd: "{{ default_pmm_mongo_passwd }}"
+    port: "{{ default_pmm_mongo_port }}"
+    host: 127.0.0.1
+    db: admin
 
+mongo_uri: mongodb://{{ pmm.mongo.user }}:{{ pmm.mongo.passwd }}@{{ pmm.mongo.host }}:{{ pmm.mongo.port }}/{{ pmm.mongo.db }}
+  

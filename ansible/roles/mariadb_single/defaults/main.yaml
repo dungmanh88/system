@@ -3,8 +3,9 @@ default_mariadb_version: 10.0.21
 
 default_mysqld_root_passwd: "{{ vault_mysqld_root_passwd }}"
 
-default_mysqld_datadir: /var/lib/mysql
+default_mysqld_datadir_origin: /var/lib/mysql
 default_mysqld_logdir: /var/log/mysqld
+default_mysqld_tmpdir: /var/log/mysqld
 default_mysqld_port: 3306
 
 default_mysqld_innodb_buffer_pool_size: 2048M
@@ -14,6 +15,7 @@ default_mysqld_max_allowed_packet: 32M
 
 default_mysqld_open_cache: 1000
 
+use_thread_cache: 1
 default_mysqld_thread_cache_size: 4
 
 default_mysqld_wait_timeout: 30
@@ -28,7 +30,14 @@ default_mysqld_long_query_time: 2
 default_mysqld_innodb_log_files_in_group: 2
 default_mysqld_innodb_log_file_size: 64M
 
+use_thread_pool: 0
 default_mysqld_thread_pool_size: 4
 default_mysqld_extra_port: 6033
 default_mysqld_extra_max_connections: 10
 default_mysqld_max_connections: 64
+
+use_gtid: 0
+default_mysqld_gtid_domain_id: NA
+default_mysqld_report_host: NA
+default_mysqld_expire_logs_days: 5
+default_mysqld_server_id: NA

@@ -3,19 +3,18 @@
 [mysqld]
 
 [galera]
-{% set cluster_members = [] -%}
-{%- for node in groups['test'] %}
-    {%- if hostvars[node].ansible_default_ipv4.address != ansible_default_ipv4.address %}
-      {%- set _ = cluster_members.append(hostvars[node].ansible_default_ipv4.address) -%}
+{% set neighbor_members = [] -%}
+{%- for node in cluster_members %}
+    {%- if node != ansible_default_ipv4.address %}
+      {%- set _ = neighbor_members.append(node) -%}
     {% endif -%}
 {% endfor -%}
-
 wsrep_sst_method = xtrabackup-v2
 wsrep_sst_auth = {{ galera_user.name }}:{{ galera_user.passwd }}
 wsrep_cluster_name = {{ galera.wsrep_cluster_name }}
 wsrep_provider = {{ galera.wsrep_provider }}
 wsrep_node_name = {{ galera.wsrep_node_name }}
-wsrep_cluster_address=gcomm://{{ ",".join(cluster_members) }}
+wsrep_cluster_address=gcomm://{{ ",".join(neighbor_members) }}
 
 wsrep_slave_threads = {{ galera.wsrep_slave_threads }}
 wsrep_provider_options = "{{ galera.wsrep_provider_options }}"
@@ -27,7 +26,6 @@ wsrep_log_conflicts = {{ galera.wsrep_log_conflicts }}
 wsrep_certify_nonPK = {{ galera.wsrep_certify_nonPK }}
 wsrep_recover = {{ galera.wsrep_recover }}
 wsrep_retry_autocommit = {{ galera.wsrep_retry_autocommit }}
-
 
 [embedded]
 
@@ -60,17 +58,33 @@ wait_timeout = {{ mysqld.wait_timeout }}
 interactive_timeout = {{ mysqld.interactive_timeout }}
 connect_timeout = {{ mysqld.connect_timeout }}
 
+### Redo log
+innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
+innodb_log_file_size = {{ mysqld.innodb_log_file_size }}
+
 ### temporary tables ###
 tmp_table_size = {{ mysqld.tmp_table_size }}
 max_heap_table_size = {{ mysqld.max_heap_table_size }}
 tmpdir = {{ mysqld.tmpdir }}
 
 ### thread pool ###
+{% if use_thread_pool == 1 %}
 thread_handling = {{ mysqld.thread_handling }}
 thread_pool_size = {{ mysqld.thread_pool_size }}
 extra_port = {{ mysqld.extra_port }}
 extra_max_connections = {{ mysqld.extra_max_connections }}
 max_connections = {{ mysqld.max_connections }}
+{% else %}
+# I do not use thread pool
+{% endif %}
+
+### thread cache ###
+{% if use_thread_cache == 1 %}
+thread_cache_size = {{ mysqld.thread_cache_size }}
+max_connections = {{ mysqld.max_connections }}
+{% else %}
+# I do not use thread cache
+{% endif %}
 
 ### log ###
 log_output = {{ mysqld.log_output }}
@@ -83,8 +97,27 @@ slow_query_log_file = {{ mysqld.slow_query_log_file }}
 general_log = 0
 general_log_file = {{ mysqld.general_log_file }}
 
+### replication ###
+{% if use_gtid == 1 %}
+gtid_domain_id = {{ mysqld.gtid_domain_id }}
+{% endif %}
+report_host = {{ mysqld.report_host }}
+report_port = {{ mysqld.port }}
+expire_logs_days = {{ mysqld.expire_logs_days }}
+log_bin = {{ mysqld.report_host }}-bin
+log_bin_index = {{ mysqld.report_host }}-bin.log.index
+relay_log = {{ mysqld.report_host }}-relay-bin
+relay_log_index = {{ mysqld.report_host }}-relay-bin.index
+server_id = {{ mysqld.server_id }}
+log_slave_updates = 1
+binlog_format = ROW
+max_binlog_size = {{ mysqld.max_binlog_size }}
+
 [mariadb-{{ base_version }}]
 
 [xtrabackup]
 datadir = {{ dir.datadir }}
+socket = {{ mysqld.socket }}
 streamfmt = xbstream
+innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
+innodb_log_file_size = {{ mysqld.innodb_log_file_size }}

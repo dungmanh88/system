@@ -1,0 +1,12 @@
+default_mysqld_root_passwd: "{{ vault_mysqld_root_passwd }}"
+default_backup_port: 3306
+default_backup_name: NA
+default_backup_table_engine: innodb
+default_backup_use_galera: "true"
+
+is_backup: 0
+backup_method: NA
+
+default_bacula_fd_name: NA
+default_bacula_server_ip: NA
+

@@ -1,0 +1,80 @@
+#!/bin/bash
+
+user_name={{ backup.user_name }}
+user_password={{ backup.user_passwd }}
+backup_name={{ backup.name }}
+host={{ backup.host }}
+parallel={{ backup.parallel }}
+backup_output="/data/local-backup"
+temp_log="/var/log/mysql_backup.log.tmp"
+log="/var/log/mysql_backup.log"
+galera_param="--galera-info"
+myisam_param="--lock-wait-timeout=180 --lock-wait-threshold=20 --lock-wait-query-type=all --kill-long-queries-timeout=20 --kill-long-query-type=all"
+root_open_file_limit={{ backup.max_open_file }}
+email_list="{{ backup.email_list }}"
+mail_sender="localbackup@appota.com"
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+route add default gw {{ gateway_ip }} &> /dev/null
+
+function do_rm_backup() {
+    rm -rvf ${backup_output}/* &> ${temp_log}
+}
+
+function do_notify_on_error() {
+    status=$1
+    if [ ! $status -eq 0 ]; then
+        inter=$(route -n | grep "UG" | awk '{print $8}' | sort -n | uniq)
+        if [ -z $inter ]; then
+            echo "No gateway" >> ${temp_log}
+            return 1
+        fi
+        ip=$(ip a | grep inet | grep $inter | awk '{print $2}' | sed -e 's/\/.*$//')
+        mail -r ${mail_sender} -s "Backup Error at server with ip=${ip} and hostname=`hostname`" ${email_list} < ${temp_log}
+    fi
+}
+
+function do_backup () {
+    engine=$1
+    use_galera=$2
+
+    #echo "engine=$engine, use_galera=$use_galera"
+    if [[ $use_galera == "false" ]]; then
+        galera_param=""
+    fi
+    if [[ $engine == "innodb" ]]; then
+        myisam_param=""
+    fi
+    #echo "galera_param=$galera_param.myisam_param=$myisam_param."
+    ulimit -n ${root_open_file_limit}
+    innobackupex  --user=${user_name} --password=${user_password} --host=${host} ${galera_param} --parallel=${parallel} ${myisam_param} ${backup_output} &>> ${temp_log}
+    status=$?
+    do_notify_on_error $status
+    return $status
+}
+
+function do_mv_backup () {
+    recent_backup=$(grep "created in directory" ${temp_log} | sed -nr "s/.*directory '([^']*)'.*/\1/p")
+    echo "RECENT_BACKUP=$recent_backup." >> ${temp_log}
+    mv ${recent_backup} ${backup_output}/mysql-${backup_name}
+}
+
+function do_save_log() {
+    echo "============================ SAVED LOG AT `date`====================" >> ${log}
+    cat ${temp_log} >> ${log}
+}
+
+which innobackupex &> /dev/null
+if [ ! $? -eq 0 ]; then
+    echo "You must install percona-xtrabackup"
+    exit 1
+fi
+
+(
+# Wait for lock on /var/lock/.myscript.lock (fd 200) for 10 seconds
+flock -x -w 80 200 || exit 1
+    do_rm_backup
+    # DEPEND YOUR DB, CUSTOMIZE THIS COMMAND
+    do_backup {{ backup.table_engine }} {{ backup.use_galera }} && do_mv_backup
+    do_save_log
+) 200>/var/lock/.mysql_backup.lock

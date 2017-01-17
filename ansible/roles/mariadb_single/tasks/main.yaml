@@ -1,6 +1,17 @@
 - include_vars: vault/main.yaml
   tags: include
 
+- name: Check mysql service is running
+  command: service mysql status
+  register: check_mysql
+  ignore_errors: yes
+  changed_when: False
+  check_mode: no  
+
+- name: Throw error if mysql is running
+  fail: msg="Please turn off mysql service"
+  when: check_mysql.rc == 0
+
 - name: Install Mariadb 10.0.21 on CentOS 6
   copy: src=MariaDB-CentOS6-10.0.21.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
   when: 
@@ -15,41 +26,55 @@
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
 
-#- name: Install MariaDB 
-#  yum: name="{{ item }}" update_cache=yes 
-#  with_items:
-#  - MariaDB-client
-#  - MariaDB-server
-#  - MariaDB-devel
+- name: Install MariaDB 
+  yum: name="{{ item }}" update_cache=yes 
+  with_items:
+  - MariaDB-client
+  - MariaDB-server
+  - MariaDB-devel
 
-#- name: Add percona repo
-#  yum: name="{{ repos.url }}" update_cache=yes
-#  when:
-#    - ansible_distribution == "{{ repos.distribution_centos }}"
+- name: Add percona repo
+  yum: name="{{ repos.url }}" update_cache=yes
+  when:
+    - ansible_distribution == "{{ repos.distribution_centos }}"
 
-#- name: Install percona-toolkit and percona-xtrabackup
-#  yum: name="{{ item }}" update_cache=yes 
-#  with_items:
-#  - percona-xtrabackup
-#  - percona-toolkit
+- name: Install percona-toolkit and percona-xtrabackup
+  yum: name="{{ item }}" update_cache=yes 
+  with_items:
+  - percona-xtrabackup
+  - percona-toolkit
 
-#- name: Get pip
-#  get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/tmp/get-pip.py mode=0644
+- name: Get pip
+  get_url: url={{ pip_url }} dest=/tmp/get-pip.py mode=0644
  
-#- name: Install pip
-#  command: /usr/bin/python get-pip.py
-#  args:
-#    chdir: /tmp
+- name: Install pip
+  command: /usr/bin/python get-pip.py
+  args:
+    chdir: /tmp
 
-#- name: Install MySQL-python
-#  pip: name=MySQL-python
+- name: Install MySQL-python
+  pip: name=MySQL-python
 
 - name: Create dir
   file: path="{{ item }}" state=directory owner=mysql group=mysql
   with_items: 
   - "{{ dir.datadir }}"
   - "{{ dir.logdir }}"
+  - "{{ dir.tmpdir }}"
   - "{{ mysqld.tmpdir }}"
+  - "{{ dir.datadir_origin }}"
+  ignore_errors: yes
+
+- name: Move /var/lib/mysql to /var/lib/mysql.bak
+  command: mv "{{ dir.datadir }}" /var/lib/mysql.bak
+  when: dir.datadir_origin != dir.datadir
+
+- name: Create softlink
+  file: 
+    src: "{{ dir.datadir_origin }}"
+    dest: "{{ dir.datadir }}"  
+    state: link
+  when: dir.datadir_origin != dir.datadir
 
 - name: Config MariaDB
   template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
@@ -143,6 +168,14 @@
     - ::1   
     - localhost
   ignore_errors: yes
+
+- name: Set /root/.my.cnf
+  template:
+    src: client.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0440
 
 - name: Check mariadb status
   command: service mysql status

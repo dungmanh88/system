@@ -1,0 +1,30 @@
+- include_vars: vault/main.yaml
+
+- name: Copy script install bacula client
+  template: src=bacula_client.sh.j2 dest=/tmp/install_bacula_client.sh owner=root group=root mode=0744
+
+- name: Run script install bacula client
+  shell: /tmp/install_bacula_client.sh
+
+- name: Throw error if is_backup equals 0
+  fail: msg="I will not install backup on this server"
+  when: is_backup == 0
+
+- name: Install script
+  template:
+    src: xtrabackup.sh.j2
+    dest: /usr/local/bin/db_backup.sh
+    owner: root
+    group: root
+    mode: 0744
+  when: 
+    - backup_method == "xtrabackup"
+    - is_backup == 1
+
+- name: Schedule by crontab
+  cron:
+    name: "Backup db daily"
+    minute: 1
+    hour: 0
+    job: "/usr/local/bin/db_backup.sh" 
+  when: is_backup == 1

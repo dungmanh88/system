@@ -1,0 +1,67 @@
+#!/bin/bash
+
+LOCAL_STATE="Synced"
+READY="ON"
+CLUSTER_STATUS="Primary"
+CONNECTED="ON"
+
+MYSQL_HOST="{{ checker.host }}"
+MYSQL_PORT="{{ checker.port }}"
+MYSQL_USERNAME="{{ checker.name }}"
+MYSQL_PASSWORD="{{ checker.passwd }}"
+
+echo=`which echo`
+mysql=`which mysql`
+grep=`which grep`
+awk=`which awk`
+
+QUERY1=`$mysql --host $MYSQL_HOST --port $MYSQL_PORT --user $MYSQL_USERNAME -p"$MYSQL_PASSWORD" -e'show status like "wsrep_cluster_status"' 2>/dev/null`
+
+QUERY2=`$mysql --host $MYSQL_HOST --port $MYSQL_PORT --user $MYSQL_USERNAME -p"$MYSQL_PASSWORD" -e'show status like "wsrep_ready"' 2>/dev/null`
+
+QUERY3=`$mysql --host $MYSQL_HOST --port $MYSQL_PORT --user $MYSQL_USERNAME -p"$MYSQL_PASSWORD" -e'show status like "wsrep_local_state_comment"' 2>/dev/null`
+
+QUERY4=`$mysql --host $MYSQL_HOST --port $MYSQL_PORT --user $MYSQL_USERNAME -p"$MYSQL_PASSWORD" -e'show status like "wsrep_connected"' 2>/dev/null`
+
+function set_health() {
+    if [ "$1" == "ok" ]; then
+        $echo -e "HTTP/1.1 200 OK\r\n"
+        $echo -e "Content-Type: Content-Type: text/plain\r\n"
+        $echo -e "\r\n"
+        $echo -e "MySQL is ALIVE.\r\n"
+        $echo -e "\r\n"
+    else
+        $echo -e "HTTP/1.1 503 Service Unavailable\r\n"
+        $echo -e "Content-Type: Content-Type: text/plain\r\n"
+        $echo -e "\r\n"
+        $echo -e "MySQL is DEAD.\r\n"
+        $echo -e "\r\n"
+    fi
+}
+
+
+cluster_status=`echo "$QUERY1" | $grep "wsrep_cluster_status" | $awk '{print $2}'`
+
+is_ready=`echo "$QUERY2" | $grep "wsrep_ready" | $awk '{print $2}'`
+
+local_state=`echo "$QUERY3" | $grep "wsrep_local_state_comment"  | $awk '{print $2}'`
+
+is_connected=`echo "$QUERY4" | $grep "wsrep_connected"  | $awk '{print $2}'`
+
+if [[ ! -n $cluster_status || $cluster_status != $CLUSTER_STATUS ]]; then
+    set_health fail
+    exit
+fi
+if [[ ! -n $is_ready || $is_ready != $READY ]]; then
+    set_health fail
+    exit
+fi
+if [[ ! -n $local_state || $local_state != $LOCAL_STATE ]]; then
+    set_health fail
+    exit
+fi
+if [[ ! -n $is_connected || $is_connected != $CONNECTED ]]; then
+    set_health fail
+    exit
+fi
+set_health ok

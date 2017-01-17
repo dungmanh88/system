@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -x
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+pmm_url={{ pmm.url }}
+pmm_server={{ pmm.server }}
+pmm_user={{ pmm.user }}
+pmm_passwd={{ pmm.passwd }}
+
+yum -y install ${pmm_url} && yum -y install pmm-client
+pmm-admin config --server ${pmm_server} --server-user ${pmm_user} --server-password ${pmm_passwd} --server-insecure-ssl
+
+{% if pmm_type == "mysql" %}
+mysql_user={{ pmm.mysql.user }}
+mysql_passwd={{ pmm.mysql.passwd }}
+mysql_port={{ pmm.mysql.port }}
+mysql_host={{ pmm.mysql.host }}
+ps -lef | grep mysqld | grep -v "grep"
+[ $? -eq 0 ] && pmm-admin add mysql --host=${mysql_host} --user ${mysql_user} --port ${mysql_port} --password ${mysql_passwd}
+{% elif pmm_type == "mongo" %}
+mongo_uri=mongodb://${mongo_user}:${mongo_passwd}@${mongo_host}:${mongo_port}/${mongo_db}
+ps -lef | grep mongod | grep -v "grep"
+if [[ $? -eq 0 && ! -z mongo_user && ! -z mongo_passwd ]]; then
+  pmm-admin add mongodb --uri ${mongo_uri}
+fi
+{% endif %}
