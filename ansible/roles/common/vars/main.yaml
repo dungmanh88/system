@@ -5,12 +5,6 @@ admins:
     - name: "{{ vault_dungnm_name }}"
       passwd: "{{ vault_dungnm_passwd }}"
       full_name: "{{ vault_dungnm_full_name }}"
-    - name: "{{ vault_thuandd_name }}"
-      passwd: "{{ vault_thuandd_passwd }}"
-      full_name: "{{ vault_thuandd_full_name }}"
-    - name: "{{ vault_longdv_name }}"
-      passwd: "{{ vault_longdv_passwd }}"
-      full_name: "{{ vault_longdv_full_name }}"
   cmd_alias: |
     Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
     Cmnd_Alias  SHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
