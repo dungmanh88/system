@@ -1,16 +1,16 @@
 - include_vars: vault/main.yaml
-#- name: Set hostname
-#  hostname:
-#    name: "{{ hostname }}"
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
 
-#- name: Config /etc/hosts follow hostname
-#  lineinfile:
-#    dest: /etc/hosts
-#    state: present
-#    line: '{{ item }}'
-#  with_items:
-#    - "127.0.0.1 {{ hostname }}"
-#    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
+- name: Config /etc/hosts follow hostname
+  lineinfile:
+    dest: /etc/hosts
+    state: present
+    line: '{{ item }}'
+  with_items:
+    - "127.0.0.1 {{ hostname }}"
+    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
     
 - name: Config temporary gateway
   command: route add default gw "{{ gateway_ip }}"
@@ -92,14 +92,14 @@
     name: "{{ admins.group }}"
     state: present
 
-#- name: Create sudoers for admins group
-#  template:
-#    src: admins.conf.j2
-#    dest: "{{ admins.file }}"
-#    owner: root
-#    group: root
-#    mode: 0440
-#    validate: 'visudo -cf %s' 
+- name: Create sudoers for admins group
+  template:
+    src: admins.conf.j2
+    dest: "{{ admins.file }}"
+    owner: root
+    group: root
+    mode: 0440
+    validate: 'visudo -cf %s' 
 
 - name: Create administrator accounts
   user:
