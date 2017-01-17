@@ -72,3 +72,4 @@ packages:
    - tmux
    - tcpdump
    - ncdu
+   - git
