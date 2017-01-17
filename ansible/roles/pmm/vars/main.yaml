@@ -7,7 +7,7 @@ pmm:
     user: "{{ default_pmm_mysql_user }}"
     passwd: "{{ default_pmm_mysql_passwd }}"
     port: "{{ default_pmm_mysql_port }}"
-    host: 127.0.0.1
+    host: "{{ default_pmm_mysql_host }}"
   mongo:
     user: "{{ default_pmm_mongo_user }}"
     passwd: "{{ default_pmm_mongo_passwd }}"

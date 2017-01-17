@@ -2,6 +2,7 @@ default_pmm_server: NA
 default_pmm_mysql_user: NA
 default_pmm_mysql_passwd: NA
 default_pmm_mysql_port: 3306
+default_pmm_mysql_host: localhost
 default_pmm_mongo_user: NA
 default_pmm_mongo_passwd: NA
 default_pmm_mongo_port: 27017
