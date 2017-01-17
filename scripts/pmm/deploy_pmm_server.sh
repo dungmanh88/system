@@ -3,7 +3,7 @@
 set -e
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-pmm_version=pmm-server:1.0.6
+pmm_version=pmm-server:1.0.7
 pmm_user=
 pmm_passwd=
 
