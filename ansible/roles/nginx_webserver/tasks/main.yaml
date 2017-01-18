@@ -5,15 +5,18 @@
     mode: 0644
     owner: root
     group: root
+  when: is_built == 1
 
 - name: Unarchive nginx
   unarchive:
     src: "/tmp/{{ nginx_version }}.tar.gz"
     dest: /tmp
     remote_src: yes
+  when: is_built == 1
 
 - name: Install nginx
   shell: cd /tmp/{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install
+  when: is_built == 1
 
 - name: Create group nginx
   group: 
@@ -47,7 +50,6 @@
 
 - name: Update config nginx global
   template: src=nginx.conf.j2 dest="{{ nginx_installation.dir }}/conf/nginx.conf" backup=yes
-  with_items: "{{ nginx_vhosts }}"
   notify: restart and enable nginx
 
 - name: Create link to binary

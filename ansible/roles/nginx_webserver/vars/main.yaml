@@ -22,6 +22,7 @@ nginx_conf:
   worker_processes: 1
   worker_connections: 1024
   vhosts_dir: "{{ nginx_installation.dir }}/conf.d"
+  upstream: "{{ nginx_installation.dir }}/conf/upstream.conf"
   
 nginx_proxy:
   cache_dir: /data/nginx/cache

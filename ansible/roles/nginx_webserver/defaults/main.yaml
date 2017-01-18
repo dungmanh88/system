@@ -12,8 +12,10 @@ default_nginx_vhosts:
       location /{
         index index.html index.php;
       }
-    upstreams:
-      - 192.168.10.122:80
+    upstreams: |
+      upstream test1 {
+        192.168.10.121:80;
+      }
 
   - service_name: test2
     name: "vhost2.example.com"
@@ -28,8 +30,13 @@ default_nginx_vhosts:
       location /{
         index index.html index.php;
       }
-    upstreams:
-      - 192.168.10.122:80
+    upstreams: |
+      upstream test2 {
+        192.168.10.122:80;
+      }
 
-### role: web|proxy|proxy_cache
-role: web
+### role: backend|proxy|proxy_cache
+role: backend
+
+### is_built: 0
+is_built: 0

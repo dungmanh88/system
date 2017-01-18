@@ -6,3 +6,24 @@
     mode: 0744
     state: directory
 
+- name: Create file upstream.conf
+  file:
+    path: "{{ nginx_conf.upstream }}"
+    mode: 0644
+    owner: nginx
+    group: nginx
+    state: touch
+
+- name: Update upstream.conf
+  blockinfile:
+    dest: "{{ nginx_conf.upstream }}"
+    owner: nginx
+    group: nginx
+    mode: 0644
+    backup: yes
+    block: |
+      {{ item.upstreams }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.service_name }}"
+  with_items: "{{ nginx_vhosts }}"
+  notify: reload nginx
+
