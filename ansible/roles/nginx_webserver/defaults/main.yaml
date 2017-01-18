@@ -1,7 +1,7 @@
 default_nginx_vhosts:
   - name: "vhost1.example.com"
     listen: 80
-    server_name: "vhost1.exampl.com"
+    server_name: "vhost1.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_conf.log_dir }}/vhost1.example.com"
     access_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/access.log"
@@ -13,7 +13,7 @@ default_nginx_vhosts:
       }
   - name: "vhost2.example.com"
     listen: 80
-    server_name: "vhost2.exampl.com"
+    server_name: "vhost2.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_conf.log_dir }}/vhost2.example.com"
     access_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/access.log"
