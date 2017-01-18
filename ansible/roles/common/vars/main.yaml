@@ -1,10 +1,6 @@
 admins:
   group: "{{ vault_admin_group }}"
   file: /etc/sudoers.d/admins
-  users:
-    - name: "{{ vault_dungnm_name }}"
-      passwd: "{{ vault_dungnm_passwd }}"
-      full_name: "{{ vault_dungnm_full_name }}"
   cmd_alias: |
     Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
     Cmnd_Alias  SHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
@@ -12,9 +8,9 @@ admins:
     Cmnd_Alias  NDD = /bin/dd 
   cmd: ALL=(ALL) ALL, !SHELLS, !SU, !SHUTDOWN, !NDD
 
-root:
-  name: "{{ vault_root_name }}"
-  recovery_passwd: "{{ vault_root_recovery_passwd }}"  
+admin_users: "{{ default_admin_users }}"
+
+root: "{{ default_root_user }}"
 
 nameservers: |
    nameserver 8.8.8.8

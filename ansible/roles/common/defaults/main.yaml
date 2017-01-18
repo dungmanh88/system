@@ -1,2 +1,6 @@
 gateway_ip: NA
 gateway_persistent: true
+
+default_admin_users: NA
+
+default_root_user: NA
