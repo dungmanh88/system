@@ -16,8 +16,11 @@ os:
     version5: 5
 
 nginx_conf:
-  pid: /run/nginx/nginx.pid
+  pid: /run/nginx.pid
+  log_dir: /var/log/nginx
   user: "{{ nginx_installation.user_name }}"
   worker_processes: 1
   worker_connections: 1024
+  vhosts_dir: "{{ nginx_installation.dir }}/conf.d"
 
+nginx_vhosts: "{{ default_nginx_vhosts }}"

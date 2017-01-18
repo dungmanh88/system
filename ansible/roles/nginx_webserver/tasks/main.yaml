@@ -29,17 +29,17 @@
     home: /dev/null
     comment: "{{ nginx_installation.full_name }}"
 
-- name: Create pid
-  file:
-    path: /run/nginx
-    owner: root
-    group: root
-    mode: 0660
-    state: directory
+#- name: Create pid
+#  file:
+#    path: /run/nginx
+#    owner: root
+#    group: root
+#    mode: 0660
+#    state: directory
 
 - name: Create log
   file:
-    path: /var/log/nginx
+    path: "{{ nginx_conf.log_dir }}"
     owner: "{{ nginx_installation.user_name }}"
     group: "{{ nginx_installation.group_name }}"
     mode: 0660
@@ -47,6 +47,7 @@
 
 - name: Update config nginx global
   template: src=nginx.conf.j2 dest="{{ nginx_installation.dir }}/conf/nginx.conf" backup=yes
+  notify: restart and enable nginx
 
 - name: Create link to binary
   file: 
@@ -59,9 +60,8 @@
   when:
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+  notify: restart and enable nginx
 
-- name: Restart and enable nginx
-  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
-  when:
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+- name: Install vhosts
+  include: vhosts.yaml
+  tags: "vhosts"

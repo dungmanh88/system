@@ -1,0 +1,26 @@
+default_nginx_vhosts:
+  - name: "vhost1.example.com"
+    listen: 80
+    server_name: "vhost1.exampl.com"
+    index: "index.php index.html"
+    log_dir: "{{ nginx_conf.log_dir }}/vhost1.example.com"
+    access_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/access.log"
+    error_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/error.log"
+    root: "/var/www/vhost1.example.com"
+    locations: |
+      location /{
+        index index.html index.php;
+      }
+  - name: "vhost2.example.com"
+    listen: 80
+    server_name: "vhost2.exampl.com"
+    index: "index.php index.html"
+    log_dir: "{{ nginx_conf.log_dir }}/vhost2.example.com"
+    access_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/access.log"
+    error_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/error.log"
+    root: "/var/www/vhost2.example.com"
+    locations: |
+      location /{
+        index index.html index.php;
+      }
+

@@ -1,0 +1,11 @@
+- name: reload nginx
+  systemd: name=nginx.service  state=reloaded
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: restart and enable nginx
+  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"

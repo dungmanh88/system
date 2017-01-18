@@ -1,0 +1,36 @@
+- name: Setup config dir for vhost
+  file:
+    path: "{{ nginx_conf.vhosts_dir }}"
+    owner: nginx
+    group: nginx
+    mode: 0750
+    state: directory
+
+- name: Setup log dir for vhost
+  file: 
+    path: "{{ item.log_dir }}"
+    owner: nginx
+    group: nginx
+    mode: 0750
+    state: directory
+  with_items: "{{ nginx_vhosts }}"
+
+- name: Setup root dir for vhost
+  file:
+    path: "{{ item.root }}"
+    owner: nginx
+    group: nginx
+    mode : 0750
+    state: directory
+  with_items: "{{ nginx_vhosts }}"
+
+- name: Setup config for vhost
+  template:
+    src: nginx.vhosts.conf.j2
+    dest: "{{ nginx_conf.vhosts_dir }}/{{ item.name }}.conf"
+    owner: nginx
+    group: nginx
+    mode: 0640
+  with_items: "{{ nginx_vhosts }}"
+  notify: reload nginx
+
