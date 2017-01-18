@@ -47,6 +47,7 @@
 
 - name: Update config nginx global
   template: src=nginx.conf.j2 dest="{{ nginx_installation.dir }}/conf/nginx.conf" backup=yes
+  with_items: "{{ nginx_vhosts }}"
   notify: restart and enable nginx
 
 - name: Create link to binary
@@ -65,3 +66,8 @@
 - name: Install vhosts
   include: vhosts.yaml
   tags: "vhosts"
+
+- name: Install nginx as proxy cache
+  include: proxy_cache.yaml
+  when: role == "proxy_cache"
+  tags: "proxy_cache"

@@ -1,0 +1,8 @@
+- name: Create proxy cache path
+  file:
+    name: "{{ nginx_proxy.cache_dir }}"
+    owner: nginx
+    group: nginx
+    mode: 0744
+    state: directory
+

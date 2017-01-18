@@ -1,5 +1,6 @@
 default_nginx_vhosts:
-  - name: "vhost1.example.com"
+  - service_name: test1
+    name: "vhost1.example.com"
     listen: 80
     server_name: "vhost1.example.com"
     index: "index.php index.html"
@@ -11,7 +12,11 @@ default_nginx_vhosts:
       location /{
         index index.html index.php;
       }
-  - name: "vhost2.example.com"
+    upstreams:
+      - 192.168.10.122:80
+
+  - service_name: test2
+    name: "vhost2.example.com"
     listen: 80
     server_name: "vhost2.example.com"
     index: "index.php index.html"
@@ -23,4 +28,8 @@ default_nginx_vhosts:
       location /{
         index index.html index.php;
       }
+    upstreams:
+      - 192.168.10.122:80
 
+### role: web|proxy|proxy_cache
+role: web

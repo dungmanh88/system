@@ -22,5 +22,15 @@ nginx_conf:
   worker_processes: 1
   worker_connections: 1024
   vhosts_dir: "{{ nginx_installation.dir }}/conf.d"
+  
+nginx_proxy:
+  cache_dir: /data/nginx/cache
+  levels: "1:2"
+  keys_zone: "my_cache:10m"
+  max_size: 10g
+  inactive: 60m
+  use_temp_path: "off"
+
+proxy_cache_path: "{{ nginx_proxy.cache_dir }} levels={{ nginx_proxy.levels }} keys_zone={{ nginx_proxy.keys_zone }} max_size={{ nginx_proxy.max_size }} inactive={{ nginx_proxy.inactive }} use_temp_path={{ nginx_proxy.use_temp_path }}"
 
 nginx_vhosts: "{{ default_nginx_vhosts }}"

@@ -22,5 +22,16 @@ http {
     sendfile        on;
     keepalive_timeout  65;
 
+{% if role == "proxy_cache" %}
+{% if item.upstreams is defined %}
+upstream {{ item.service_name|indent(4) }} {
+{% for backend in item.upstreams %}
+{{ backend|indent(6) }};
+{% endfor %}
+}
+{% endif %}
+proxy_cache_path {{ proxy_cache_path|indent(4) }};
+{% endif %}
+
     include {{ nginx_conf.vhosts_dir }}/*.conf;
 }
