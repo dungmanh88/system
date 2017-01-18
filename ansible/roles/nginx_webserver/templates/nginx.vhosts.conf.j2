@@ -22,6 +22,15 @@ server {
     error_log {{ item.error_log }} error;
 {% endif %}
 
+    location / {
+{% if role == "proxy" or role == "proxy_cache" %}
+      proxy_pass http://{{ item.upstream.name }};
+{% endif %}
+{% if role == "proxy_cache" %}
+      proxy_cache {{ item.cache_name }};
+{% endif %}
+      index index.html index.php;
+    }
 {% if item.locations is defined %}
     {{ item.locations|indent(4) }}
 {% endif %}

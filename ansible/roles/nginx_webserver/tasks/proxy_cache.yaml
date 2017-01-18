@@ -1,14 +1,23 @@
 - name: Create proxy cache path
   file:
-    name: "{{ nginx_proxy.cache_dir }}"
+    name: "{{ item.cache_dir }}"
     owner: nginx
     group: nginx
     mode: 0744
     state: directory
+  with_items: "{{ nginx_vhosts }}"
 
 - name: Create file upstream.conf
   file:
     path: "{{ nginx_conf.upstream }}"
+    mode: 0644
+    owner: nginx
+    group: nginx
+    state: touch
+
+- name: Create file proxy_cache_path.conf
+  file:
+    path: "{{ nginx_conf.proxy_cache_path }}"
     mode: 0644
     owner: nginx
     group: nginx
@@ -22,8 +31,18 @@
     mode: 0644
     backup: yes
     block: |
-      {{ item.upstreams }}
-    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.service_name }}"
+      {{ item.upstream.content }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.upstream.name }}"
   with_items: "{{ nginx_vhosts }}"
   notify: reload nginx
 
+- name: Update proxy_cache_path.conf
+  lineinfile:
+    dest: "{{ nginx_conf.proxy_cache_path }}"
+    owner: nginx
+    group: nginx
+    mode: 0644
+    backup: yes
+    line: "proxy_cache_path {{ item.proxy_cache_path }};"
+  with_items: "{{ nginx_vhosts }}"
+  notify: reload nginx

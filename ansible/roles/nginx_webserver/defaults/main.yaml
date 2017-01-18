@@ -8,14 +8,19 @@ default_nginx_vhosts:
     access_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/access.log"
     error_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/error.log"
     root: "/var/www/vhost1.example.com"
-    locations: |
-      location /{
-        index index.html index.php;
-      }
-    upstreams: |
-      upstream test1 {
-        192.168.10.121:80;
-      }
+#    locations: |
+#      location /{
+#        index index.html index.php;
+#      }
+    upstream:
+      name: test1
+      content: |
+        upstream test1 {
+          server 192.168.10.122:80;
+        }
+    cache_dir: /data/nginx/cache/test1
+    cache_name: test1_cache
+    proxy_cache_path: /data/nginx/cache/test1 levels=1:2 keys_zone=test1_cache:10m max_size=1g inactive=60m use_temp_path=off
 
   - service_name: test2
     name: "vhost2.example.com"
@@ -26,14 +31,19 @@ default_nginx_vhosts:
     access_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/access.log"
     error_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/error.log"
     root: "/var/www/vhost2.example.com"
-    locations: |
-      location /{
-        index index.html index.php;
-      }
-    upstreams: |
-      upstream test2 {
-        192.168.10.122:80;
-      }
+#    locations: |
+#      location /{
+#        index index.html index.php;
+#      }
+    upstream:
+      name: test2
+      content: | 
+        upstream test2 {
+          server 192.168.10.122:80;
+        }
+    cache_dir: /data/nginx/cache/test2
+    cache_name: test2_cache
+    proxy_cache_path: /data/nginx/cache/test2 levels=1:2 keys_zone=test2_cache:10m max_size=1g inactive=60m use_temp_path=off
 
 ### role: backend|proxy|proxy_cache
 role: backend

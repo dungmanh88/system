@@ -25,7 +25,7 @@ http {
     include {{ nginx_conf.upstream|indent(4) }};
 {% endif %}
 {% if role == "proxy_cache" %}
-    proxy_cache_path {{ proxy_cache_path|indent(4) }};
+    include {{ nginx_conf.proxy_cache_path|indent(4) }};
 {% endif %}
     include {{ nginx_conf.vhosts_dir }}/*.conf;
 }
