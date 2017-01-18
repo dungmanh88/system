@@ -1,0 +1,67 @@
+- name: Download nginx
+  get_url: 
+    url: "{{ nginx_installation.url }}"
+    dest: "/tmp/{{ nginx_version }}.tar.gz"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Unarchive nginx
+  unarchive:
+    src: "/tmp/{{ nginx_version }}.tar.gz"
+    dest: /tmp
+    remote_src: yes
+
+- name: Install nginx
+  shell: cd /tmp/{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install
+
+- name: Create group nginx
+  group: 
+    name: "{{ nginx_installation.group_name }}"
+    state: present
+
+- name: Create user nginx
+  user:
+    name: "{{ nginx_installation.user_name }}"
+    group: "{{ nginx_installation.group_name }}"
+    state: present
+    shell: /sbin/nologin
+    home: /dev/null
+    comment: "{{ nginx_installation.full_name }}"
+
+- name: Create pid
+  file:
+    path: /run/nginx
+    owner: root
+    group: root
+    mode: 0660
+    state: directory
+
+- name: Create log
+  file:
+    path: /var/log/nginx
+    owner: "{{ nginx_installation.user_name }}"
+    group: "{{ nginx_installation.group_name }}"
+    mode: 0660
+    state: directory
+
+- name: Update config nginx global
+  template: src=nginx.conf.j2 dest="{{ nginx_installation.dir }}/conf/nginx.conf" backup=yes
+
+- name: Create link to binary
+  file: 
+    src: "{{ nginx_installation.dir }}/sbin/nginx"
+    dest: /usr/sbin/nginx
+    state: link
+ 
+- name: Create nginx service
+  template: src=nginx.systemd.j2 dest=/usr/lib/systemd/system/nginx.service backup=yes
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+
+- name: Restart and enable nginx
+  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"

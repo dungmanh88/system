@@ -1,0 +1,23 @@
+nginx_version: nginx-1.11.8
+nginx_installation:
+  url: "https://nginx.org/download/{{ nginx_version }}.tar.gz"
+  group_name: nginx
+  user_name: nginx
+  full_name: nginx user
+  dir: /etc/nginx
+  
+nginx_compiling_params: "--prefix={{ nginx_installation.dir }} --user={{ nginx_installation.user_name }} --group={{ nginx_installation.group_name }}"
+
+os:
+  distribution_centos:
+    name: CentOS
+    version7: 7
+    version6: 6
+    version5: 5
+
+nginx_conf:
+  pid: /run/nginx/nginx.pid
+  user: "{{ nginx_installation.user_name }}"
+  worker_processes: 1
+  worker_connections: 1024
+
