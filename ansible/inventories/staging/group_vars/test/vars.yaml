@@ -2,3 +2,30 @@ gateway_ip: 192.168.10.1
 gateway_persistent: true
 
 default_mongodb_port: 38128
+
+default_nginx_vhosts:
+  - service_name: hotel
+    name: "hotel.example.com"
+    listen: 80
+    server_name: "hotel.example.com"
+    index: "index.php index.html index.php"
+    log_dir: "{{ nginx_conf.log_dir }}/hotel.example.com"
+    access_log: "{{ nginx_conf.log_dir }}/hotel.example.com/access.log"
+    error_log: "{{ nginx_conf.log_dir }}/hotel.example.com/error.log"
+    root: "/var/www/hotel.example.com"
+    locations: |
+      location ~ \.php$ {
+        fastcgi_pass {{ default_php_fpm_unix }};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include {{ nginx_installation.dir }}/conf/fastcgi_params;
+      }
+    upstream:
+      name: hotel
+      content: |
+        upstream hotel {
+          server 192.168.10.122:80;
+        }
+    cache_dir: /data/nginx/cache/hotel
+    cache_name: hotel_cache
+    proxy_cache_path: /data/nginx/cache/hotel levels=1:2 keys_zone=hotel_cache:10m max_size=1g inactive=60m use_temp_path=off
