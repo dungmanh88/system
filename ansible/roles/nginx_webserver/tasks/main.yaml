@@ -18,6 +18,13 @@
   shell: cd /tmp/{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install
   when: is_built == 1
 
+- name: Install dependencies package supports framework, such as php
+  yum: name="{{ item }}"
+  with_items: "{{ frmwrk_php }}"
+  when:
+    - use_processor == 1
+    - frmwrk == "php" 
+
 - name: Create group nginx
   group: 
     name: "{{ nginx_installation.group_name }}"
@@ -77,3 +84,10 @@
   include: proxy_cache.yaml
   when: role == "proxy_cache"
   tags: "proxy_cache"
+
+- name: Install php-fpm 
+  include: php-fpm.yaml
+  when: 
+    - use_processor == 1 
+    - processor == "php_fpm"
+

@@ -27,5 +27,11 @@ http {
 {% if role == "proxy_cache" %}
     include {{ nginx_conf.proxy_cache_path|indent(4) }};
 {% endif %}
+    server {
+      listen 80 default_server;
+      location / {
+        deny all;
+      }
+    }
     include {{ nginx_conf.vhosts_dir }}/*.conf;
 }

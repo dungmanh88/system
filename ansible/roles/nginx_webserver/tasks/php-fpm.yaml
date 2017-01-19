@@ -1,0 +1,24 @@
+- name: Install processor, such as php-fpm
+  yum: name="{{ item }}"
+  with_items: "{{ processor_php_fpm }}"
+  when:
+    - use_processor == 1
+    - processor == "php_fpm"
+
+- name: Config php-fpm
+  template: src=php_fpm.conf.j2 dest=/etc/php-fpm.conf backup=yes
+  when:
+    - use_processor == 1
+    - processor == "php_fpm"
+
+- name: Config php-fpm.d/www.conf
+  template: src=php_fpm.d.www.conf.j2 dest=/etc/php-fpm.d/www.conf backup=yes
+  when:
+    - use_processor == 1
+    - processor == "php_fpm"
+
+- name: restart and enable php-fpm
+  systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"

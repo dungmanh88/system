@@ -3,15 +3,18 @@ default_nginx_vhosts:
     name: "vhost1.example.com"
     listen: 80
     server_name: "vhost1.example.com"
-    index: "index.php index.html"
+    index: "index.php index.html index.php"
     log_dir: "{{ nginx_conf.log_dir }}/vhost1.example.com"
     access_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/access.log"
     error_log: "{{ nginx_conf.log_dir }}/vhost1.example.com/error.log"
     root: "/var/www/vhost1.example.com"
-#    locations: |
-#      location /{
-#        index index.html index.php;
-#      }
+    locations: |
+      location ~ \.php$ {
+        fastcgi_pass {{ default_php_fpm_unix }};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include {{ nginx_installation.dir }}/conf/fastcgi_params;
+      }
     upstream:
       name: test1
       content: |
@@ -26,15 +29,18 @@ default_nginx_vhosts:
     name: "vhost2.example.com"
     listen: 80
     server_name: "vhost2.example.com"
-    index: "index.php index.html"
+    index: "index.php index.html index.php"
     log_dir: "{{ nginx_conf.log_dir }}/vhost2.example.com"
     access_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/access.log"
     error_log: "{{ nginx_conf.log_dir }}/vhost2.example.com/error.log"
     root: "/var/www/vhost2.example.com"
-#    locations: |
-#      location /{
-#        index index.html index.php;
-#      }
+    locations: |
+      location ~ \.php$ {
+        fastcgi_pass {{ default_php_fpm_unix }};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include {{ nginx_installation.dir }}/conf/fastcgi_params;
+      }
     upstream:
       name: test2
       content: | 
@@ -48,5 +54,17 @@ default_nginx_vhosts:
 ### role: backend|proxy|proxy_cache
 role: backend
 
-### is_built: 0
+default_php_fpm_listen: /var/run/php-fpm/php-fpm.sock
+default_php_fpm_unix: "unix:{{ default_php_fpm_listen }}"
+
+### is_built: 0|1
 is_built: 0
+
+### frmwrk: php
+frmwrk: php
+
+### use_processor: 0|1
+use_processor: 0
+
+### processor: php_fpm
+processor: php_fpm

@@ -26,3 +26,16 @@ nginx_conf:
   proxy_cache_path: "{{ nginx_installation.dir }}/conf/proxy_cache_path.conf"
   
 nginx_vhosts: "{{ default_nginx_vhosts }}"
+
+frmwrk_php:
+  - php
+  - php-mysql
+
+processor_php_fpm:
+  - php-fpm
+
+php_fpm:
+  listen: "{{ default_php_fpm_listen }}"
+  listen_owner: nobody
+  listen_group: nobody
+  listen_mode: 0660
