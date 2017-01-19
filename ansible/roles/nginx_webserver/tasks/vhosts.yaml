@@ -23,6 +23,7 @@
     mode : 0750
     state: directory
   with_items: "{{ nginx_vhosts }}"
+  when: role == "backend"
 
 - name: Setup config for vhost
   template:
