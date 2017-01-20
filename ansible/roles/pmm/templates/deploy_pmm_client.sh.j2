@@ -17,12 +17,15 @@ mysql_user={{ pmm.mysql.user }}
 mysql_passwd={{ pmm.mysql.passwd }}
 mysql_port={{ pmm.mysql.port }}
 mysql_host={{ pmm.mysql.host }}
+mysql_uri="{{ mysql_uri }}"
 ps -lef | grep mysqld | grep -v "grep"
-[ $? -eq 0 ] && pmm-admin add mysql --host=${mysql_host} --user ${mysql_user} --port ${mysql_port} --password ${mysql_passwd}
-{% elif pmm_type == "mongo" %}
-mongo_uri={{ mongo_uri }}
-ps -lef | grep mongod | grep -v "grep"
 if [ $? -eq 0 ]; then
+  pmm-admin add mysql ${mysql_uri}
+fi
+{% elif pmm_type == "mongo" %}
+mongo_uri="{{ mongo_uri }}"
+ps -lef | grep mongod | grep -v "grep"
+if [ $? -eq 0 ]; then 
   pmm-admin add mongodb --uri ${mongo_uri}
 fi
 {% endif %}

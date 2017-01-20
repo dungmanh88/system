@@ -9,7 +9,6 @@ backup:
   table_engine: "{{ default_backup_table_engine }}"
   email_list: "{{ vault_notify_email_list }}"
   use_galera: "{{ default_backup_use_galera }}"
-  
 
 bacula_version: 7.4.0
 bacula:

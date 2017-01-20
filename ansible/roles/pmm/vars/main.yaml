@@ -15,5 +15,6 @@ pmm:
     host: 127.0.0.1
     db: admin
 
+mysql_uri: --host {{ pmm.mysql.host }} --user {{ pmm.mysql.user }} --port {{ pmm.mysql.port }} --password {{ pmm.mysql.passwd }}
 mongo_uri: mongodb://{{ pmm.mongo.user }}:{{ pmm.mongo.passwd }}@{{ pmm.mongo.host }}:{{ pmm.mongo.port }}/{{ pmm.mongo.db }}
   
