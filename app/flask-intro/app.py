@@ -19,21 +19,22 @@ def login_required(f):
 @app.route("/")
 @login_required
 def home():
-    g.db = connect_db()
-    cur = g.db.execute("select * from posts")
-    
-    post_list=[]
-    for row in cur.fetchall():
-        post={}
-        post["title"] = row[0]
-        post["description"] = row[1]
-        post_list.append(post)
+    posts=[]
+    try:
+        g.db = connect_db()
+        cur = g.db.execute("select * from posts")
+        for row in cur.fetchall():
+            post={}
+            post["title"] = row[0]
+            post["description"] = row[1]
+            posts.append(post)
 
-#    print post_list
-#    posts = [ dict(title=row[0], description=row[1]) for row in cur.fetchall() ]
-    posts = post_list
-    cur.close()
-    g.db.close()
+    #    print posts
+    #    posts = [ dict(title=row[0], description=row[1]) for row in cur.fetchall() ]
+        cur.close()
+        g.db.close()
+    except sqlite3.OperationalError:
+        flash("You have no database!")
     return render_template("index.html", posts=posts)
 
 @app.route("/welcome")
