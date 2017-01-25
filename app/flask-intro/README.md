@@ -13,7 +13,10 @@ source venv/bin/activate
 deactivate
 
 ### Into venv
-pip install Flask gunicorn
+pip install Flask gunicorn Flask-SQLAlchemy ipython
+
+### Using ipython
+ipython
 
 ### Install heroku
 wget https://cli-assets.heroku.com/branches/stable/heroku-linux-amd64.tar.gz
@@ -71,3 +74,8 @@ venv
 ### Procfile: which process type and how to start app 
 ### requirements: Libraries that is neccessary for app
 
+
+### Create db
+python sql.py ### -> sample.db
+or
+python db_create.py ### -> posts.db
