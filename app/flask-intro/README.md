@@ -23,10 +23,14 @@ ln -s /usr/local/lib/heroku/bin/heroku /usr/local/bin/heroku
 heroku --version
 heroku login ### make sure you have an account
 
-### Using gunicorn
+### Using gunicorn to start app
 gunicorn -b 192.168.10.121:4000 app:app
+gunicorn app:app ### run on 0.0.0.0:8000
 
-### Using Procfile
+### Procfile
+web: gunicorn app:app
+
+### Using Procfile to start app via gunicorn
 heroku local
 
 ### Flush requirements
@@ -34,22 +38,27 @@ pip freeze > requirements.txt
 
 ### Using heroku
 heroku create [app-name]
-heroku apps
-heroku apps:info --app dungnm-app
-heroku open --app dungnm-app
+heroku apps/heroku list
+heroku apps:info --app [app-name]
+heroku open --app [app-name]
 
 ### heroku unit test
-heroku run python test.py -v
+heroku run --app [app-name] python test.py -v
 
 ### Push code to heroku
 git init
 git add .
 ### Make sure you have configured user.name and user.email (not global)
+git config user.name "my username"
+git config user.email "my email"
 git commit -m "Init"
 heroku create
-git remove -v
+heroku info [app-name]
+git remote add heroku [remote-url]
+git remote -v
 git config --list
 git push heroku master
+git pull heroku master
 
 ### Create .gitignore
 *.pyc
@@ -58,3 +67,7 @@ venv
 .gitignore
 .gitkeep
 .git
+
+### Procfile: which process type and how to start app 
+### requirements: Libraries that is neccessary for app
+
