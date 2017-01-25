@@ -6,13 +6,18 @@ from functools import wraps
 
 app = Flask(__name__)
 
-app.secret_key = "my key"
+#app.secret_key = "my key"
 #app.database = "posts.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+
+### load config
+import os
+### please export APP_SETTINGS="config.DevelopmentConfig"
+app.config.from_object(os.environ['APP_SETTINGS'])
 
 ### Create the sqlalchemy object
-db = SQLAlchemy(app) 
-from models import BlogPost
+db = SQLAlchemy(app)
+from models import *
 
 def login_required(f):
     @wraps(f)
@@ -72,4 +77,4 @@ def logout():
 #    return sqlite3.connect(app.database)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug='True')
+    app.run(host='0.0.0.0')
