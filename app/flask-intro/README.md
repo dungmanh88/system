@@ -13,7 +13,7 @@ source venv/bin/activate
 deactivate
 
 ### Into venv
-pip install Flask gunicorn Flask-SQLAlchemy ipython
+pip install Flask gunicorn Flask-SQLAlchemy ipython psycopg2
 
 ### Using ipython
 ipython
@@ -48,6 +48,12 @@ heroku open --app [app-name]
 ### heroku unit test
 heroku run --app [app-name] python test.py -v
 
+### Run python on heroku
+heroku run --app [app-name] python test.py -v
+heroku run --app [app-name] python db_create.py
+heroku run python ### call python shell
+heroku run ipython 
+
 ### Push code to heroku
 git init
 git add .
@@ -71,7 +77,7 @@ venv
 .gitkeep
 .git
 
-### Procfile: which process type and how to start app 
+### Procfile: which process type and how to start app
 ### requirements: Libraries that is neccessary for app
 
 
@@ -88,4 +94,13 @@ Database has been created and is available
  ! This database is empty. If upgrading, you can transfer
  ! data from another database with pg:copy
 Created postgresql-octagonal-15381 as DATABASE_URL
--> This means heroku created an database and you can access it via DATABASE_URL 
+-> This means heroku created an database and you can access it via DATABASE_URL
+
+### View heroku config
+heroku config
+
+### Install pg adapter
+sudo apt-get install libpq-dev
+or
+yum install postgresql-devel
+pip install psycopg2
