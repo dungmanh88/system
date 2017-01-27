@@ -79,3 +79,13 @@ venv
 python sql.py ### -> sample.db
 or
 python db_create.py ### -> posts.db
+
+### Set environment variables on heroku
+heroku config:set APP_SETTINGS=config.ProductionConfig --remote heroku
+heroku addons:add heroku-postgresql:hobby-dev
+
+Database has been created and is available
+ ! This database is empty. If upgrading, you can transfer
+ ! data from another database with pg:copy
+Created postgresql-octagonal-15381 as DATABASE_URL
+-> This means heroku created an database and you can access it via DATABASE_URL 
