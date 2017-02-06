@@ -89,6 +89,8 @@ python db_create.py ### -> posts.db
 ### Set environment variables on heroku
 heroku config:set APP_SETTINGS=config.ProductionConfig --remote heroku
 heroku addons:add heroku-postgresql:hobby-dev
+heroku addons:destroy HEROKU_POSTGRESQL_<color>_URL
+heroku pg:reset DATABASE_URL
 
 Database has been created and is available
  ! This database is empty. If upgrading, you can transfer

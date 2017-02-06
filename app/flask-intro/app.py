@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for, session, flash
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import exc
 from functools import wraps
 
 app = Flask(__name__)
@@ -31,8 +32,11 @@ def login_required(f):
 @app.route("/")
 @login_required
 def home():
-    posts=[]
-    posts = db.session.query(BlogPost).all()
+    try:
+        posts=[]
+        posts = db.session.query(BlogPost).all()
+    except exc.SQLAlchemyError:
+        flash("You have no database")
     return render_template("index.html", posts=posts)
 
 @app.route("/welcome")
