@@ -35,6 +35,9 @@ options {
 
         pid-file "/run/named/named.pid";
         session-keyfile "/run/named/session.key";
+        rrset-order {
+                class IN type A name "*" order cyclic;
+        };
 };
 
 logging {

@@ -1,0 +1,6 @@
+os:
+  distribution_centos:
+    name: CentOS
+    version7: 7
+    version6: 6
+    version5: 5

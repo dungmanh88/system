@@ -5,7 +5,12 @@
     - bind-utils
 
 - name: Setup /etc/named.conf
-  template: src=named.conf.j2 dest=/etc/named.conf backup=yes
+  template: 
+    src: named.conf.j2 
+    dest: /etc/named.conf 
+    backup: yes
+    validate: '/sbin/named-checkconf %s'
+  tags: named_conf
 
 - name: Setup /etc/named.conf.local
   template: src=named.conf.local.j2 dest=/etc/named/named.conf.local backup=yes
@@ -13,6 +18,13 @@
 #- name: Setup  /etc/named/zones/db.example.com
 
 #- name: Setup /etc/named/zones/db.192.168.10
+
+- name: restart and enable named
+  systemd: name=named.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ os.distribution_centos.name }}"
+    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+  tags: named_conf
 
 - name: Assign permision and owner
   file:
