@@ -1,3 +1,14 @@
+- name: Install dependencies
+  yum: name="{{ item }}"
+  with_items:
+    - pcre
+    - pcre-devel
+    - zlib
+    - zlib-devel
+    - openssl
+    - openssl-devel
+  tags: build
+
 - name: Download nginx
   get_url: 
     url: "{{ nginx_installation.url }}"
@@ -6,6 +17,7 @@
     owner: root
     group: root
   when: is_built == 1
+  tags: build
 
 - name: Unarchive nginx
   unarchive:
@@ -13,10 +25,12 @@
     dest: /tmp
     remote_src: yes
   when: is_built == 1
+  tags: build
 
 - name: Install nginx
   shell: cd /tmp/{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install
   when: is_built == 1
+  tags: build
 
 - name: Install dependencies package supports framework, such as php
   yum: name="{{ item }}"

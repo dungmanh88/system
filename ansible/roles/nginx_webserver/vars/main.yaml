@@ -6,7 +6,7 @@ nginx_installation:
   full_name: nginx user
   dir: /etc/nginx
   
-nginx_compiling_params: "--prefix={{ nginx_installation.dir }} --user={{ nginx_installation.user_name }} --group={{ nginx_installation.group_name }}"
+nginx_compiling_params: "--prefix={{ nginx_installation.dir }} --user={{ nginx_installation.user_name }} --group={{ nginx_installation.group_name }} --without-http_autoindex_module --without-http_ssi_module --without-http_map_module --without-http_uwsgi_module --without-http_scgi_module --without-http_empty_gif_module --with-threads --with-file-aio --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_stub_status_module"
 
 os:
   distribution_centos:
