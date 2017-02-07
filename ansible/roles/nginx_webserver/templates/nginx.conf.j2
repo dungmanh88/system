@@ -10,6 +10,7 @@ events {
     worker_connections  {{ nginx_conf.worker_connections }};
 }
 
+worker_rlimit_nofile 4096;
 
 http {
     include       mime.types;

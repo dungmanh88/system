@@ -69,3 +69,7 @@ packages:
    - tcpdump
    - ncdu
    - git
+   - siege
+   - httpd-tools
+   - nmap
+   - bind-utils
