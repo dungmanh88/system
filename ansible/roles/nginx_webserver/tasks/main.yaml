@@ -57,6 +57,7 @@
 
 - name: Update config nginx global
   template: src=nginx.conf.j2 dest="{{ nginx_installation.dir }}/conf/nginx.conf" backup=yes
+  tags: nginx_conf
 
 - name: Create link to binary
   file: 
@@ -75,6 +76,7 @@
   when:
     - ansible_distribution == "{{ os.distribution_centos.name }}"
     - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+  tags: nginx_conf
 
 - name: Install vhosts
   include: vhosts.yaml

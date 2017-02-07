@@ -1,0 +1,26 @@
+- name: Download named
+  yum: name="{{ item }}"
+  with_items:
+    - bind
+    - bind-utils
+
+- name: Setup /etc/named.conf
+  template: src=named.conf.j2 dest=/etc/named.conf backup=yes
+
+- name: Setup /etc/named.conf.local
+  template: src=named.conf.local.j2 dest=/etc/named/named.conf.local backup=yes
+
+#- name: Setup  /etc/named/zones/db.example.com
+
+#- name: Setup /etc/named/zones/db.192.168.10
+
+- name: Assign permision and owner
+  file:
+    path: /etc/named
+    mode: 0755
+  
+- name: Create zones
+  file:
+    path: /etc/named/zones
+    state: directory
+

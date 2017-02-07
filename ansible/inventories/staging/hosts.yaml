@@ -2,3 +2,7 @@
 test2 ansible_host=192.168.10.122 hostname=test2 use_processor=1
 test3 ansible_host=192.168.10.123 hostname=test3 role=proxy_cache
 test4 ansible_host=192.168.10.124 hostname=test4 role=proxy_cache
+
+[test_named]
+test2 ansible_host=192.168.10.122 hostname=test2
+
