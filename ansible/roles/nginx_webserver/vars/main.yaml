@@ -20,7 +20,7 @@ nginx_conf:
   log_dir: /var/log/nginx
   user: "{{ nginx_installation.user_name }}"
   worker_processes: 1
-  worker_connections: 4096
+  worker_connections: 25000
   vhosts_dir: "{{ nginx_installation.dir }}/conf.d"
   upstream: "{{ nginx_installation.dir }}/conf/upstream.conf"
   proxy_cache_path: "{{ nginx_installation.dir }}/conf/proxy_cache_path.conf"

@@ -8,9 +8,11 @@ pid        {{ nginx_conf.pid }};
 
 events {
     worker_connections  {{ nginx_conf.worker_connections }};
+    use epoll;
+    multi_accept on;
 }
 
-worker_rlimit_nofile 4096;
+worker_rlimit_nofile 25000;
 
 http {
     include       mime.types;
