@@ -29,4 +29,5 @@ ln -s /path/to/origin/dir /path/to/symlink
 
 ```
 groups
+cat /etc/passwd
 ```
