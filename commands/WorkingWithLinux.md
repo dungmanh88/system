@@ -22,3 +22,11 @@ git pull
 ssh-agent bash -c 'ssh-add ~/.ssh/id_rsa_xxx; git add -A; git commit -m "Add"; git push  -u origin master'
 ssh-agent bash -c 'ssh-add ~/.ssh/id_rsa_xxx; git pull'
 ```
+
+```
+ln -s /path/to/origin/dir /path/to/symlink
+```
+
+```
+groups
+```

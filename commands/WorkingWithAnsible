@@ -1,0 +1,20 @@
+```
+ansible --version
+```
+
+```
+ansible lab -m ping
+```
+
+```
+ansible-playbook --limit lab  -s playbooks/common.yaml
+```
+
+```
+ansible-playbook --limit lab -s playbooks/common.yaml --tags "test"
+```
+
+```
+ansible-playbook --limit lab -s playbooks/common.yaml --step
+ansible-playbook --limit lab -s playbooks/common.yaml --start-at-task "taskname"
+```
