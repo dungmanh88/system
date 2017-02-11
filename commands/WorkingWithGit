@@ -1,0 +1,43 @@
+```
+git status
+git commit -m "msg"
+git push -u origin master
+```
+
+```
+git clone remote_url
+```
+
+```
+git pull
+```
+
+```
+git config --list
+git config user.name "name"
+git config user.email "email"
+```
+
+```
+git diff <file>
+```
+
+```
+git log
+```
+
+```
+git remote -v
+```
+
+```
+git branch -v
+```
+
+```
+git checkout -b branch_name
+git checkout branch_name
+git add .
+git commit -m "msg"
+git push remote_name branch_name
+```
