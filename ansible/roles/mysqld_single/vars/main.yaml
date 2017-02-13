@@ -1,0 +1,15 @@
+percona_repo_url: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+
+mysqld_57_centos_7_repo_url: https://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm
+mysqld_57_centos_6_repo_url: https://dev.mysql.com/get/mysql57-community-release-el6-9.noarch.rpm
+
+distro_centos:
+  name: CentOS
+  version7: 7
+  version6: 6
+  version5: 5
+
+admin_user:
+  name: "{{ vault_mysqld_root_user }}"
+  passwd: "{{ default_mysqld_root_passwd }}"
+  priv: "{{ vault_mysqld_root_priv }}"

@@ -1,0 +1,64 @@
+### mysqld_version: 5.6|5.7
+mysqld_version: 5.7
+
+mysqld_root_passwd: "{{ vault_mysqld_root_passwd }}"
+
+mysqld_datadir: /var/lib/mysql
+mysqld_datadir_origin: /var/lib/mysql
+mysqld_logdir: /var/log/mysqld
+mysqld_tmpdir: "{{ mysqld_logdir }}/tmp"
+mysqld_port: 3306
+mysqld_socket: "{{ mysqld_datadir }}/mysql.sock"
+mysqld_skip_name_resolve: 1
+
+### InnoDB ###
+mysqld_default_storage_engine: InnoDB
+mysqld_innodb_buffer_pool_size: 2048M
+mysqld_innodb_buffer_pool_instances: 1
+mysqld_innodb_autoinc_lock_mode: 2
+mysqld_innodb_doublewrite: 1
+mysqld_innodb_flush_log_at_trx_commit: 1
+mysqld_innodb_flush_method: O_DIRECT
+mysqld_innodb_log_buffer_size: 16M
+mysqld_innodb_file_per_table: 1
+
+### query cache ###
+mysqld_query_cache_size: 0
+mysqld_query_cache_type: 0
+
+### packet size ###
+mysqld_max_allowed_packet: 32M
+
+### Open cache ###
+mysqld_open_cache: 1000
+
+### use_thread_cache: 0|1
+use_thread_cache: 1
+mysqld_thread_cache_size: 4
+
+### Timeout ###
+mysqld_wait_timeout: 30
+mysqld_interactive_timeout: 30
+mysqld_connect_timeout: 30
+
+### Temporary ###
+mysqld_tmp_table_size: 64M
+mysqld_max_heap_table_size: 64M
+
+### Log ###
+mysqld_log_output: FILE
+mysqld_log_queries_not_using_indexes: 0
+mysqld_log_warnings: 2
+mysqld_long_query_time: 2
+
+### Redo log ###
+mysqld_innodb_log_files_in_group: 2
+mysqld_innodb_log_file_size: 64M
+
+### use_gtid: 0|1
+use_gtid: 0
+mysqld_report_host: NA
+mysqld_expire_logs_days: 5
+mysqld_server_id: NA
+
+sysctl_vm_swappiness: 10

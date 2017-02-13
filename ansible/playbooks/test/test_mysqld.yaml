@@ -1,0 +1,4 @@
+- name: Deploy mysqld server
+  hosts: test_mysqld57
+  roles:
+  - role: mysqld_single

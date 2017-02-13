@@ -6,3 +6,5 @@ test4 ansible_host=192.168.10.124 hostname=test4 role=proxy_cache is_built=1
 [test_named]
 test2 ansible_host=192.168.10.122 hostname=test2
 
+[test_mysqld57]
+test4 ansible_host=192.168.10.124 hostname=test4
