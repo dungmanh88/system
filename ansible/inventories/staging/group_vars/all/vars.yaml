@@ -23,6 +23,22 @@ admin_users:
     passwd: "{{ vault_dungnm_passwd }}"
     full_name: "{{ vault_dungnm_full_name }}"
 
+admin_group: "{{ vault_admin_group }}"
+admin_sudo_file: /etc/sudoers.d/admins
+admin_cmd_alias: |
+  Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
+  Cmnd_Alias  SHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
+  Cmnd_Alias  SU = /bin/su 
+  Cmnd_Alias  NDD = /bin/dd
+admin_cmd: ALL=(ALL) ALL, !SHELLS, !SU, !SHUTDOWN, !NDD
+
 root_user:
   name: "{{ vault_root_name }}"
   recovery_passwd: "{{ vault_root_recovery_passwd }}"
+
+deployer_user:
+  name: "{{ vault_deployer_name }}"
+  passwd: "{{ vault_deployer_passwd }}"
+  group: "{{ vault_deployer_group }}"
+  sudo_file: /etc/sudoers.d/ansible
+  full_name: "{{ vault_deployer_full_name }}"

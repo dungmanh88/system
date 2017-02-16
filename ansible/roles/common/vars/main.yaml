@@ -1,13 +1,3 @@
-admins:
-  group: "{{ vault_admin_group }}"
-  file: /etc/sudoers.d/admins
-  cmd_alias: |
-    Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
-    Cmnd_Alias  SHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
-    Cmnd_Alias  SU = /bin/su 
-    Cmnd_Alias  NDD = /bin/dd 
-  cmd: ALL=(ALL) ALL, !SHELLS, !SU, !SHUTDOWN, !NDD
-
 nameservers: |
    nameserver 8.8.8.8
    nameserver 8.8.4.4

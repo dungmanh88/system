@@ -1,5 +1,3 @@
-- include_vars: vault/main.yaml
-
 - name: Config hostname
   hostname:
     name: "{{ hostname }}"
@@ -112,18 +110,18 @@
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
 
-- name: Enable ntpd
+- name: Restart and enable ntpd
   service: name="ntpd" enabled=yes state=restarted
 
-- name: Create admins group
+- name: Create admin group
   group:
-    name: "{{ admins.group }}"
+    name: "{{ admin_group }}"
     state: present
 
-- name: Create sudoers for admins group
+- name: Create sudoers for admin group
   template:
     src: admins.conf.j2
-    dest: "{{ admins.file }}"
+    dest: "{{ admin_sudo_file }}"
     owner: root
     group: root
     mode: 0440
@@ -135,11 +133,19 @@
     password: "{{ item.passwd }}"
     comment: "{{ item.full_name }}"
     shell: /bin/bash 
-    groups: "{{ admins.group }}"
+    groups: "{{ admin_group }}"
     append: yes 
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
+  with_items: "{{ admin_users }}"
+
+- name: Config basic vim
+  copy: src=vimrc.conf.j2 dest="/home/{{ item.name }}/.vimrc"
+  with_items: "{{ admin_users }}"
+
+- name: Config basic tmux
+  copy: src=tmux.conf.j2 dest="/home/{{ item.name }}/.tmux.conf"
   with_items: "{{ admin_users }}"
 
 - name: Check if filter user in sshd 
@@ -158,7 +164,7 @@
   with_items: "{{ admin_users }}"
   when: check_sshd.rc == 0
 
-- name: Restart sshd
+- name: Restart sshd to apply config
   service: name="sshd" enabled=yes state=restarted
   when: check_sshd.rc == 0
 
@@ -175,16 +181,12 @@
     line: "PermitRootLogin no"
     state: present
     validate: '/usr/sbin/sshd -T -t -f %s'
-  notify: reload sshd
 
-- name: Remove temporary gateway
-  command: route del default gw "{{ gateway_ip }}"
-  ignore_errors: yes
-  when: not gateway_persistent
+- name: Copy script fix e1000e
+  copy: src=e1000e_fix.sh.j2 dest=/tmp/e1000e_fix.sh owner=root group=root mode=0744
 
-- name: Remove persistent gateway
-  lineinfile:
-    dest: /etc/sysconfig/network
-    state: absent
-    regexp: '^GATEWAY='
-  when: not gateway_persistent
+- name: Run script fix e1000e
+  shell: /tmp/e1000e_fix.sh
+
+- name: Show msg
+  debug: msg="You should recheck /tmp/e1000e_fix.sh"

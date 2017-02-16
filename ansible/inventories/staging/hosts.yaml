@@ -1,4 +1,15 @@
-[test]
+[lab:children]
+test_nginx
+test_named
+test_mysqld57
+test_phpmyadmin
+test_mariadb
+
+[lab:vars]
+gateway_ip=192.168.10.1
+gateway_persistent=true
+
+[test_nginx]
 test2 ansible_host=192.168.10.122 hostname=test2 use_processor=1 is_built=1
 test3 ansible_host=192.168.10.123 hostname=test3 role=proxy_cache is_built=1
 test4 ansible_host=192.168.10.124 hostname=test4 role=proxy_cache is_built=1
@@ -11,3 +22,6 @@ test4 ansible_host=192.168.10.124 hostname=test4
 
 [test_phpmyadmin]
 test5 ansible_host=192.168.10.125 hostname=test5 install_dependency=1
+
+[test_mariadb]
+test5 ansible_host=192.168.10.125 hostname=test5

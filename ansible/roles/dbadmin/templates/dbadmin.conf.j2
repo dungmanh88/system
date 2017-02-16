@@ -13,13 +13,17 @@ server {
 {% if nginx_error_log is defined %}
     error_log {{ nginx_error_log }} error;
 {% endif %}
+{% if nginx_auth is defined %}
+    {{ nginx_auth|indent(4) }}
+{% endif %}
+{% if nginx_allow_ips is defined %}
+    {{ nginx_allow_ips|indent(4) }}
+{% endif %}
 
     location / {
-{% if nginx_auth is defined %}
-      {{ nginx_auth|indent(6) }}
-{% endif %}
       index {{ nginx_index | default('index.html index.htm') }};
     }
+
 {% if nginx_locations is defined %}
     {{ nginx_locations|indent(4) }}
 {% endif %}

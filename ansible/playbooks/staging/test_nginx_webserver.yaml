@@ -1,4 +1,4 @@
 - name: Deploy nginx web server
-  hosts: test
+  hosts: test_nginx
   roles:
   - role: nginx_webserver

@@ -10,7 +10,6 @@ mariadb_slow_query_log_file: "{{ mariadb_logdir }}/mysql_slow.log"
 mariadb_general_log_file: "{{ mariadb_logdir }}/mysql_general.log"
 
 mariadb_user: mysql
-mariadb_group: mysql
 mariadb_port: 3306
 mariadb_bind_address: 0.0.0.0
 mariadb_socket: "{{ mariadb_datadir }}/mysql.sock"

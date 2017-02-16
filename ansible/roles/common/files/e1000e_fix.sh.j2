@@ -1,0 +1,45 @@
+#!/bin/bash
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+grep -iq Centos /etc/*release
+is_centos=$?
+
+lspci | grep -iq 82574L
+is_driver_82574L=$?
+
+if [ ${is_centos} -eq 0 ] && [ ${is_driver_82574L} -eq 0 ]; then
+
+
+  ping -c 1 8.8.8.8 &> /dev/null
+  if [ ! $? -eq 0 ]; then
+    echo "You are impossible to connect to internet. Check IP and gateway now"
+    exit 1
+  fi
+  ping -c 1 google.com &> /dev/null
+  if [ ! $? -eq 0 ]; then
+    echo "You are impossible to resolve a domain. Check resolver now"
+    exit 1
+  fi
+  rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+  version=`rpm -q --queryformat '%{VERSION}' centos-release`
+
+  if [ ${version} == "6" ]; then
+    rpm -Uvh http://www.elrepo.org/elrepo-release-6-6.el6.elrepo.noarch.rpm
+  elif [ ${version} == "7" ]; then
+    rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+  fi
+
+  yum -y install kmod-e1000e
+
+  echo "Checking..."
+
+  rpm -qa | grep -i e1000e | grep -iq kmod
+  if [ ! $? -eq 0 ]; then
+    echo "IMPOSSIBLE TO FIX e1000e"
+  fi
+
+  echo "You will reboot to apply completely and recheck by run modinfo e1000e | head | grep -iq 3.3.4-NAPI"
+fi
+

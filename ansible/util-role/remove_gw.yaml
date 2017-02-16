@@ -1,0 +1,15 @@
+- name: Setup deployer user
+  hosts: all
+
+  tasks:
+    - name: Remove temporary gateway
+      command: route del default gw "{{ gateway_ip }}"
+      ignore_errors: yes
+      when: not gateway_persistent
+
+    - name: Remove persistent gateway 
+      lineinfile:
+        dest: /etc/sysconfig/network
+        state: absent
+        regexp: '^GATEWAY='
+      when: not gateway_persistent

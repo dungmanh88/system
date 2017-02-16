@@ -12,19 +12,8 @@
   fail: msg="Please turn off mysql service"
   when: check_mysql.rc == 0
 
-- name: Install Mariadb 10.0.21 on CentOS 6
-  copy: src=MariaDB-CentOS6-10.0.21.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
-  when: 
-    - version == "10.0.21"
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version6 }}"
-
-- name: Install Mariadb 10.0.21 on CentOS 7
-  copy: src=MariaDB-CentOS7-10.0.21.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
-  when:   
-    - version == "10.0.21"
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+- name: Install Mariadb on CentOS
+  copy: src=MariaDB-{{ ansible_distribution }}{{ ansible_distribution_major_version }}-{{ mariadb_version }}.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
 
 - name: Install MariaDB 
   yum: name="{{ item }}" update_cache=yes 
@@ -34,9 +23,9 @@
   - MariaDB-devel
 
 - name: Add percona repo
-  yum: name="{{ repos.url }}" update_cache=yes
+  yum: name="{{ percona_centos_url }}" update_cache=yes
   when:
-    - ansible_distribution == "{{ repos.distribution_centos }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
 
 - name: Install percona-toolkit and percona-xtrabackup
   yum: name="{{ item }}" update_cache=yes 
@@ -55,33 +44,46 @@
 - name: Install MySQL-python
   pip: name=MySQL-python
 
-- name: Create dir
-  file: path="{{ item }}" state=directory owner=mysql group=mysql
+- name: Create tmpdir, logdir and datadir
+  file: path="{{ item }}" state=directory owner="{{ mariadb_user }}" group="{{ mariadb_group }}"
   with_items: 
-  - "{{ dir.datadir }}"
-  - "{{ dir.logdir }}"
-  - "{{ dir.tmpdir }}"
-  - "{{ mysqld.tmpdir }}"
-  - "{{ dir.datadir_origin }}"
+  - "{{ mariadb_tmpdir }}"
+  - "{{ mariadb_logdir }}"
+  - "{{ mariadb_datadir }}"
   ignore_errors: yes
 
+- stat:
+    path: "{{ mariadb_datadir }}"
+  register: datadir
+
+- name: Copy files in mariadb_datadir to mariadb_datadir_origin
+  command: cp -r {{ mariadb_datadir }}/ {{ mariadb_datadir_origin }}
+  when: mariadb_datadir_origin != mariadb_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
+
 - name: Move /var/lib/mysql to /var/lib/mysql.bak
-  command: mv "{{ dir.datadir }}" /var/lib/mysql.bak
-  when: dir.datadir_origin != dir.datadir
+  command: mv "{{ mariadb_datadir }}" /var/lib/mysql.bak
+  when: mariadb_datadir_origin != mariadb_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
+  ignore_errors: yes
 
 - name: Create softlink
   file: 
-    src: "{{ dir.datadir_origin }}"
-    dest: "{{ dir.datadir }}"  
+    src: "{{ mariadb_datadir_origin }}"
+    dest: "{{ mariadb_datadir }}"  
     state: link
-  when: dir.datadir_origin != dir.datadir
+  when: mariadb_datadir_origin != mariadb_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
+
+- name: Ensure all are mysql:mysql mariadb_datadir_origin
+  command: chown -R {{ mariadb_user }}:{{ mariadb_group }} {{ mariadb_datadir_origin }}
+
+- name: Ensure all are mysql:mysql on softlink
+  command: chown {{ mariadb_user }}:{{ mariadb_group }} {{ mariadb_datadir }}
 
 - name: Config MariaDB
   template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
   tags: reconfig
 
 - name: set vm.swappiness in sysctl.conf
-  sysctl: name=vm.swappiness value="{{ sysctl.vm.swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
+  sysctl: name=vm.swappiness value="{{ sysctl_vm_swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
 
 - name: Change ulimit
   copy: src=mysqld_ulimit.j2 dest=/etc/security/limits.d/95-mysqld.conf  
@@ -110,14 +112,14 @@
 - name: Create /etc/systemd/system/mariadb.service.d
   file: path=/etc/systemd/system/mariadb.service.d state=directory mode=0755
   when:
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Customize mariadb service script
   copy: src=mariadb_service_limits.conf.j2 dest=/etc/systemd/system/mariadb.service.d/10_limits.conf 
   when:
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Enable and start mariadb
   service: name=mysql enabled=yes state=restarted
@@ -125,8 +127,8 @@
 
 - name: Remove anonymous user
   mysql_user:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
     login_password: ''
     name: ''
     host_all: yes
@@ -135,8 +137,8 @@
 
 - name: Remove test db
   mysql_db:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
     login_password: ''
     name: test
     state: absent
@@ -144,22 +146,22 @@
 
 - name: Disallow remote login for root
   mysql_user:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
     login_password: ''
-    name: "{{ admin_user.name }}"
+    name: "{{ mariadb_root_name }}"
     state: absent
     host: "{{ ansible_hostname }}"
   ignore_errors: yes
 
 - name: Set root passwd
   mysql_user:
-    name: "{{ admin_user.name }}"
-    password: "{{ admin_user.passwd }}"
-    priv: "{{ admin_user.priv }}"
+    name: "{{ mariadb_root_name }}"
+    password: "{{ mariadb_root_passwd }}"
+    priv: "{{ mariadb_root_priv }}"
     state: present 
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
     login_password: ''
     login_host: localhost
     host: "{{ item }}"

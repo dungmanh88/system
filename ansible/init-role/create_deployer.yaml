@@ -1,24 +1,16 @@
 - name: Setup deployer user
   hosts: all
 
-  vars:
-    ansible_deployers:
-      file: /etc/sudoers.d/ansible
-      group: "{{ vault_deployer_group }}"
-      users:
-        - name: "{{ vault_deployer_name }}"
-          passwd: "{{ vault_deployer_passwd }}"
-          full_name: "{{ vault_deployer_full_name }}"
   tasks:
     - name: Make sure we have deployer group
       group:
-        name: "{{ ansible_deployers.group }}"
+        name: "{{ deployer_user.group }}"
         state: present
 
     - name: Create sudoers for deployer group
       template:
         src: ansible.conf.j2
-        dest: "{{ ansible_deployers.file }}"
+        dest: "{{ deployer_user.sudo_file }}"
         owner: root
         group: root
         mode: 0440
@@ -26,12 +18,11 @@
 
     - name: Add deployer user to deployer group
       user:
-        name: "{{ item.name }}"
-        password: "{{ item.passwd }}"
-        comment: "{{ item.full_name }}"
-        groups: "{{ ansible_deployers.group }}"
+        name: "{{ deployer_user.name }}"
+        password: "{{ deployer_user.passwd }}"
+        comment: "{{ deployer_user.full_name }}"
+        groups: "{{ deployer_user.group }}"
         append: yes
-      with_items: "{{ ansible_deployers.users }}"
 
     - name: Check if filter user in sshd
       command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
@@ -43,10 +34,9 @@
     - name: Allow user deployer in sshd
       lineinfile:
         dest: /etc/ssh/sshd_config
-        line: 'AllowUsers {{ item.name }}'
+        line: 'AllowUsers {{ deployer_user.name }}'
         state: present
         validate: '/usr/sbin/sshd -T -t -f %s'
-      with_items: "{{ ansible_deployers.users }}"
       when: check_sshd.rc == 0
 
     - name: Restart sshd
@@ -55,7 +45,5 @@
 
     - name: Copy ssh key to authorized_keys
       authorized_key:
-        user: "{{ item.name }}"
+        user: "{{ deployer_user.name }}"
         key: "{{ lookup('file', '/etc/.ssh/ansible_id_rsa.pub') }}"
-      with_items: "{{ ansible_deployers.users }}"
-

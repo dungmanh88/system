@@ -1,0 +1,4 @@
+- name: Deploy mariadb
+  hosts: test_mariadb
+  roles:
+  - role: mariadb_single

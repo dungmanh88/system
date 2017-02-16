@@ -1,4 +1,0 @@
-- name: Deploy single mongodb
-  hosts: test
-  roles:
-  - role: mongodb_single
