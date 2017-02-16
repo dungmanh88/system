@@ -9,6 +9,8 @@ try:
     ### Insert data
     db.session.add(BlogPost("Good", "I\'m Good"))
     db.session.add(BlogPost("Bad", "I\'m Bad"))
+    db.session.add(BlogPost("Flask", "Flask"))
+    db.session.add(BlogPost("Postgresql", "Postgresql"))
 
     ### Commit the change
     db.session.commit()
