@@ -48,6 +48,13 @@ find ${base_output} -type d | xargs rmdir > /dev/null ### remove empty dir, redi
 find ${base_output} -mtime +1 | xargs rm -rf ### rm files whose age is order than 2 days -> Keep files whose age less than 2 days
 ```
 
+### Encrypt files
+https://askubuntu.com/questions/17641/create-encrypted-password-protected-zip-file
+```
+zip --encrypt file.zip files ### enter pass to zip
+unzip file.zip ### enter pass to unzip
+```
+
 ## User Group management
 
 ### Group management
