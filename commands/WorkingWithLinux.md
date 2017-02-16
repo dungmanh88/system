@@ -34,9 +34,86 @@ diff -r dir1/ dir2/
 ln -s /path/to/origin/dir /path/to/symlink
 ```
 
-## User management
-### Get group and user
+### Sort file/dir by modification time
+```
+ls -lt /path/to/dir ### order by asc
+ls -ltr /path/to/dir ### order by desc
+```
+
+### Remove folder order than a specific day
+https://unix.stackexchange.com/questions/92346/why-does-find-mtime-1-only-return-files-older-than-2-days
+```
+base_output=/data/local-backup
+find ${base_output} -type d | xargs rmdir > /dev/null ### remove empty dir, redirect if rm non empty dir
+find ${base_output} -mtime +1 | xargs rm -rf ### rm files whose age is order than 2 days -> Keep files whose age less than 2 days
+```
+
+## User Group management
+
+### Group management
+#### Get group of current user
 ```
 groups
-cat /etc/passwd
+id
+```
+
+#### Get group of other user
+```
+groups username
+id username
+```
+
+#### Create group
+```
+groupadd foo
+```
+
+#### Check group
+```
+cat /etc/group
+```
+
+#### Get all members of a group
+https://www.cyberciti.biz/faq/linux-list-all-members-of-a-group/
+```
+lid -g groupname
+or
+cat /etc/group | grep groupname
+```
+
+### User management
+#### Check user
+```
+cat /etc/passwd | grep username
+```
+
+#### Create user
+```
+useradd username
+```
+
+#### Set passwd for user
+```
+passwd username
+```
+
+https://www.cyberciti.biz/faq/ubuntu-add-user-to-group/
+#### Add user to group
+```
+usermod -a -G groupname username
+```
+eg:
+```
+groups test
+test : test admins -> test is primary group, admins is secondary group
+```
+
+#### Change primary group of user
+```
+usermod -g groupname username
+```
+eg:
+```
+group test
+test : admins -> adnins become to primary group
 ```
