@@ -1,5 +1,6 @@
 - include_vars: vault/main.yaml
-- name: Set hostname
+
+- name: Config hostname
   hostname:
     name: "{{ hostname }}"
 
@@ -33,26 +34,53 @@
 - name: Install epel-release
   yum: name="epel-release" update_cache=yes
 
-- name: Debug
-  debug: msg="ansible_ssh_user= {{ ansible_ssh_user }}"
+- name: Install elrepo
+  yum:
+    name: "{{ elrepo_centos_7_url }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Install elrepo
   yum:
-    name: "{{ item.url.0 }}"
+    name: "{{ elrepo_centos_6_url }}"
     update_cache: yes
   when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
+
+- name: Install elrepo
+  yum:
+    name: "{{ elrepo_centos_5_url }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version5 }}"
 
 - name: Install remi repo
   yum:
-    name: "{{ item.url.1 }}"
+    name: "{{ remi_centos_7_url }}"
     update_cache: yes
   when:
-    - ansible_distribution == "{{ item.distribution }}"
-    - ansible_distribution_major_version == "{{ item.distribution_major_version }}"
-  with_items: "{{ repos }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+
+- name: Install remi repo
+  yum:
+    name: "{{ remi_centos_6_url }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
+
+- name: Install remi repo
+  yum:
+    name: "{{ remi_centos_5_url }}"
+    update_cache: yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version5 }}"
 
 - name: Get pip 
   get_url: url="{{ pip_url }}" dest=/tmp/get-pip.py mode=0644
@@ -63,7 +91,7 @@
     chdir: /tmp
 
 - name: Install libselinux-python
-  yum: name=libselinux-python
+  yum: name=libselinux-python update_cache=yes
 
 - name: Install monitoring and debuging package
   yum: name="{{ item }}" update_cache=yes
@@ -75,14 +103,14 @@
 - name: Disable firewall
   service: name="firewalld" enabled=no state=stopped
   when:
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Disable firewall
   service: name="iptables" enabled=no state=stopped
   when:
-    - ansible_distribution == "{{ os.distribution_centos.name }}"
-    - ansible_distribution_major_version == "{{ os.distribution_centos.version6 }}"
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
 
 - name: Enable ntpd
   service: name="ntpd" enabled=yes state=restarted
@@ -136,8 +164,8 @@
 
 - name: Change passwd root and disable root login
   user:
-    name: "{{ root.name }}"
-    password: "{{ root.recovery_passwd }}"
+    name: "{{ root_user.name }}"
+    password: "{{ root_user.recovery_passwd }}"
     shell: /sbin/nologin
   
 - name: Disallow root SSH access

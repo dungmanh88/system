@@ -8,39 +8,25 @@ admins:
     Cmnd_Alias  NDD = /bin/dd 
   cmd: ALL=(ALL) ALL, !SHELLS, !SU, !SHUTDOWN, !NDD
 
-admin_users: "{{ default_admin_users }}"
-
-root: "{{ default_root_user }}"
-
 nameservers: |
    nameserver 8.8.8.8
    nameserver 8.8.4.4
    nameserver 208.67.222.222
    nameserver 208.67.220.220
 
-repos:
-   - distribution: CentOS
-     distribution_major_version: 7
-     url: 
-       - http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
-       - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
-   - distribution: CentOS
-     distribution_major_version: 6
-     url:
-       - http://www.elrepo.org/elrepo-release-6-6.el6.elrepo.noarch.rpm
-       - http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-   - distribution: CentOS
-     distribution_major_version: 5
-     url:
-       - http://www.elrepo.org/elrepo-release-5-5.el5.elrepo.noarch.rpm
-       - http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
+elrepo_centos_7_url: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+elrepo_centos_6_url: http://www.elrepo.org/elrepo-release-6-6.el6.elrepo.noarch.rpm
+elrepo_centos_5_url: http://www.elrepo.org/elrepo-release-5-5.el5.elrepo.noarch.rpm
 
-os:
-  distribution_centos:
-    name: CentOS
-    version7: 7
-    version6: 6
-    version5: 5
+remi_centos_7_url: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+remi_centos_6_url: http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+remi_centos_5_url: http://rpms.famillecollet.com/enterprise/remi-release-5.rpm
+
+distro_centos:
+  name: CentOS
+  version7: 7
+  version6: 6
+  version5: 5
 
 pip_url: https://bootstrap.pypa.io/get-pip.py
      

@@ -8,3 +8,6 @@ test2 ansible_host=192.168.10.122 hostname=test2
 
 [test_mysqld57]
 test4 ansible_host=192.168.10.124 hostname=test4
+
+[test_phpmyadmin]
+test5 ansible_host=192.168.10.125 hostname=test5 install_dependency=1

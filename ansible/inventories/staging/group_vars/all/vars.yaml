@@ -18,11 +18,11 @@ ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
 ansible_become: true
 ansible_become_method: sudo
 
-default_admin_users:
+admin_users:
   - name: "{{ vault_dungnm_name }}"
     passwd: "{{ vault_dungnm_passwd }}"
     full_name: "{{ vault_dungnm_full_name }}"
 
-default_root_user:
+root_user:
   name: "{{ vault_root_name }}"
   recovery_passwd: "{{ vault_root_recovery_passwd }}"

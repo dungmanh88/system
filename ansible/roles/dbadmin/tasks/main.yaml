@@ -1,0 +1,90 @@
+- include_vars: vault/main.yaml
+
+- name: Install nginx and mysql package
+  yum: name="{{ item }}" update_cache=yes
+  with_items:
+    - nginx
+    - mysql
+  when: install_dependency == 1
+
+- name: Install php package
+  yum: name="{{ item }}" update_cache=yes enablerepo=remi-php71
+  with_items:
+    - php
+    - php-mysql
+    - php-fpm
+    - php-mbstring
+  tags: php
+
+- name: Download phpmyadmin package
+  get_url: 
+    url: "{{ phpmyadmin_url }}"
+    dest: "/tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }}.tar.xz"
+    mode: 0644
+    owner: root
+    group: root
+     
+- name: Unarchive phpmyadmin package
+  unarchive:
+    src: "/tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }}.tar.xz"
+    dest: /tmp
+    remote_src: yes
+
+- name: Remove phpmyadmin in tmp 
+  file: path=/tmp/phpmyadmin state=absent
+
+- name: Rename to phpmyadmin
+  command: "mv /tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }} /tmp/phpmyadmin"
+
+- name: Create root and log dir
+  file:
+    path: "{{ item }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0660
+    state: directory
+  with_items:
+    - "{{ nginx_root_dir }}"
+    - "{{ nginx_log_dir }}"
+    - "{{ nginx_conf_dir }}"
+   
+- name: Move phpmyadmin to document root
+  command: "mv /tmp/phpmyadmin  {{ nginx_root_dir }}"
+  ignore_errors: yes
+
+- name: Ensure all are nginx:nginx
+  command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ nginx_root_dir }}
+
+- name: Ensure dictories are 0755
+  command: find {{ nginx_root_dir }} -type d -exec chmod 0755 {} \;
+
+- name: Ensure files are 0644
+  command: find {{ nginx_root_dir }} -type f -exec chmod 0644 {} \;
+
+- name: Config vhost
+  template: src=dbadmin.conf.j2 dest="{{ nginx_conf_file }}" backup=yes
+
+- name: Config htaccess
+  template: src=htaccess.conf.j2 dest="{{ nginx_htaccess_file }}"
+
+- name: Config phpmyadmin config
+  template: src=phpmyadmin.conf.j2 dest="{{ nginx_root_dir }}/phpmyadmin/config.inc.php" backup=yes owner="{{ nginx_user }}" group="{{ nginx_group }}" mode=0644
+  with_items: "{{ mysql_servers }}"
+  tags: conf
+
+- name: restart and enable nginx
+  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+  tags: restart
+
+- name: restart and enable php-fpm
+  systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
+  when:
+   - ansible_distribution == "{{ distro_centos.name }}"
+   - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+  tags: restart
+
+- name: Show msg
+  debug: msg="Access http://{{ nginx_vhost_name }}:{{ nginx_listen }}/phpmyadmin/index.php. Remember point domain {{ nginx_vhost_name }} to {{ ansible_default_ipv4.address }}" 

@@ -1,6 +1,5 @@
 gateway_ip: NA
 gateway_persistent: true
-
-default_admin_users: NA
-
-default_root_user: NA
+### No need to override admin_users and root_user on group
+admin_users: NA
+root_user: NA

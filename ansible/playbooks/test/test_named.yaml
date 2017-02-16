@@ -1,4 +1,0 @@
-- name: Deploy named server
-  hosts: test_named
-  roles:
-  - role: named

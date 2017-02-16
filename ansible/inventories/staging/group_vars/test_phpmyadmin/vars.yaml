@@ -1,0 +1,47 @@
+gateway_ip: 192.168.10.1
+### server for phpmyadmin and rockmongo
+nginx_service_name: dbadmin
+nginx_vhost_name: dbadmin.example.com
+nginx_install_dir: /etc/nginx
+nginx_conf_dir: /etc/nginx/conf.d
+nginx_conf_file: "{{ nginx_conf_dir }}/{{ nginx_vhost_name }}.conf"
+nginx_log_dir: "/var/log/nginx/{{ nginx_vhost_name }}"
+nginx_access_log: "{{ nginx_log_dir }}/access_log"
+nginx_error_log: "{{ nginx_log_dir }}/error_log"
+nginx_root_dir: "/var/www/{{ nginx_vhost_name }}"
+nginx_htaccess_file: "{{ nginx_install_dir }}/.dbadmin_passwd"
+nginx_user: nginx
+nginx_group: nginx
+nginx_fastcgi_file: "{{ nginx_install_dir }}/fastcgi_params"
+nginx_server_name: "dbadmin.example.com www.dbadmin.example.com"
+nginx_listen: 80
+nginx_index: "index.php index.html"
+
+### use openssl passwd -apr1  to gen passwd
+nginx_auth: |
+    auth_basic "dbadmin site";
+    auth_basic_user_file {{ nginx_htaccess_file }};
+
+nginx_locations: |
+    location ~ \.php$ {
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index   index.php;
+      fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+      include         {{ nginx_fastcgi_file }};
+    }
+
+### install_dependency = 0|1
+install_dependency: 0
+
+### for phpmyadmin
+mysql_servers:
+  - host: localhost
+    verbose: "This localhost"
+
+### for rockmongo
+mongo_servers: NA
+
+### vault
+nginx_htaccess_name: "{{ vault_nginx_test_phpmyadmin_htaccess_name }}"
+nginx_htaccess_password: "{{ vault_nginx_default_htaccess_password }}"
+phpmyadmin_blowfish_secret: "{{ vault_phpmyadmin_test_phpmyadmin_blowfish_secret }}"

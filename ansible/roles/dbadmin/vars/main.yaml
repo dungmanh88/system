@@ -1,0 +1,10 @@
+phpmyadmin_url: https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-english.tar.xz
+phpmyadmin_version: phpMyAdmin-4.6.6
+phpmyadmin_language: english
+
+distro_centos:
+  name: CentOS
+  version7: 7
+  version6: 6
+  version5: 5
+

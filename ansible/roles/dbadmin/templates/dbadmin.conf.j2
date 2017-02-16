@@ -1,0 +1,27 @@
+server {
+    listen {{ nginx_listen }};
+
+{% if nginx_server_name is defined %}
+    server_name {{ nginx_server_name }};
+{% endif %}
+    root {{ nginx_root_dir }};
+    index {{ nginx_index | default('index.html index.htm') }};
+
+{% if nginx_access_log is defined %}
+    access_log {{ nginx_access_log }};
+{% endif %}
+{% if nginx_error_log is defined %}
+    error_log {{ nginx_error_log }} error;
+{% endif %}
+
+    location / {
+{% if nginx_auth is defined %}
+      {{ nginx_auth|indent(6) }}
+{% endif %}
+      index {{ nginx_index | default('index.html index.htm') }};
+    }
+{% if nginx_locations is defined %}
+    {{ nginx_locations|indent(4) }}
+{% endif %}
+}
+
