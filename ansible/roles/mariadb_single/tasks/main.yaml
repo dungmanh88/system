@@ -22,7 +22,7 @@
   - MariaDB-server
   - MariaDB-devel
 
-- name: Add percona repo
+- name: Install percona repo
   yum: name="{{ percona_centos_url }}" update_cache=yes
   when:
     - ansible_distribution == "{{ distro_centos.name }}"
@@ -47,9 +47,10 @@
 - name: Create tmpdir, logdir and datadir
   file: path="{{ item }}" state=directory owner="{{ mariadb_user }}" group="{{ mariadb_group }}"
   with_items: 
-  - "{{ mariadb_tmpdir }}"
   - "{{ mariadb_logdir }}"
+  - "{{ mariadb_tmpdir }}"
   - "{{ mariadb_datadir }}"
+  - "{{ mariadb_datadir_base }}"
   ignore_errors: yes
 
 - stat:
