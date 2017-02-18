@@ -4,6 +4,7 @@ test_named
 test_mysqld57
 test_phpmyadmin
 test_mariadb
+test_gitlabci
 
 [lab:vars]
 gateway_ip=192.168.10.1
@@ -25,3 +26,7 @@ test5 ansible_host=192.168.10.125 hostname=test5 install_dependency=1
 
 [test_mariadb]
 test5 ansible_host=192.168.10.125 hostname=test5
+
+[test_gitlabci]
+gitlab ansible_host=192.168.10.127 hostname=gitlab
+gitlab-runner ansible_host=192.168.10.128 hostname=gitlab-runner
