@@ -49,3 +49,6 @@ packages:
    - httpd-tools
    - nmap
    - bind-utils
+   - curl
+   - openssh-server
+   - openssh-clients
