@@ -52,3 +52,4 @@ packages:
    - curl
    - openssh-server
    - openssh-clients
+   - yum-utils
