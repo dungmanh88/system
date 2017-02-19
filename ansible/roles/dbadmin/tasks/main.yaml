@@ -39,7 +39,7 @@
   command: "mv /tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }} /tmp/phpmyadmin"
 
 - name: debug
-  debug: msg="{{ nginx_log_dir }}"
+  debug: msg="{{ nginx_vhost_name }}, {{ nginx_log_dir }}"
 
 - name: Create root and log dir
   file:
