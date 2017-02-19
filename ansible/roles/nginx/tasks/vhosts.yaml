@@ -41,13 +41,17 @@
     state: present
     regexp: '^user = '
     line: 'user = {{ nginx_user }}'
-
+  when:
+    - ngx_enable_php == 1
+    
 - name: Change group of php-fpm socket to nginx
   lineinfile:
     dest: /etc/php-fpm.d/www.conf
     state: present
     regexp: '^group = '
     line: 'group = {{ nginx_group }}'
+  when:
+    - ngx_enable_php == 1
 
 - name: Restart and enable php-fpm
   systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
