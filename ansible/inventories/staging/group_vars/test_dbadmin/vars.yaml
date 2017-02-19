@@ -28,15 +28,16 @@ nginx_allow_ips: |
     deny all;
 
 nginx_locations: |
+    location / {
+      index {{ nginx_index | default('index.html index.htm') }};
+    }
+
     location ~ \.php$ {
-      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_pass {{ php_fpm_listen }};
       fastcgi_index   index.php;
       fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
       include         {{ nginx_fastcgi_file }};
     }
-
-### install_dependency = 0|1
-install_dependency: 0
 
 ### for phpmyadmin
 mysql_servers:
@@ -46,7 +47,16 @@ mysql_servers:
 ### for rockmongo
 mongo_servers: NA
 
+### for php-fpm
+### unix:/var/run/php-fpm/php-fpm.sock
+### or 127.0.0.1:9000
+php_fpm_listen: 127.0.0.1:9000
+
 ### vault
 nginx_htaccess_name: "{{ vault_nginx_default_htaccess_name }}"
 nginx_htaccess_passwd: "{{ vault_nginx_default_htaccess_passwd }}"
 phpmyadmin_blowfish_secret: "{{ vault_phpmyadmin_default_blowfish_secret }}"
+
+### Control param
+### dbm_install_dependency = 0|1
+dbm_install_dependency: 0

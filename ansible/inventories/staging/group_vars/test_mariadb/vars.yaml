@@ -2,8 +2,8 @@ mariadb_base_version: 10.0
 mariadb_version: 10.0.21
 
 mariadb_datadir: /var/lib/mysql
-mariadb_datadir_base: /var/lib
-mariadb_datadir_origin: "{{ mariadb_datadir_base }}/mysql"
+mariadb_datadir_base: /data
+mariadb_datadir_origin: "{{ mariadb_datadir_base }}/mysql_datadir"
 mariadb_logdir: /var/log/mysqld
 mariadb_tmpdir: "{{ mariadb_logdir }}/tmp"
 mariadb_log_error: "{{ mariadb_logdir }}/mysql_error.log"
@@ -36,7 +36,7 @@ mariadb_table_open_cache: 1000
 mariadb_query_cache_size: 0
 mariadb_query_cache_type: 0
 
-use_thread_cache: 1
+### ma_enable_thread_cache: 0|1
 mariadb_thread_cache_size: 4
 mariadb_max_connections: 64
 
@@ -57,14 +57,14 @@ mariadb_slow_query_log: 1
 mariadb_innodb_log_files_in_group: 2
 mariadb_innodb_log_file_size: 64M
 
-use_thread_pool: 0
+### ma_enable_thread_pool: 0|1
 mariadb_thread_handling: pool-of-threads
 mariadb_thread_pool_size: 4
 mariadb_extra_port: 6033
 mariadb_extra_max_connections: 10
 
-use_replication: 0
-use_gtid: 0
+### ma_enable_replication: 0|1
+### ma_enable_gtid: 0|1
 mariadb_gtid_domain_id: NA
 mariadb_report_host: NA
 mariadb_report_port: "{{ mariadb_port }}"
@@ -82,3 +82,9 @@ sysctl_vm_swappiness: 10
 mariadb_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
 mariadb_root_name: "{{ vault_mariadb_default_root_name }}"
 mariadb_root_priv: "{{ vault_mariadb_default_root_priv }}"
+
+### Control param
+ma_enable_thread_cache: 1
+ma_enable_thread_pool: 0
+ma_enable_replication: 0
+ma_enable_gtid: 0

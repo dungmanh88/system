@@ -1,4 +1,5 @@
 - name: Deploy nginx web server
   hosts: test_nginx
   roles:
-  - role: nginx_webserver
+  - role: php-fpm
+  - role: nginx

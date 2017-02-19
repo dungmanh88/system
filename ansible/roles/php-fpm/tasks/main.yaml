@@ -1,0 +1,20 @@
+- name: Install php packages
+  yum: name="{{ item }}" update_cache=yes enablerepo=remi-php71
+  with_items:
+    - php
+    - php-mysql
+    - php-fpm
+    - php-mbstring
+  tags: php
+
+- name: Config php-fpm
+  template: src=php_fpm.conf.j2 dest=/etc/php-fpm.conf backup=yes
+
+- name: Config php-fpm.d/www.conf
+  template: src=php_fpm.d.www.conf.j2 dest=/etc/php-fpm.d/www.conf backup=yes
+
+- name: Restart and enable php-fpm
+  systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"

@@ -43,7 +43,7 @@ max_heap_table_size = {{ mariadb_max_heap_table_size }}
 tmpdir = {{ mariadb_tmpdir }}
 
 ### thread pool ###
-{% if use_thread_pool == 1 %}
+{% if ma_enable_thread_pool == 1 %}
 thread_handling = {{ mariadb_thread_handling }}
 thread_pool_size = {{ mariadb_thread_pool_size }}
 extra_port = {{ mariadb_extra_port }}
@@ -54,7 +54,7 @@ max_connections = {{ mariadb_max_connections }}
 {% endif %}
 
 ### thread cache ###
-{% if use_thread_cache == 1 %}
+{% if ma_enable_thread_cache == 1 %}
 thread_cache_size = {{ mariadb_thread_cache_size }}
 max_connections = {{ mariadb_max_connections }}
 {% else %}
@@ -73,8 +73,8 @@ general_log = {{ mariadb_general_log }}
 general_log_file = {{ mariadb_general_log_file }}
 
 ### replication ###
-{% if use_replication == 1 %}
-{% if use_gtid == 1 %}
+{% if ma_enable_replication == 1 %}
+{% if ma_enable_gtid == 1 %}
 gtid_domain_id = {{ mariadb_gtid_domain_id }}
 {% endif %}
 report_host = {{ mariadb_report_host }}

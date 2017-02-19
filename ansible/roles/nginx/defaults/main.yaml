@@ -17,10 +17,10 @@ nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
 nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
 nginx_proxy_cache_path: "{{ nginx_install_dir }}/conf/proxy_cache_path.conf"
 nginx_vhosts:
-  - service_name: hotel
-    name: "hotel.example.com"
+  - service_name: test1
+    name: "vhost1.example.com"
     listen: 80
-    server_name: "hotel.example.com www.hotel.example.com"
+    server_name: "vhost1.example.com www.vhost1.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts.0.name }}"
     access_log: "{{ nginx_vhosts.0.log_dir }}/access.log"
@@ -43,10 +43,10 @@ nginx_vhosts:
     cache_name: {{ nginx_vhosts.0.service_name }}_cache
     proxy_cache_path: /data/nginx/cache/{{ nginx_vhosts.0.service_name }} levels=1:2 keys_zone={{ nginx_vhosts.0.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off
 
-  - service_name: motel
-    name: "motel.example.com"
+  - service_name: test2
+    name: "vhost2.example.com"
     listen: 80
-    server_name: "motel.example.com www.motel.example.com"
+    server_name: "vhost2.example.com www.vhost2.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts.1.name }}"
     access_log: "{{ nginx_vhosts.1.log_dir }}/access.log"
@@ -77,13 +77,3 @@ ngx_enable_php: 0
 ngx_role: web
 ### ngx_built: 0|1
 ngx_built: 0
-
-php_fpm_unix_listen: unix:/var/run/php-fpm/php-fpm.sock
-php_fpm_tcp_listen: 127.0.0.1:9000
-### php_fpm_listen is php_fpm_unix_listen or php_fpm_tcp_listen
-php_fpm_listen: "{{ php_fpm_unix_listen }}"
-php_fpm_listen_owner: nobody
-php_fpm_listen_group: nobody
-php_fpm_listen_mode: 0660
-php_fpm_user: nginx
-php_fpm_group: nginx

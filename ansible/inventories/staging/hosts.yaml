@@ -2,7 +2,7 @@
 test_nginx
 test_named
 test_mysqld57
-test_phpmyadmin
+test_dbadmin
 test_mariadb
 test_gitlabci
 
@@ -11,9 +11,9 @@ gateway_ip=192.168.10.1
 gateway_persistent=true
 
 [test_nginx]
-test2 ansible_host=192.168.10.122 hostname=test2 use_processor=1 is_built=1
-test3 ansible_host=192.168.10.123 hostname=test3 role=proxy_cache is_built=1
-test4 ansible_host=192.168.10.124 hostname=test4 role=proxy_cache is_built=1
+test2 ansible_host=192.168.10.122 hostname=test2 ngx_built=1 ngx_enable_php=1 ngx_role=web
+test3 ansible_host=192.168.10.123 hostname=test3 ngx_built=1 ngx_role=proxy_cache
+test4 ansible_host=192.168.10.124 hostname=test4 ngx_built=1 ngx_role=proxy_cache
 
 [test_named]
 test2 ansible_host=192.168.10.122 hostname=test2
@@ -21,11 +21,11 @@ test2 ansible_host=192.168.10.122 hostname=test2
 [test_mysqld57]
 test4 ansible_host=192.168.10.124 hostname=test4
 
-[test_phpmyadmin]
-test5 ansible_host=192.168.10.125 hostname=test5 install_dependency=1
+[test_dbadmin]
+test2 ansible_host=192.168.10.122 hostname=test2 dbm_install_dependency=0
 
 [test_mariadb]
-test5 ansible_host=192.168.10.125 hostname=test5
+test2 ansible_host=192.168.10.122 hostname=test2
 
 [test_gitlabci]
 gitlab ansible_host=192.168.10.127 hostname=gitlab

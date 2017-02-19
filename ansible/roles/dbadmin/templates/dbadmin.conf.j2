@@ -19,13 +19,7 @@ server {
 {% if nginx_allow_ips is defined %}
     {{ nginx_allow_ips|indent(4) }}
 {% endif %}
-
-    location / {
-      index {{ nginx_index | default('index.html index.htm') }};
-    }
-
 {% if nginx_locations is defined %}
     {{ nginx_locations|indent(4) }}
 {% endif %}
 }
-

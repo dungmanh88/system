@@ -1,0 +1,9 @@
+php_fpm_unix_listen: unix:/var/run/php-fpm/php-fpm.sock
+php_fpm_tcp_listen: 127.0.0.1:9000
+### php_fpm_listen is php_fpm_unix_listen or php_fpm_tcp_listen
+php_fpm_listen: "{{ php_fpm_unix_listen }}"
+php_fpm_listen_owner: nobody
+php_fpm_listen_group: nobody
+php_fpm_listen_mode: 0660
+php_fpm_user: nginx
+php_fpm_group: nginx

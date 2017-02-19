@@ -1,0 +1,95 @@
+- name: Install dependencies
+  yum: name="{{ item }}"
+  with_items:
+    - pcre
+    - pcre-devel
+    - zlib
+    - zlib-devel
+    - openssl
+    - openssl-devel
+  tags: build
+
+- name: Download nginx
+  get_url:
+    url: "{{ nginx_url }}"
+    dest: "/tmp/nginx-{{ nginx_version }}.tar.gz"
+    mode: 0644
+    owner: root
+    group: root
+  when: ngx_built == 1
+  tags: build
+
+- name: Unarchive nginx
+  unarchive:
+    src: "/tmp/nginx-{{ nginx_version }}.tar.gz"
+    dest: /tmp
+    remote_src: yes
+  when: ngx_built == 1
+  tags: build
+
+- name: Install nginx
+  shell: cd /tmp/nginx-{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install
+  when: ngx_built == 1
+  tags: build
+
+- name: Create group nginx
+  group:
+    name: "{{ nginx_group }}"
+    state: present
+
+- name: Create user nginx
+  user:
+    name: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    state: present
+    shell: /sbin/nologin
+    home: /dev/null
+    comment: "{{ nginx_full_name }}"
+
+#- name: Create pid
+#  file:
+#    path: /run/nginx
+#    owner: root
+#    group: root
+#    mode: 0660
+#    state: directory
+
+- name: Create log
+  file:
+    path: "{{ nginx_log_dir }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0660
+    state: directory
+
+- name: Update config nginx global
+  template: src=nginx.conf.j2 dest="{{ nginx_install_dir }}/conf/nginx.conf" backup=yes
+  tags: nginx_conf
+
+- name: Create link to binary
+  file:
+    src: "{{ nginx_install_dir }}/sbin/nginx"
+    dest: /usr/sbin/nginx
+    state: link
+
+- name: Create nginx service
+  template: src=nginx.systemd.j2 dest=/usr/lib/systemd/system/nginx.service backup=yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+
+- name: restart and enable nginx
+  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+  tags: nginx_conf
+
+- name: Install vhosts
+  include: vhosts.yaml
+  tags: "vhosts"
+
+- name: Install nginx as proxy cache
+  include: proxy_cache.yaml
+  when: ngx_role == "proxy_cache"
+  tags: "proxy_cache"
