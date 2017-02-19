@@ -39,7 +39,7 @@
   command: find {{ item.root }} -type f -exec chmod 0644 {} \;
   with_items: "{{ nginx_vhosts }}"
   when: ngx_role == "web"
-  
+
 - name: Setup config for vhost
   template:
     src: nginx.vhosts.conf.j2
@@ -65,6 +65,24 @@
     state: present
     regexp: '^group = '
     line: 'group = {{ nginx_group }}'
+  when:
+    - ngx_enable_php == 1
+
+- name: Change listen owner of php-fpm socket to nginx
+  lineinfile:
+    dest: /etc/php-fpm.d/www.conf
+    state: present
+    regexp: '^listen.owner = '
+    line: 'listen.owner = {{ nginx_user }}'
+  when:
+    - ngx_enable_php == 1
+
+- name: Change listen group of php-fpm socket to nginx
+  lineinfile:
+    dest: /etc/php-fpm.d/www.conf
+    state: present
+    regexp: '^listen.group = '
+    line: 'listen.group = {{ nginx_group }}'
   when:
     - ngx_enable_php == 1
 

@@ -57,6 +57,9 @@
 - name: Ensure all are nginx:nginx
   command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ nginx_root_dir }}
 
+- name: Ensure session save path is nginx:nginx
+  command: chown -R {{ nginx_user }}:{{ nginx_group }} /var/lib/php/session
+
 - name: Ensure dictories are 0755
   command: find {{ nginx_root_dir }} -type d -exec chmod 0755 {} \;
 
