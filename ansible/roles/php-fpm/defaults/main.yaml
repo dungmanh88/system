@@ -5,8 +5,8 @@ php_fpm_listen: "{{ php_fpm_unix_listen }}"
 php_fpm_listen_owner: nobody
 php_fpm_listen_group: nobody
 php_fpm_listen_mode: "0660"
-php_fpm_user: nginx
-php_fpm_group: nginx
+php_fpm_user: apache
+php_fpm_group: apache
 ### Control param
 ### pfm_enable: 0|1
 pfm_enable: 0

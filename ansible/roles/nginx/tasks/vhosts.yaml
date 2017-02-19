@@ -34,3 +34,24 @@
     mode: 0640
   with_items: "{{ nginx_vhosts }}"
   tags: vhost_conf
+
+- name: Change user of php-fpm socket to nginx
+  lineinfile:
+    dest: /etc/php-fpm.d/www.conf
+    state: present
+    regexp: '^user = '
+    line: 'user = {{ nginx_user }}'
+
+- name: Change group of php-fpm socket to nginx
+  lineinfile:
+    dest: /etc/php-fpm.d/www.conf
+    state: present
+    regexp: '^group = '
+    line: 'group = {{ nginx_group }}'
+
+- name: Restart and enable php-fpm
+  systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ngx_enable_php == 1
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
