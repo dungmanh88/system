@@ -38,6 +38,9 @@
 - name: Rename to phpmyadmin
   command: "mv /tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }} /tmp/phpmyadmin"
 
+- name: debug
+  debug: msg="{{ nginx_log_dir }}"
+
 - name: Create root and log dir
   file:
     path: "{{ item }}"
