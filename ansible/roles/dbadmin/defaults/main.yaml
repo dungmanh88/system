@@ -33,7 +33,7 @@ nginx_locations: |
     }
 
     location ~ \.php$ {
-      fastcgi_pass {{ php_fpm_listen }};
+      fastcgi_pass unix:{{ php_fpm_listen }};
       fastcgi_index   index.php;
       fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
       include         {{ nginx_fastcgi_file }};

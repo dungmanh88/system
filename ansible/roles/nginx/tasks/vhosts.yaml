@@ -25,6 +25,21 @@
   with_items: "{{ nginx_vhosts }}"
   when: ngx_role == "web"
 
+- name: Ensure all are nginx:nginx
+  command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ item.root }}
+  with_items: "{{ nginx_vhosts }}"
+  when: ngx_role == "web"
+
+- name: Ensure dictories are 0755
+  command: find {{ item.root }} -type d -exec chmod 0755 {} \;
+  with_items: "{{ nginx_vhosts }}"
+  when: ngx_role == "web"
+
+- name: Ensure files are 0644
+  command: find {{ item.root }} -type f -exec chmod 0644 {} \;
+  with_items: "{{ nginx_vhosts }}"
+  when: ngx_role == "web"
+  
 - name: Setup config for vhost
   template:
     src: nginx.vhosts.conf.j2
@@ -43,7 +58,7 @@
     line: 'user = {{ nginx_user }}'
   when:
     - ngx_enable_php == 1
-    
+
 - name: Change group of php-fpm socket to nginx
   lineinfile:
     dest: /etc/php-fpm.d/www.conf
