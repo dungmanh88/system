@@ -78,8 +78,8 @@
   lineinfile:
     dest: "{{ nginx_conf_file }}"
     state: present
-    regexp: '^include '
-    line: 'include {{ nginx_install_dir }}/conf/fastcgi_params'
+    regexp: '^      include '
+    line: '      include {{ nginx_install_dir }}/conf/fastcgi_params'
   when: dbm_install_dependency == 0
 
 - name: restart and enable nginx
