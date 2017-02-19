@@ -34,10 +34,3 @@
     mode: 0640
   with_items: "{{ nginx_vhosts }}"
   tags: vhost_conf
-
-- name: Restart and enable nginx
-  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
-  tags: vhost_conf

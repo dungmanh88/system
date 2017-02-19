@@ -78,13 +78,6 @@
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
-- name: restart and enable nginx
-  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
-  tags: nginx_conf
-
 - name: Install vhosts
   include: vhosts.yaml
   tags: "vhosts"
@@ -93,3 +86,10 @@
   include: proxy_cache.yaml
   when: ngx_role == "proxy_cache"
   tags: "proxy_cache"
+
+- name: restart and enable nginx
+  systemd: name=nginx.service enabled=yes daemon_reload=yes state=restarted
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+  tags: nginx_conf
