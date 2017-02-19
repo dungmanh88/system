@@ -17,10 +17,10 @@ nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
 nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
 nginx_proxy_cache_path: "{{ nginx_install_dir }}/conf/proxy_cache_path.conf"
 nginx_vhosts:
-  - service_name: test1
-    name: "vhost1.example.com"
+  - service_name: hotel
+    name: "hotel.example.com"
     listen: 80
-    server_name: "vhost1.example.com www.vhost1.example.com"
+    server_name: "hotel.example.com www.hotel.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts.0.name }}"
     access_log: "{{ nginx_vhosts.0.log_dir }}/access.log"
@@ -34,19 +34,19 @@ nginx_vhosts:
         include {{ nginx_install_dir }}/conf/fastcgi_params;
       }
     upstream:
-      name: {{ nginx_vhosts.0.service_name }}
+      name: "{{ nginx_vhosts.0.service_name }}"
       content: |
         upstream {{ nginx_vhosts.0.service_name }} {
           server 192.168.10.122:80;
         }
-    cache_dir: /data/nginx/cache/{{ nginx_vhosts.0.service_name }}
-    cache_name: {{ nginx_vhosts.0.service_name }}_cache
-    proxy_cache_path: /data/nginx/cache/{{ nginx_vhosts.0.service_name }} levels=1:2 keys_zone={{ nginx_vhosts.0.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off
+    cache_dir: "/data/nginx/cache/{{ nginx_vhosts.0.service_name }}"
+    cache_name: "{{ nginx_vhosts.0.service_name }}_cache"
+    proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts.0.service_name }} levels=1:2 keys_zone={{ nginx_vhosts.0.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
 
-  - service_name: test2
-    name: "vhost2.example.com"
+  - service_name: motel
+    name: "motel.example.com"
     listen: 80
-    server_name: "vhost2.example.com www.vhost2.example.com"
+    server_name: "motel.example.com www.motel.example.com"
     index: "index.php index.html"
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts.1.name }}"
     access_log: "{{ nginx_vhosts.1.log_dir }}/access.log"
@@ -60,14 +60,14 @@ nginx_vhosts:
         include {{ nginx_install_dir }}/conf/fastcgi_params;
       }
     upstream:
-      name: {{ nginx_vhosts.1.service_name }}
+      name: "{{ nginx_vhosts.1.service_name }}"
       content: |
         upstream {{ nginx_vhosts.1.service_name }} {
           server 192.168.10.122:80;
         }
-    cache_dir: /data/nginx/cache/{{ nginx_vhosts.1.service_name }}
-    cache_name: {{ nginx_vhosts.1.service_name }}_cache
-    proxy_cache_path: /data/nginx/cache/{{ nginx_vhosts.1.service_name }} levels=1:2 keys_zone={{ nginx_vhosts.1.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off
+    cache_dir: "/data/nginx/cache/{{ nginx_vhosts.1.service_name }}"
+    cache_name: "{{ nginx_vhosts.1.service_name }}_cache"
+    proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts.1.service_name }} levels=1:2 keys_zone={{ nginx_vhosts.1.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
 
 ### Control param
 ### ngx_enable_php: 0|1

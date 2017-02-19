@@ -34,7 +34,7 @@ nginx_vhosts:
         include {{ nginx_install_dir }}/conf/fastcgi_params;
       }
     upstream:
-      name: {{ nginx_vhosts.0.service_name }}
+      name: "{{ nginx_vhosts.0.service_name }}"
       content: |
         upstream {{ nginx_vhosts.0.service_name }} {
           server 192.168.10.122:80;
@@ -60,7 +60,7 @@ nginx_vhosts:
         include {{ nginx_install_dir }}/conf/fastcgi_params;
       }
     upstream:
-      name: {{ nginx_vhosts.1.service_name }}
+      name: "{{ nginx_vhosts.1.service_name }}"
       content: |
         upstream {{ nginx_vhosts.1.service_name }} {
           server 192.168.10.122:80;
