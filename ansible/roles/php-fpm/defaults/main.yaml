@@ -1,4 +1,4 @@
-php_fpm_unix_listen: unix:/var/run/php-fpm/php-fpm.sock
+php_fpm_unix_listen: /var/run/php-fpm/php-fpm.sock
 php_fpm_tcp_listen: 127.0.0.1:9000
 ### php_fpm_listen is php_fpm_unix_listen or php_fpm_tcp_listen
 php_fpm_listen: "{{ php_fpm_unix_listen }}"

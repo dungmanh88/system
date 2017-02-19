@@ -35,7 +35,7 @@ nginx_vhosts:
     root: "/var/www/{{ nginx_vhost_meta.0.name }}"
     locations: |
       location ~ \.php$ {
-        fastcgi_pass {{ php_fpm_listen }};
+        fastcgi_pass unix:{{ php_fpm_listen }};
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include {{ nginx_install_dir }}/conf/fastcgi_params;
@@ -61,7 +61,7 @@ nginx_vhosts:
     root: "/var/www/{{ nginx_vhost_meta.1.name }}"
     locations: |
       location ~ \.php$ {
-        fastcgi_pass {{ php_fpm_listen }};
+        fastcgi_pass unix:{{ php_fpm_listen }};
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include {{ nginx_install_dir }}/conf/fastcgi_params;
