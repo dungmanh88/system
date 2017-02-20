@@ -2,7 +2,7 @@
 test_nginx
 test_named
 test_mysqld57
-test_dbadmin
+test_phpmyadmin
 test_mariadb
 test_gitlabci
 
