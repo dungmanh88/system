@@ -33,7 +33,7 @@ phpmyadmin_locations: |
     }
 
     location ~ \.php$ {
-      fastcgi_pass unix:{{ phpmyadmin_fpm_listen }};
+      fastcgi_pass {{ phpmyadmin_fastcgi_pass }};
       fastcgi_index   index.php;
       fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
       include         {{ phpmyadmin_fastcgi_file }};
@@ -50,7 +50,7 @@ phpmyadmin_mongo_servers: NA
 ### for php-fpm
 ### unix:/var/run/php-fpm/php-fpm.sock
 ### or 127.0.0.1:9000
-phpmyadmin_fpm_listen: 127.0.0.1:9000
+phpmyadmin_fastcgi_pass: unix:/var/run/php-fpm/php-fpm.sock
 
 ### vault
 phpmyadmin_htaccess_name: "{{ vault_phpmyadmin_default_htaccess_name }}"
