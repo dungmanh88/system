@@ -77,7 +77,7 @@
 
 - name: Config phpmyadmin config
   template: src=phpmyadmin.conf.j2 dest="{{ phpmyadmin_root_dir }}/phpmyadmin/config.inc.php" backup=yes owner="{{ phpmyadmin_user }}" group="{{ phpmyadmin_group }}" mode=0644
-  with_items: "{{ mysql_servers }}"
+  with_items: "{{ phpmyadmin_mysql_servers }}"
   tags: conf
 
 - name: Correct fastcgi_params path if dbm_install_dependency == 0
