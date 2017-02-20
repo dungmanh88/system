@@ -7,17 +7,17 @@
   - MariaDB-server
   - MariaDB-client
   - MariaDB-devel
-  when: base_version != "10.1"
+  when: mariadb_base_version != "10.1"
 
 - name: Install galera
-  yum: name="{{ item }}" update_cache=yes 
+  yum: name="{{ item }}" update_cache=yes
   with_items:
   - galera
   - socat
   - MariaDB-client
   - MariaDB-Galera-server
   - MariaDB-devel
-  when: base_version != "10.1"
+  when: mariadb_base_version != "10.1"
 
 - name: Install galera
   yum: name="{{ item }}" update_cache=yes
@@ -27,10 +27,10 @@
   - MariaDB-client
   - MariaDB-server
   - MariaDB-devel
-  when: base_version == "10.1"
+  when: mariadb_base_version == "10.1"
 
 - name: Create file galera dir
-  file: path="{{ galeradir }}" state=directory owner=mysql group=mysql
+  file: path="{{ mag_galera_dir }}" state=directory owner={{ mariadb_user }} group={{ mariadb_group }}
 
 - name: Enable and start mariadb
   service: name=mysql enabled=yes state=restarted
@@ -38,21 +38,21 @@
 
 - name: Create user galera
   mysql_user:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
-    login_password: "{{ admin_user.passwd }}"
-    name: "{{ galera_user.name }}"
-    password: "{{ galera_user.passwd }}"
-    priv: "{{ galera_user.priv }}"
-    state: present 
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
+    login_password: "{{ mariadb_root_passwd }}"
+    name: "{{ mag_galera_name }}"
+    password: "{{ mag_galera_passwd }}"
+    priv: "{{ mag_galera_priv }}"
+    state: present
   ignore_errors: yes
   tags: create_galera_user
 
-- name: Config MariaDB 
+- name: Config MariaDB Galera Cluster
   template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
   tags: reconfig
 
-- name: Check mariadb status
+- name: Check MariaDB status
   command: service mysql status
   tags: check_service
 

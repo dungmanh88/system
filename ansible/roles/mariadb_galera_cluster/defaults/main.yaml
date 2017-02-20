@@ -1,9 +1,21 @@
-default_gcache_size: 16M
-default_gcs_recv_q_hard_limit: 16M
-default_gcs_fc_limit: 16
-default_gcs_fc_master_slave: NO
-default_gcs_fc_factor: 0.5
-default_wsrep_cluster_name: NA
-default_wsrep_slave_threads: 4
-default_mysqld_galera_passwd: "{{ vault_mysqld_galera_passwd }}"
-default_wsrep_node_name: NA
+mag_galera_dir: /data/galera
+mag_gcache_size: 16M
+mag_gcs_recv_q_hard_limit: 16M
+mag_gcs_fc_limit: 16
+mag_gcs_fc_master_slave: NO
+mag_gcs_fc_factor: 0.5
+mag_wsrep_cluster_name: NA
+mag_wsrep_slave_threads: 4
+mag_wsrep_node_name: NA
+mag_wsrep_provider: /usr/lib64/galera/libgalera_smm.so
+mag_wsrep_provider_options: "gcache.size={{ mag_gcache_size }};gcache.name = {{ mag_galera_dir }}/galera.cache;gcache.dir={{ mag_galera_dir }};gcs.recv_q_hard_limit={{ mag_gcs_recv_q_hard_limit }};gcs.fc_limit={{ mag_gcs_fc_limit }};gcs.fc_master_slave={{ mag_gcs_fc_master_slave }};gcs.fc_factor={{ mag_gcs_fc_factor }}"
+mag_wsrep_log_conflicts: "ON"
+mag_wsrep_certify_nonPK: "ON"
+mag_wsrep_recover: "OFF"
+mag_wsrep_retry_autocommit: 3
+mag_wsrep_sst_method: "xtrabackup-v2"
+
+### vault
+mag_galera_name: "{{ vault_mag_default_galera_name }}"
+mag_galera_passwd: "{{ vault_mag_default_galera_passwd }}"
+mag_galera_priv: "{{ vault_mag_default_galera_priv }}"

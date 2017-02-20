@@ -9,115 +9,117 @@
       {%- set _ = neighbor_members.append(node) -%}
     {% endif -%}
 {% endfor -%}
-wsrep_sst_method = xtrabackup-v2
-wsrep_sst_auth = {{ galera_user.name }}:{{ galera_user.passwd }}
-wsrep_cluster_name = {{ galera.wsrep_cluster_name }}
-wsrep_provider = {{ galera.wsrep_provider }}
-wsrep_node_name = {{ galera.wsrep_node_name }}
+wsrep_sst_method = {{ mag_wsrep_sst_method }}
+wsrep_sst_auth = {{ mag_galera_name }}:{{ mag_galera_passwd }}
+wsrep_cluster_name = {{ mag_wsrep_cluster_name }}
+wsrep_provider = {{ mag_wsrep_provider }}
+wsrep_node_name = {{ mag_wsrep_node_name }}
 wsrep_cluster_address=gcomm://{{ ",".join(neighbor_members) }}
 
-wsrep_slave_threads = {{ galera.wsrep_slave_threads }}
-wsrep_provider_options = "{{ galera.wsrep_provider_options }}"
+wsrep_slave_threads = {{ mag_wsrep_slave_threads }}
+wsrep_provider_options = "{{ mag_wsrep_provider_options }}"
 
 wsrep_node_address = {{ ansible_default_ipv4.address }}
 wsrep_sst_receive_address = {{ ansible_default_ipv4.address }}
 
-wsrep_log_conflicts = {{ galera.wsrep_log_conflicts }}
-wsrep_certify_nonPK = {{ galera.wsrep_certify_nonPK }}
-wsrep_recover = {{ galera.wsrep_recover }}
-wsrep_retry_autocommit = {{ galera.wsrep_retry_autocommit }}
+wsrep_log_conflicts = {{ mag_wsrep_log_conflicts }}
+wsrep_certify_nonPK = {{ mag_wsrep_certify_nonPK }}
+wsrep_recover = {{ mag_wsrep_recover }}
+wsrep_retry_autocommit = {{ mag_wsrep_retry_autocommit }}
 
 [embedded]
 
 [mariadb]
 ### basic ###
-user = mysql
-datadir = {{ dir.datadir }}
-socket = {{ mysqld.socket }}
-port = {{ mysqld.port }}
-skip_name_resolve = {{ mysqld.skip_name_resolve }}
-max_allowed_packet = {{ mysqld.max_allowed_packet }}
+user = {{ mariadb_user }}
+datadir = {{ mariadb_datadir }}
+socket = {{ mariadb_socket }}
+port = {{ mariadb_port }}
+skip_name_resolve = {{ mariadb_skip_name_resolve }}
+max_allowed_packet = {{ mariadb_max_allowed_packet }}
 
 ### innodb ###
-default_storage_engine = InnoDB
-innodb_autoinc_lock_mode = {{ mysqld.innodb_autoinc_lock_mode }}
-innodb_doublewrite = {{ mysqld.innodb_doublewrite }}
-innodb_flush_log_at_trx_commit = {{ mysqld.innodb_flush_log_at_trx_commit }}
-innodb_buffer_pool_size = {{ mysqld.innodb_buffer_pool_size }}
-innodb_buffer_pool_instances = {{ mysqld.innodb_buffer_pool_instances }}
-innodb_file_per_table = 1
-innodb_flush_method = {{ mysqld.innodb_flush_method }}
-innodb_log_buffer_size = {{ mysqld.innodb_log_buffer_size }}
+default_storage_engine = {{ mariadb_default_storage_engine }}
+innodb_autoinc_lock_mode = {{ mariadb_innodb_autoinc_lock_mode }}
+innodb_doublewrite = {{ mariadb_innodb_doublewrite }}
+innodb_flush_log_at_trx_commit = {{ mariadb_innodb_flush_log_at_trx_commit }}
+innodb_buffer_pool_size = {{ mariadb_innodb_buffer_pool_size }}
+innodb_buffer_pool_instances = {{ mariadb_innodb_buffer_pool_instances }}
+innodb_file_per_table = {{ mariadb_innodb_file_per_table }}
+innodb_flush_method = {{ mariadb_innodb_flush_method }}
+innodb_log_buffer_size = {{ mariadb_innodb_log_buffer_size }}
 
 ### query cache ###
-query_cache_size = 0
-query_cache_type = 0
+query_cache_size = {{ mariadb_query_cache_size }}
+query_cache_type = {{ mariadb_query_cache_type }}
 
 ### timeout ###
-wait_timeout = {{ mysqld.wait_timeout }}
-interactive_timeout = {{ mysqld.interactive_timeout }}
-connect_timeout = {{ mysqld.connect_timeout }}
+wait_timeout = {{ mariadb_wait_timeout }}
+interactive_timeout = {{ mariadb_interactive_timeout }}
+connect_timeout = {{ mariadb_connect_timeout }}
 
 ### Redo log
-innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
-innodb_log_file_size = {{ mysqld.innodb_log_file_size }}
+innodb_log_files_in_group = {{ mariadb_innodb_log_files_in_group }}
+innodb_log_file_size = {{ mariadb_innodb_log_file_size }}
 
 ### temporary tables ###
-tmp_table_size = {{ mysqld.tmp_table_size }}
-max_heap_table_size = {{ mysqld.max_heap_table_size }}
-tmpdir = {{ mysqld.tmpdir }}
+tmp_table_size = {{ mariadb_tmp_table_size }}
+max_heap_table_size = {{ mariadb_max_heap_table_size }}
+tmpdir = {{ mariadb_tmpdir }}
 
 ### thread pool ###
-{% if use_thread_pool == 1 %}
-thread_handling = {{ mysqld.thread_handling }}
-thread_pool_size = {{ mysqld.thread_pool_size }}
-extra_port = {{ mysqld.extra_port }}
-extra_max_connections = {{ mysqld.extra_max_connections }}
-max_connections = {{ mysqld.max_connections }}
+{% if ma_enable_thread_pool == 1 %}
+thread_handling = {{ mariadb_thread_handling }}
+thread_pool_size = {{ mariadb_thread_pool_size }}
+extra_port = {{ mariadb_extra_port }}
+extra_max_connections = {{ mariadb_extra_max_connections }}
+max_connections = {{ mariadb_max_connections }}
 {% else %}
 # I do not use thread pool
 {% endif %}
 
 ### thread cache ###
-{% if use_thread_cache == 1 %}
-thread_cache_size = {{ mysqld.thread_cache_size }}
-max_connections = {{ mysqld.max_connections }}
+{% if ma_enable_thread_cache == 1 %}
+thread_cache_size = {{ mariadb_thread_cache_size }}
+max_connections = {{ mariadb_max_connections }}
 {% else %}
 # I do not use thread cache
 {% endif %}
 
 ### log ###
-log_output = {{ mysqld.log_output }}
-log_error = {{ mysqld.log_error }}
-slow_query_log = 1
-log_queries_not_using_indexes = {{ mysqld.log_queries_not_using_indexes }}
-log_warnings = {{ mysqld.log_warnings }}
-long_query_time = {{ mysqld.long_query_time }}
-slow_query_log_file = {{ mysqld.slow_query_log_file }}
-general_log = 0
-general_log_file = {{ mysqld.general_log_file }}
+log_output = {{ mariadb_log_output }}
+log_error = {{ mariadb_log_error }}
+slow_query_log = {{ mariadb_slow_query_log }}
+log_queries_not_using_indexes = {{ mariadb_log_queries_not_using_indexes }}
+log_warnings = {{ mariadb_log_warnings }}
+long_query_time = {{ mariadb_long_query_time }}
+slow_query_log_file = {{ mariadb_slow_query_log_file }}
+general_log = {{ mariadb_general_log }}
+general_log_file = {{ mariadb_general_log_file }}
 
 ### replication ###
-{% if use_gtid == 1 %}
-gtid_domain_id = {{ mysqld.gtid_domain_id }}
+{% if ma_enable_replication == 1 %}
+{% if ma_enable_gtid == 1 %}
+gtid_domain_id = {{ mariadb_gtid_domain_id }}
 {% endif %}
-report_host = {{ mysqld.report_host }}
-report_port = {{ mysqld.port }}
-expire_logs_days = {{ mysqld.expire_logs_days }}
-log_bin = {{ mysqld.report_host }}-bin
-log_bin_index = {{ mysqld.report_host }}-bin.log.index
-relay_log = {{ mysqld.report_host }}-relay-bin
-relay_log_index = {{ mysqld.report_host }}-relay-bin.index
-server_id = {{ mysqld.server_id }}
-log_slave_updates = 1
-binlog_format = ROW
-max_binlog_size = {{ mysqld.max_binlog_size }}
+report_host = {{ mariadb_report_host }}
+report_port = {{ mariadb_port }}
+expire_logs_days = {{ mariadb_expire_logs_days }}
+log_bin = {{ mariadb_report_host }}-bin
+log_bin_index = {{ mariadb_report_host }}-bin.log.index
+relay_log = {{ mariadb_report_host }}-relay-bin
+relay_log_index = {{ mariadb_report_host }}-relay-bin.index
+server_id = {{ mariadb_server_id }}
+log_slave_updates = {{ mariadb_log_slave_updates }}
+binlog_format = {{ mariadb_binlog_format }}
+max_binlog_size = {{ mariadb_max_binlog_size }}
+{% endif %}
 
-[mariadb-{{ base_version }}]
+[mariadb-{{ mariadb_base_version }}]
 
 [xtrabackup]
-datadir = {{ dir.datadir }}
-socket = {{ mysqld.socket }}
-streamfmt = xbstream
-innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
-innodb_log_file_size = {{ mysqld.innodb_log_file_size }}
+datadir = {{ mariadb_datadir }}
+socket = {{ mariadb_socket }}
+streamfmt = {{ xtrabackup_streamfmt }}
+innodb_log_files_in_group = {{ mariadb_innodb_log_files_in_group }}
+innodb_log_file_size = {{ mariadb_innodb_log_file_size }}
