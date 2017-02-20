@@ -29,7 +29,7 @@ phpmyadmin_allow_ips: |
 
 phpmyadmin_locations: |
     location / {
-      index {{ nginx_index | default('index.html index.htm') }};
+      index {{ phpmyadmin_index | default('index.html index.htm') }};
     }
 
     location ~ \.php$ {

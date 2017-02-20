@@ -29,11 +29,11 @@ phpmyadmin_allow_ips: |
 
 phpmyadmin_locations: |
     location / {
-      index {{ nginx_index | default('index.html index.htm') }};
+      index {{ phpmyadmin_index | default('index.html index.htm') }};
     }
 
     location ~ \.php$ {
-      fastcgi_pass unix:{{ php_fpm_listen }};
+      fastcgi_pass unix:{{ phpmyadmin_fpm_listen }};
       fastcgi_index   index.php;
       fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
       include         {{ phpmyadmin_fastcgi_file }};
