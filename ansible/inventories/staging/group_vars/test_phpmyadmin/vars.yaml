@@ -1,0 +1,62 @@
+### server for phpmyadmin and rockmongo
+phpmyadmin_service_name: phpmyadmin
+phpmyadmin_vhost_name: phpmyadmin.example.com
+phpmyadmin_install_dir: /etc/nginx
+phpmyadmin_conf_dir: /etc/nginx/conf.d
+phpmyadmin_conf_file: "{{ phpmyadmin_conf_dir }}/{{ phpmyadmin_vhost_name }}.conf"
+phpmyadmin_log_dir: "/var/log/nginx/{{ phpmyadmin_vhost_name }}"
+phpmyadmin_access_log: "{{ phpmyadmin_log_dir }}/access.log"
+phpmyadmin_error_log: "{{ phpmyadmin_log_dir }}/error.log"
+phpmyadmin_root_dir: "/var/www/{{ phpmyadmin_vhost_name }}"
+phpmyadmin_htaccess_file: "{{ phpmyadmin_install_dir }}/.phpmyadmin_passwd"
+phpmyadmin_user: nginx
+phpmyadmin_group: nginx
+phpmyadmin_fastcgi_file: "{{ phpmyadmin_install_dir }}/fastcgi_params"
+phpmyadmin_server_name: "phpmyadmin.example.com www.phpmyadmin.example.com"
+phpmyadmin_listen: 80
+phpmyadmin_index: "index.php index.html"
+
+### use openssl passwd -apr1  to gen passwd
+phpmyadmin_auth: |
+    auth_basic "phpmyadmin site";
+    auth_basic_user_file {{ phpmyadmin_htaccess_file }};
+
+phpmyadmin_allow_ips: |
+    allow 127.0.0.1;
+    allow 192.168.10.0/24;
+    allow 192.168.5.0/24;
+    deny all;
+
+phpmyadmin_locations: |
+    location / {
+      index {{ nginx_index | default('index.html index.htm') }};
+    }
+
+    location ~ \.php$ {
+      fastcgi_pass unix:{{ php_fpm_listen }};
+      fastcgi_index   index.php;
+      fastcgi_param   SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+      include         {{ phpmyadmin_fastcgi_file }};
+    }
+
+### for phpmyadmin
+phpmyadmin_mysql_servers:
+  - host: localhost
+    verbose: "This localhost"
+
+### for rockmongo
+phpmyadmin_mongo_servers: NA
+
+### for php-fpm
+### unix:/var/run/php-fpm/php-fpm.sock
+### or 127.0.0.1:9000
+phpmyadmin_fpm_listen: 127.0.0.1:9000
+
+### vault
+phpmyadmin_htaccess_name: "{{ vault_phpmyadmin_default_htaccess_name }}"
+phpmyadmin_htaccess_passwd: "{{ vault_phpmyadmin_default_htaccess_passwd }}"
+phpmyadmin_blowfish_secret: "{{ vault_phpmyadmin_default_blowfish_secret }}"
+
+### Control param
+### dbm_install_dependency = 0|1
+pma_install_dependency: 0

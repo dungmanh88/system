@@ -5,7 +5,7 @@
   with_items:
     - nginx
     - mysql
-  when: dbm_install_dependency == 1
+  when: pma_install_dependency == 1
   tags: nginx
 
 - name: Install php packages
@@ -15,7 +15,7 @@
     - php-mysql
     - php-fpm
     - php-mbstring
-  when: dbm_install_dependency == 1
+  when: pma_install_dependency == 1
   tags: php
 
 - name: Download phpmyadmin package
@@ -39,53 +39,53 @@
   command: "mv /tmp/{{ phpmyadmin_version }}-{{ phpmyadmin_language }} /tmp/phpmyadmin"
 
 - name: debug
-  debug: msg="{{ nginx_vhost_name }}, {{ nginx_log_dir }}"
+  debug: msg="{{ phpmyadmin_vhost_name }}, {{ phpmyadmin_log_dir }}"
 
 - name: Create root and log dir
   file:
     path: "{{ item }}"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    owner: "{{ phpmyadmin_user }}"
+    group: "{{ phpmyadmin_group }}"
     mode: 0660
     state: directory
   with_items:
-    - "{{ nginx_root_dir }}"
-    - "{{ nginx_log_dir }}"
-    - "{{ nginx_conf_dir }}"
+    - "{{ phpmyadmin_root_dir }}"
+    - "{{ phpmyadmin_log_dir }}"
+    - "{{ phpmyadmin_conf_dir }}"
 
 - name: Move phpmyadmin to document root
-  command: "mv /tmp/phpmyadmin  {{ nginx_root_dir }}"
+  command: "mv /tmp/phpmyadmin  {{ phpmyadmin_root_dir }}"
   ignore_errors: yes
 
 - name: Ensure all are nginx:nginx
-  command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ nginx_root_dir }}
+  command: chown -R {{ phpmyadmin_user }}:{{ phpmyadmin_group }} {{ phpmyadmin_root_dir }}
 
 - name: Ensure session save path is nginx:nginx
-  command: chown -R {{ nginx_user }}:{{ nginx_group }} /var/lib/php/session
+  command: chown -R {{ phpmyadmin_user }}:{{ phpmyadmin_group }} /var/lib/php/session
 
 - name: Ensure dictories are 0755
-  command: find {{ nginx_root_dir }} -type d -exec chmod 0755 {} \;
+  command: find {{ phpmyadmin_root_dir }} -type d -exec chmod 0755 {} \;
 
 - name: Ensure files are 0644
-  command: find {{ nginx_root_dir }} -type f -exec chmod 0644 {} \;
+  command: find {{ phpmyadmin_root_dir }} -type f -exec chmod 0644 {} \;
 
 - name: Config vhost
-  template: src=dbadmin.conf.j2 dest="{{ nginx_conf_file }}" backup=yes
+  template: src=phpmyadmin.vhost.conf.j2 dest="{{ phpmyadmin_conf_file }}" backup=yes
 
 - name: Config htaccess
-  template: src=htaccess.conf.j2 dest="{{ nginx_htaccess_file }}"
+  template: src=htaccess.conf.j2 dest="{{ phpmyadmin_htaccess_file }}"
 
 - name: Config phpmyadmin config
-  template: src=phpmyadmin.conf.j2 dest="{{ nginx_root_dir }}/phpmyadmin/config.inc.php" backup=yes owner="{{ nginx_user }}" group="{{ nginx_group }}" mode=0644
+  template: src=phpmyadmin.conf.j2 dest="{{ phpmyadmin_root_dir }}/phpmyadmin/config.inc.php" backup=yes owner="{{ phpmyadmin_user }}" group="{{ phpmyadmin_group }}" mode=0644
   with_items: "{{ mysql_servers }}"
   tags: conf
 
 - name: Correct fastcgi_params path if dbm_install_dependency == 0
   lineinfile:
-    dest: "{{ nginx_conf_file }}"
+    dest: "{{ phpmyadmin_conf_file }}"
     state: present
     regexp: '^      include '
-    line: '      include {{ nginx_install_dir }}/conf/fastcgi_params;'
+    line: '      include {{ phpmyadmin_install_dir }}/conf/fastcgi_params;'
   when: dbm_install_dependency == 0
 
 - name: restart and enable nginx
@@ -103,4 +103,4 @@
   tags: restart
 
 - name: Show msg
-  debug: msg="Access http://{{ nginx_vhost_name }}:{{ nginx_listen }}/phpmyadmin/index.php. Remember point domain {{ nginx_vhost_name }} to {{ ansible_default_ipv4.address }}"
+  debug: msg="Access http://{{ phpmyadmin_vhost_name }}:{{ phpmyadmin_listen }}/phpmyadmin/index.php. Remember point domain {{ phpmyadmin_vhost_name }} to {{ ansible_default_ipv4.address }}"

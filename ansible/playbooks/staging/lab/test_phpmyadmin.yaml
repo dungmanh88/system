@@ -1,0 +1,4 @@
+- name: Deploy dbadmin
+  hosts: test_phpmyadmin
+  roles:
+  - role: phpmyadmin

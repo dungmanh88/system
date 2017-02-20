@@ -1,0 +1,25 @@
+server {
+    listen {{ phpmyadmin_listen }};
+
+{% if phpmyadmin_server_name is defined %}
+    server_name {{ phpmyadmin_server_name }};
+{% endif %}
+    root {{ phpmyadmin_root_dir }};
+    index {{ phpmyadmin_index | default('index.html index.htm') }};
+
+{% if phpmyadmin_access_log is defined %}
+    access_log {{ phpmyadmin_access_log }};
+{% endif %}
+{% if phpmyadmin_error_log is defined %}
+    error_log {{ phpmyadmin_error_log }} error;
+{% endif %}
+{% if phpmyadmin_auth is defined %}
+    {{ phpmyadmin_auth|indent(4) }}
+{% endif %}
+{% if phpmyadmin_allow_ips is defined %}
+    {{ phpmyadmin_allow_ips|indent(4) }}
+{% endif %}
+{% if phpmyadmin_locations is defined %}
+    {{ phpmyadmin_locations|indent(4) }}
+{% endif %}
+}

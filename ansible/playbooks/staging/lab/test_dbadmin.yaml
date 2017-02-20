@@ -1,4 +1,0 @@
-- name: Deploy dbadmin
-  hosts: test_dbadmin
-  roles:
-  - role: dbadmin

@@ -21,8 +21,8 @@ test2 ansible_host=192.168.10.122 hostname=test2
 [test_mysqld57]
 test4 ansible_host=192.168.10.124 hostname=test4
 
-[test_dbadmin]
-test2 ansible_host=192.168.10.122 hostname=test2 dbm_install_dependency=0
+[test_phpmyadmin]
+test2 ansible_host=192.168.10.122 hostname=test2 pma_install_dependency=0
 
 [test_mariadb]
 test2 ansible_host=192.168.10.122 hostname=test2
