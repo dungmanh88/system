@@ -34,6 +34,7 @@ nginx_vhosts:
     access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/access.log"
     error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/error.log"
     root: "/data/www/{{ nginx_vhost_meta.0.name }}"
+    client_max_body_size: 20M
     locations: |
       location ~ \.php$ {
         fastcgi_pass unix:{{ php_fpm_listen }};
@@ -60,6 +61,7 @@ nginx_vhosts:
     access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/access.log"
     error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/error.log"
     root: "/data/www/{{ nginx_vhost_meta.1.name }}"
+    client_max_body_size: 20M
     locations: |
       location ~ \.php$ {
         fastcgi_pass unix:{{ php_fpm_listen }};
