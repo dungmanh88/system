@@ -1,8 +1,0 @@
-checker:
-  name: "{{ vault_mysqld_check_user }}"
-  passwd: "{{ vault_mysqld_check_passwd }}"
-  port: 3306
-  host: localhost
-
-monitor:
-  port: 9302
