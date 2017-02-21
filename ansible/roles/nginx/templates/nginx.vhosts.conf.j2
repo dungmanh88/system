@@ -21,6 +21,9 @@ server {
 {% if item.error_log is defined %}
     error_log {{ item.error_log }} error;
 {% endif %}
+{% if item.client_max_body_size is defined %}
+    client_max_body_size {{ item.client_max_body_size }};
+{% endif %}
 
     location / {
 {% if ngx_role == "proxy" or ngx_role == "proxy_cache" %}
