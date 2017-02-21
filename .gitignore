@@ -5,3 +5,5 @@
 *.pyc
 .idea
 venv
+production
+initial_setup.sh.j2
