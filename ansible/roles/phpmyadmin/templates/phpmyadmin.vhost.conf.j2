@@ -13,6 +13,10 @@ server {
 {% if phpmyadmin_error_log is defined %}
     error_log {{ phpmyadmin_error_log }} error;
 {% endif %}
+
+{% if phpmyadmin_auth is defined and phpmyadmin_allow_ips is defined %}
+    satisfy all;
+{% endif %}
 {% if phpmyadmin_auth is defined %}
     {{ phpmyadmin_auth|indent(4) }}
 {% endif %}
