@@ -27,7 +27,7 @@ test2 ansible_host=192.168.10.122 hostname=test2 pma_install_dependency=0
 [test_mariadb]
 test2 ansible_host=192.168.10.122 hostname=test2
 
-[test_maraidb_galera_cluster]
+[test_mariadb_galera_cluster]
 test2_mariadb_galera_cluster ansible_host=192.168.10.122 hostname=test2 mariadb_report_host=test2 mariadb_server_id=2 mag_wsrep_node_name=test2
 test3_mariadb_galera_cluster ansible_host=192.168.10.123 hostname=test3 mariadb_report_host=test3 mariadb_server_id=3 mag_wsrep_node_name=test3
 test4_mariadb_galera_cluster ansible_host=192.168.10.124 hostname=test4 mariadb_report_host=test4 mariadb_server_id=4 mag_wsrep_node_name=test4
