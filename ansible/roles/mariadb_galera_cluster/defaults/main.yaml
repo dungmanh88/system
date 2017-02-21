@@ -1,3 +1,4 @@
+cluster_members: NA
 mag_galera_dir: /data/galera
 mag_gcache_size: 16M
 mag_gcs_recv_q_hard_limit: 16M
