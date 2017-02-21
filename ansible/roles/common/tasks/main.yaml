@@ -10,7 +10,7 @@
   with_items:
     - "127.0.0.1 {{ hostname }}"
     - "{{ ansible_default_ipv4.address }} {{ hostname }}"
-    
+
 - name: Config temporary gateway
   command: route add default gw "{{ gateway_ip }}"
   ignore_errors: yes
@@ -80,9 +80,9 @@
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version5 }}"
 
-- name: Get pip 
+- name: Get pip
   get_url: url="{{ pip_url }}" dest=/tmp/get-pip.py mode=0644
- 
+
 - name: Install pip
   command: /usr/bin/python get-pip.py
   args:
@@ -128,16 +128,16 @@
     owner: root
     group: root
     mode: 0440
-    validate: 'visudo -cf %s' 
+    validate: 'visudo -cf %s'
 
 - name: Create administrator accounts
   user:
-    name: "{{ item.name }}" 
+    name: "{{ item.name }}"
     password: "{{ item.passwd }}"
     comment: "{{ item.full_name }}"
-    shell: /bin/bash 
+    shell: /bin/bash
     groups: "{{ admin_group }}"
-    append: yes 
+    append: yes
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
@@ -151,18 +151,18 @@
   copy: src=tmux.conf.j2 dest="/home/{{ item.name }}/.tmux.conf"
   with_items: "{{ admin_users }}"
 
-- name: Check if filter user in sshd 
+- name: Check if filter user in sshd
   command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
   register: check_sshd
   ignore_errors: yes
   changed_when: False
   check_mode: no
 
-- name: Allow user in sshd 
+- name: Allow user in sshd
   lineinfile:
     dest: /etc/ssh/sshd_config
     line: 'AllowUsers {{ item.name }}'
-    state: present 
+    state: present
     validate: '/usr/sbin/sshd -T -t -f %s'
   with_items: "{{ admin_users }}"
   when: check_sshd.rc == 0
@@ -176,14 +176,17 @@
     name: "{{ root_user.name }}"
     password: "{{ root_user.recovery_passwd }}"
     shell: /sbin/nologin
-  
+
 - name: Disallow root SSH access
-  lineinfile: 
+  lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^PermitRootLogin"
     line: "PermitRootLogin no"
     state: present
     validate: '/usr/sbin/sshd -T -t -f %s'
+
+- name: Reloaded sshd
+  service: name="sshd" enabled=yes state=reloaded
 
 - name: Copy script fix e1000e
   copy: src=e1000e_fix.sh.j2 dest=/tmp/e1000e_fix.sh owner=root group=root mode=0744
