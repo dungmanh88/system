@@ -94,6 +94,7 @@ php_fpm_listen_group: nobody
 php_fpm_listen_mode: "0660"
 php_fpm_user: apache
 php_fpm_group: apache
+php_version: php56
 ### Control param
 ### pfm_enable: 0|1
 pfm_enable: 0

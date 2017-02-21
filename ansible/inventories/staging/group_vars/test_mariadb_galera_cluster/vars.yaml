@@ -1,3 +1,8 @@
+cluster_members:
+  - 192.168.10.122
+  - 192.168.10.123
+  - 192.168.10.124
+
 mag_galera_dir: /data/galera
 mag_gcache_size: 16M
 mag_gcs_recv_q_hard_limit: 16M
