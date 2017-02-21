@@ -79,8 +79,8 @@ xtrabackup_streamfmt: xbstream
 sysctl_vm_swappiness: 10
 
 ### vault
-mariadb_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
 mariadb_root_name: "{{ vault_mariadb_default_root_name }}"
+mariadb_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
 mariadb_root_priv: "{{ vault_mariadb_default_root_priv }}"
 
 ### Control param
