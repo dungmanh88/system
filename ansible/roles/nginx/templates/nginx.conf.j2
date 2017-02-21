@@ -24,6 +24,7 @@ http {
     access_log  {{ nginx_access_log }}  main;
     sendfile        on;
     keepalive_timeout  65;
+    client_max_body_size {{ nginx_client_max_body_size }};
 {% if ngx_role == "proxy"  or ngx_role == "proxy_cache" %}
     include {{ nginx_upstream|indent(4) }};
 {% endif %}
