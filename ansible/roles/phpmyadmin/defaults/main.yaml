@@ -7,7 +7,7 @@ phpmyadmin_conf_file: "{{ phpmyadmin_conf_dir }}/{{ phpmyadmin_vhost_name }}.con
 phpmyadmin_log_dir: "/var/log/nginx/{{ phpmyadmin_vhost_name }}"
 phpmyadmin_access_log: "{{ phpmyadmin_log_dir }}/access.log"
 phpmyadmin_error_log: "{{ phpmyadmin_log_dir }}/error.log"
-phpmyadmin_root_dir: "/var/www/{{ phpmyadmin_vhost_name }}"
+phpmyadmin_root_dir: "/data/www/{{ phpmyadmin_vhost_name }}"
 phpmyadmin_htaccess_file: "{{ phpmyadmin_install_dir }}/.phpmyadmin_passwd"
 phpmyadmin_user: nginx
 phpmyadmin_group: nginx
