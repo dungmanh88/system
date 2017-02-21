@@ -4,6 +4,7 @@ test_named
 test_mysqld57
 test_phpmyadmin
 test_mariadb
+test_mariadb_galera_cluster
 test_gitlabci
 
 [lab:vars]
