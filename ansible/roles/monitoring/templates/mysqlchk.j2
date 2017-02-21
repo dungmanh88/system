@@ -2,7 +2,7 @@ service mysqlchk
 {
   flags = REUSE
   socket_type = stream
-  port = {{ monitor.port }}
+  port = {{ monitor_port }}
   wait = no
   user = nobody
   {% if monitor_what == "galera" %}
@@ -15,4 +15,3 @@ log_on_failure += USERID
   only_from = 0.0.0.0/0
   per_source = UNLIMITED
 }
-
