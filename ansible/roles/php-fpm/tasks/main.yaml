@@ -1,10 +1,28 @@
 - name: Install php packages
-  yum: name="{{ item }}" update_cache=yes enablerepo=remi-php71
+  yum: name="{{ item }}" update_cache=yes enablerepo=remi-{{ php_version }}
   with_items:
     - php
     - php-mysql
-    - php-fpm
+    - php-mcrypt
     - php-mbstring
+    - php-fpm
+    - php-gd
+    - php-xml
+    - php-pdo
+    - php-zip
+    - php-bcmath
+    - php-memcached
+    - php-redis
+    - php-soap
+    - php-pecl-igbinary
+    - php-snmp
+    - php-msgpack
+    - php-ldap
+    - php-process
+    - php-json
+    - php-mysqlnd
+    - php-imap
+
   when: pfm_enable == 1
   tags: php
 
