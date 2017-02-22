@@ -67,6 +67,9 @@ tmp_table_size = {{ mariadb_tmp_table_size }}
 max_heap_table_size = {{ mariadb_max_heap_table_size }}
 tmpdir = {{ mariadb_tmpdir }}
 
+### open cache
+table_open_cache = {{ mariadb_table_open_cache }}
+
 ### thread pool ###
 {% if ma_enable_thread_pool == 1 %}
 thread_handling = {{ mariadb_thread_handling }}
