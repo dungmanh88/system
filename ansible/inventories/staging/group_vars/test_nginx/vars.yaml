@@ -12,6 +12,7 @@ nginx_access_log: "{{ nginx_log_dir }}/access.log"
 nginx_worker_processes: 1
 nginx_worker_connections: 25000
 nginx_worker_rlimit_nofile: 25000
+nginx_client_max_body_size: 8M
 nginx_multi_accept: "on"
 nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
 nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
@@ -32,7 +33,8 @@ nginx_vhosts:
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}"
     access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/access.log"
     error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/error.log"
-    root: "/var/www/{{ nginx_vhost_meta.0.name }}"
+    root: "/data/www/{{ nginx_vhost_meta.0.name }}"
+    client_max_body_size: 20M
     locations: |
       location ~ \.php$ {
         fastcgi_pass unix:{{ php_fpm_listen }};
@@ -58,7 +60,8 @@ nginx_vhosts:
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}"
     access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/access.log"
     error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/error.log"
-    root: "/var/www/{{ nginx_vhost_meta.1.name }}"
+    root: "/data/www/{{ nginx_vhost_meta.1.name }}"
+    client_max_body_size: 20M
     locations: |
       location ~ \.php$ {
         fastcgi_pass unix:{{ php_fpm_listen }};
@@ -94,7 +97,8 @@ php_fpm_listen_group: nobody
 php_fpm_listen_mode: "0660"
 php_fpm_user: apache
 php_fpm_group: apache
-php_version: php56
 ### Control param
 ### pfm_enable: 0|1
 pfm_enable: 0
+### php_version: php56|php71
+php_version: php56
