@@ -101,4 +101,4 @@ php_fpm_group: apache
 ### pfm_enable: 0|1
 pfm_enable: 0
 ### php_version: php56|php71
-php_version: php56
+php_version: php71

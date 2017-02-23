@@ -22,6 +22,8 @@
     - php-json
     - php-mysqlnd
     - php-imap
+#    - php-pecl-apcu
+    - php-opcache
 
   when: pfm_enable == 1
   tags: php
