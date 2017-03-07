@@ -1,24 +1,23 @@
 systemLog:
   destination: file
   logAppend: true
-  path: {{ config.systemLog.path }}
+  path: {{ mongo_systemLog_path }}
 
 storage:
-  dbPath: {{ config.storage.dbPath }}
+  dbPath: {{ mongo_storage_dbPath }}
   journal:
     enabled: true
 
 processManagement:
   fork: true
-  pidFilePath: {{ config.processManagement.pidFilePath }}
+  pidFilePath: {{ mongo_processManagement_pidFilePath }}
 
 net:
-  port: {{ config.net.port }}
-  bindIp: {{ config.net.bindIp }}
+  port: {{ mongo_net_port }}
+  bindIp: {{ mongo_net_bindIp }}
 
 security:
-  authorization: {{ config.security.authorization }}
+  authorization: {{ mongo_security_authorization }}
 
 setParameter:
-  enableLocalhostAuthBypass: {{ config.setParameter.enableLocalhostAuthBypass }}
-
+  enableLocalhostAuthBypass: {{ mongo_setParameter_enableLocalhostAuthBypass }}
