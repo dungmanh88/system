@@ -6,21 +6,23 @@
   register: check_mysql
   ignore_errors: yes
   changed_when: False
-  check_mode: no  
+  check_mode: no
 
 - name: Throw error if mysql is running
   fail: msg="Please turn off mysql service"
   when: check_mysql.rc == 0
 
-- name: Install Mariadb on CentOS
+- name: Install MariaDB Repo on CentOS
   copy: src=MariaDB-{{ ansible_distribution }}{{ ansible_distribution_major_version }}-{{ mariadb_version }}.repo.j2 dest=/etc/yum.repos.d/MariaDB.repo
 
-- name: Install MariaDB 
-  yum: name="{{ item }}" update_cache=yes 
+- name: Install MariaDB
+  yum: name="{{ item }}" update_cache=yes
   with_items:
   - MariaDB-client
   - MariaDB-server
   - MariaDB-devel
+  - MariaDB-shared
+  - MariaDB-common
 
 - name: Install percona repo
   yum: name="{{ percona_centos_url }}" update_cache=yes
@@ -28,14 +30,14 @@
     - ansible_distribution == "{{ distro_centos.name }}"
 
 - name: Install percona-toolkit and percona-xtrabackup
-  yum: name="{{ item }}" update_cache=yes 
+  yum: name="{{ item }}" update_cache=yes
   with_items:
   - percona-xtrabackup
   - percona-toolkit
 
 - name: Get pip
   get_url: url={{ pip_url }} dest=/tmp/get-pip.py mode=0644
- 
+
 - name: Install pip
   command: /usr/bin/python get-pip.py
   args:
@@ -46,7 +48,7 @@
 
 - name: Create tmpdir, logdir and datadir
   file: path="{{ item }}" state=directory owner="{{ mariadb_user }}" group="{{ mariadb_group }}"
-  with_items: 
+  with_items:
   - "{{ mariadb_logdir }}"
   - "{{ mariadb_tmpdir }}"
   - "{{ mariadb_datadir }}"
@@ -67,9 +69,9 @@
   ignore_errors: yes
 
 - name: Create softlink
-  file: 
+  file:
     src: "{{ mariadb_datadir_origin }}"
-    dest: "{{ mariadb_datadir }}"  
+    dest: "{{ mariadb_datadir }}"
     state: link
   when: mariadb_datadir_origin != mariadb_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
 
@@ -87,7 +89,7 @@
   sysctl: name=vm.swappiness value="{{ sysctl_vm_swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
 
 - name: Change ulimit
-  copy: src=mysqld_ulimit.j2 dest=/etc/security/limits.d/95-mysqld.conf  
+  copy: src=mysqld_ulimit.j2 dest=/etc/security/limits.d/95-mysqld.conf
 
 - name: Check if ulimit in service script
   command: grep -Fq "ulimit" /etc/init.d/mysql
@@ -97,8 +99,8 @@
   check_mode: no
   tags: change_ulimit
 
-- name: Change limit in service script 
-  lineinfile: 
+- name: Change limit in service script
+  lineinfile:
     line: "{{ item }}"
     dest: /etc/init.d/mysql
     insertbefore: '^case \"\$mode\" in'
@@ -117,7 +119,7 @@
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Customize mariadb service script
-  copy: src=mariadb_service_limits.conf.j2 dest=/etc/systemd/system/mariadb.service.d/10_limits.conf 
+  copy: src=mariadb_service_limits.conf.j2 dest=/etc/systemd/system/mariadb.service.d/10_limits.conf
   when:
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
@@ -160,15 +162,15 @@
     name: "{{ mariadb_root_name }}"
     password: "{{ mariadb_root_passwd }}"
     priv: "{{ mariadb_root_priv }}"
-    state: present 
+    state: present
     login_user: "{{ mariadb_root_name }}"
     login_port: "{{ mariadb_port }}"
     login_password: ''
     login_host: localhost
     host: "{{ item }}"
-  with_items: 
+  with_items:
     - 127.0.0.1
-    - ::1   
+    - ::1
     - localhost
   ignore_errors: yes
 
@@ -183,5 +185,3 @@
 - name: Check mariadb status
   command: service mysql status
   tags: check_service
-
-

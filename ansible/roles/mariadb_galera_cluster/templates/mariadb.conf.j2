@@ -16,6 +16,10 @@ wsrep_provider = {{ mag_wsrep_provider }}
 wsrep_node_name = {{ mag_wsrep_node_name }}
 wsrep_cluster_address=gcomm://{{ ",".join(neighbor_members) }}
 
+{% if mariadb_base_version == "10.1" %}
+wsrep_on = ON
+{% endif %}
+
 wsrep_slave_threads = {{ mag_wsrep_slave_threads }}
 wsrep_provider_options = "{{ mag_wsrep_provider_options }}"
 

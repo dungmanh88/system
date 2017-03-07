@@ -11,18 +11,6 @@
     - "127.0.0.1 {{ hostname }}"
     - "{{ ansible_default_ipv4.address }} {{ hostname }}"
 
-- name: Config temporary gateway
-  command: route add default gw "{{ gateway_ip }}"
-  ignore_errors: yes
-
-- name: Config persistent gateway
-  lineinfile:
-    dest: /etc/sysconfig/network
-    state: present
-    regexp: '^GATEWAY='
-    line: 'GATEWAY={{ gateway_ip }}'
-  when: gateway_persistent
-
 - name: Config nameserver
   blockinfile:
     dest: /etc/resolv.conf
@@ -113,9 +101,6 @@
 - name: Restart and enable ntpd
   service: name="ntpd" enabled=yes state=restarted
 
-- name: Start and enable sshd
-  service: name="sshd" enabled=yes state=started
-
 - name: Create admin group
   group:
     name: "{{ admin_group }}"
@@ -141,14 +126,17 @@
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
+  when: item.active == 1
   with_items: "{{ admin_users }}"
 
 - name: Config basic vim
   copy: src=vimrc.conf.j2 dest="/home/{{ item.name }}/.vimrc"
+  when: item.active == 1
   with_items: "{{ admin_users }}"
 
 - name: Config basic tmux
   copy: src=tmux.conf.j2 dest="/home/{{ item.name }}/.tmux.conf"
+  when: item.active == 1
   with_items: "{{ admin_users }}"
 
 - name: Check if filter user in sshd
@@ -164,18 +152,20 @@
     line: 'AllowUsers {{ item.name }}'
     state: present
     validate: '/usr/sbin/sshd -T -t -f %s'
+  when:
+    - item.active == 1
+    - check_sshd.rc == 0
   with_items: "{{ admin_users }}"
-  when: check_sshd.rc == 0
 
 - name: Restart sshd to apply config
   service: name="sshd" enabled=yes state=restarted
   when: check_sshd.rc == 0
 
-- name: Change passwd root and disable root login
+- name: Change passwd root and enable root login console
   user:
     name: "{{ root_user.name }}"
     password: "{{ root_user.recovery_passwd }}"
-    shell: /sbin/nologin
+    shell: /bin/bash
 
 - name: Disallow root SSH access
   lineinfile:
