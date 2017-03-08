@@ -12,6 +12,9 @@
 - name: Install MongoDB
   yum: name=mongodb-org update_cache=yes
 
+- name: Install numactl
+  yum: name=numactl update_cache=yes
+
 - name: Get pip
   get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/tmp/get-pip.py mode=0644
 
@@ -63,14 +66,23 @@
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
-- name: Customize mongod service script
+- name: Customize limits mongod service script
   copy: src=mongod_service_limits.conf.j2 dest=/etc/systemd/system/mongod.service.d/10_limits.conf
   when:
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
-- name: Enable and start transparent huge page script
-  service: name=disable-transparent-hugepages enabled=yes state=restarted
+- name: Customize numa support mongod service script
+  copy: src=mongod_numa_support.conf.j2 dest=/etc/systemd/system/mongod.service.d/9_numa_support.conf
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+
+- name: Restart transparent huge page script
+  command: service disable-transparent-hugepages restart
+
+- name: Enable transparent huge page script
+  command: chkconfig --add disable-transparent-hugepages
 
 - name: Enable and start mongod on centos 6
   service: name=mongod enabled=yes state=restarted

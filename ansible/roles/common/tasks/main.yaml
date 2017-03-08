@@ -9,7 +9,8 @@
     line: '{{ item }}'
   with_items:
     - "127.0.0.1 {{ hostname }}"
-    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
+#    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
+    - "{{ ansible_host }} {{ hostname }}"
 
 - name: Config nameserver
   blockinfile:
