@@ -40,3 +40,21 @@ https://askubuntu.com/questions/17641/create-encrypted-password-protected-zip-fi
 zip --encrypt file.zip files ### enter pass to zip
 unzip file.zip ### enter pass to unzip
 ```
+
+# Calculate disk space
+```
+df -Th
+```
+
+```
+du -h --max-depth=1 --exclude=/var
+```
+
+```
+ncdu
+```
+
+# Keep files for last 15 days
+```
+ls -lt | tail -n +15
+```

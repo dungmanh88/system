@@ -29,6 +29,11 @@ or
 cat /etc/group | grep groupname
 ```
 
+## Remove member from all secondary groups
+```
+usermod -G "" username
+```
+
 # User management
 ## Check user
 ```

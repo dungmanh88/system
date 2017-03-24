@@ -68,6 +68,16 @@ docker service rm <service-name>
 docker node update --availability drain <node-name-in-docker-node-ls-output>
 ```
 
+### List node
+```
+docker node ls
+```
+
+## Deploy docker compose
+```
+docker stack deploy --compose-file docker-compose.yml lab
+```
+
 # Docker swarm worker node
 ```
 docker swarm join \
