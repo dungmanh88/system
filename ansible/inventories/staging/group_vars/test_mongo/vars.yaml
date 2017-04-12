@@ -1,0 +1,28 @@
+mongo_version: 3
+
+mongo_systemLog_path: /var/log/mongodb/mongod.log
+mongo_storage_dbPath: /var/lib/mongo
+mongo_processManagement_pidFilePath: /var/run/mongodb/mongod.pid
+mongo_net_port: 27017
+mongo_net_bindIp: "0.0.0.0"
+mongo_security_authorization: "enabled"
+mongo_setParameter_enableLocalhostAuthBypass: 0
+
+sysctl_vm_swappiness: 10
+
+### first, disable security and enable localhost auth bypass then revert these options.
+mongo_users:
+  - name: "{{ vault_mongo_root_user }}"
+    passwd: "{{ vault_mongo_root_passwd }}"
+    roles: "{{ vault_mongo_root_roles }}"
+    db: "{{ vault_mongo_root_db }}"
+
+  - name: "{{ vault_mongo_admin_user }}"
+    passwd: "{{ vault_mongo_admin_passwd }}"
+    roles: "{{ vault_mongo_admin_roles }}"
+    db: "{{ vault_mongo_admin_db }}"
+
+  - name: "{{ vault_mongo_dumper_user }}"
+    passwd: "{{ vault_mongo_dumper_passwd }}"
+    roles: "{{ vault_mongo_dumper_roles }}"
+    db: "{{ vault_mongo_dumper_db }}"

@@ -28,11 +28,13 @@ mariadb_innodb_log_buffer_size: 16M
 
 mariadb_innodb_file_per_table: 1
 
+### packet size ###
 mariadb_max_allowed_packet: 32M
 
+### Open cache ###
 mariadb_table_open_cache: 1000
 
-
+### query cache ###
 mariadb_query_cache_size: 0
 mariadb_query_cache_type: 0
 
@@ -40,13 +42,16 @@ mariadb_query_cache_type: 0
 mariadb_thread_cache_size: 4
 mariadb_max_connections: 64
 
+### Timeout ###
 mariadb_wait_timeout: 30
 mariadb_interactive_timeout: 30
 mariadb_connect_timeout: 30
 
+### Temporary ###
 mariadb_tmp_table_size: 64M
 mariadb_max_heap_table_size: 64M
 
+### Log ###
 mariadb_log_output: FILE
 mariadb_log_queries_not_using_indexes: 0
 mariadb_log_warnings: 2
@@ -54,6 +59,7 @@ mariadb_long_query_time: 2
 mariadb_general_log: 0
 mariadb_slow_query_log: 1
 
+### Redo log ###
 mariadb_innodb_log_files_in_group: 2
 mariadb_innodb_log_file_size: 64M
 
@@ -72,6 +78,7 @@ mariadb_expire_logs_days: 5
 mariadb_server_id: NA
 mariadb_max_binlog_size: 200M
 mariadb_log_slave_updates: 1
+#mariadb_binlog_format: ROW or MIXED
 mariadb_binlog_format: ROW
 
 xtrabackup_streamfmt: xbstream

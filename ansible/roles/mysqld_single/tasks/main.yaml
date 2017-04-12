@@ -6,7 +6,7 @@
   register: check_mysql
   ignore_errors: yes
   changed_when: False
-  check_mode: no  
+  check_mode: no
 
 - name: Throw error if mysql is running
   fail: msg="Please turn off mysql service"
@@ -14,36 +14,39 @@
 
 - name: Install mysqld 5.7 repo on CentOS 6
   yum: name="{{ mysqld_57_centos_6_repo_url }}"
-  when: 
-    - mysqld_version == 5.7
+  when:
+    - mysqld_version == "5.7"
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
 
 - name: Install mysqld 5.7 repo on Centos 7
   yum: name="{{ mysqld_57_centos_7_repo_url }}"
-  when:   
-    - mysqld_version == 5.7
+  when:
+    - mysqld_version == "5.7"
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Install mysqld 5.7
-  yum: name="{{ item }}" update_cache=yes 
+  yum: name="{{ item }}" update_cache=yes
   with_items:
   - mysql-community-server
   - mysql-devel
+  - mysql-community-libs
 
 - name: Install percona repo
-  yum: name="{{ percona_repo_url }}" update_cache=yes
+  yum: name="{{ percona_centos_url }}" update_cache=yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
 
 - name: Install percona-toolkit and percona-xtrabackup
-  yum: name="{{ item }}" update_cache=yes 
+  yum: name="{{ item }}" update_cache=yes
   with_items:
   - percona-xtrabackup
   - percona-toolkit
 
 - name: Get pip
   get_url: url={{ pip_url }} dest=/tmp/get-pip.py mode=0644
- 
+
 - name: Install pip
   command: /usr/bin/python get-pip.py
   args:
@@ -52,118 +55,78 @@
 - name: Install MySQL-python
   pip: name=MySQL-python
 
-- name: Create dir
-  file: path="{{ item }}" state=directory owner=mysql group=mysql
-  with_items: 
-  - "{{ mysqld_datadir }}"
-  - "{{ mysqld_datadir_origin }}"
+- name: Create dir, logdir and datadir
+  file: path="{{ item }}" state=directory owner="{{ mysqld_user }}" group="{{ mysqld_group }}"
+  with_items:
   - "{{ mysqld_logdir }}"
   - "{{ mysqld_tmpdir }}"
+  - "{{ mysqld_datadir }}"
+  - "{{ mysqld_datadir_base }}"
+  - "{{ mysqld_piddir }}"
   ignore_errors: yes
+
+- stat:
+    path: "{{ mysqld_datadir }}"
+  register: datadir
+
+- name: Copy files in mysqld_datadir to mysqld_datadir_origin
+  command: cp -r {{ mysqld_datadir }}/ {{ mysqld_datadir_origin }}
+  when: mysqld_datadir_origin != mysqld_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
 
 - name: Move /var/lib/mysql to /var/lib/mysql.bak
   command: mv "{{ mysqld_datadir }}" /var/lib/mysql.bak
-  when: mysqld_datadir_origin != mysqld_datadir
+  when: mysqld_datadir_origin != mysqld_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
+  ignore_errors: yes
 
 - name: Create softlink
-  file: 
+  file:
     src: "{{ mysqld_datadir_origin }}"
-    dest: "{{ mysqld_datadir }}"  
+    dest: "{{ mysqld_datadir }}"
     state: link
-  when: mysqld_datadir_origin != mysqld_datadir
+  when: mysqld_datadir_origin != mysqld_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
 
-#- name: Config mysqld
-#  template: src=mysqld.conf.j2 dest=/etc/my.cnf backup=yes
-#  tags: reconfig
+- name: Ensure all are mysql:mysql mysqld_datadir_origin
+  command: chown -R {{ mysqld_user }}:{{ mysqld_group }} {{ mysqld_datadir_origin }}
+
+- name: Ensure all are mysql:mysql on softlink
+  command: chown {{ mysqld_user }}:{{ mysqld_group }} {{ mysqld_datadir }}
+
+- name: Config Mysqld
+  template: src=mysqld.conf.j2 dest=/etc/my.cnf backup=yes
+  tags: reconfig
 
 - name: set vm.swappiness in sysctl.conf
   sysctl: name=vm.swappiness value="{{ sysctl_vm_swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
 
 - name: Change ulimit
-  copy: src=mysqld_ulimit.j2 dest=/etc/security/limits.d/95-mysqld.conf  
+  copy: src=mysqld_ulimit.j2 dest=/etc/security/limits.d/95-mysqld.conf
 
-- name: Check if ulimit in service script
-  command: grep -Fq "ulimit" /etc/init.d/mysql
-  register: check_ulimit_mysql
-  ignore_errors: yes
-  changed_when: False
-  check_mode: no
-  tags: change_ulimit
+- name: Create /etc/systemd/system/mysqld.service.d
+  file: path=/etc/systemd/system/mysqld.service.d state=directory mode=0755
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
-#- name: Change limit in service script 
-#  lineinfile: 
-#    line: "{{ item }}"
-#    dest: /etc/init.d/mysql
-#    insertbefore: '^case \"\$mode\" in'
-#  with_items:
-#  - ulimit -u 32000
-#  - ulimit -n 32000
-#  when:
-#  - check_ulimit_mysql.rc != 0
-#  ignore_errors: yes
-#  tags: change_ulimit
-
-#- name: Create /etc/systemd/system/mariadb.service.d
-#  file: path=/etc/systemd/system/mariadb.service.d state=directory mode=0755
-#  when:
-#    - ansible_distribution == "{{ os.distribution_centos.name }}"
-#    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
-#
-#- name: Customize mysqld service script
-#  copy: src=mysqld_service_limits.conf.j2 dest=/etc/systemd/system/mariadb.service.d/10_limits.conf 
-#  when:
-#    - ansible_distribution == "{{ os.distribution_centos.name }}"
-#    - ansible_distribution_major_version == "{{ os.distribution_centos.version7 }}"
+- name: Customize mysqld service script
+  copy: src=mysqld_service_limits.conf.j2 dest=/etc/systemd/system/mysqld.service.d/10_limits.conf
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
 
 - name: Enable and start mysqld
   service: name=mysqld enabled=yes state=restarted
   tags: restart_mysqld
 
-- name: Remove anonymous user
-  mysql_user:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
-    login_password: ''
-    name: ''
-    host_all: yes
-    state: absent
-  ignore_errors: yes
+- name: Copy mysql secure script
+  template:
+    src: mysql_secure.sh.j2
+    dest: /tmp/mysql_secure.sh
+    owner: root
+    group: root
+    mode: 0550
 
-- name: Remove test db
-  mysql_db:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
-    login_password: ''
-    name: test
-    state: absent
-  ignore_errors: yes
-
-- name: Disallow remote login for root
-  mysql_user:
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
-    login_password: ''
-    name: "{{ admin_user.name }}"
-    state: absent
-    host: "{{ ansible_hostname }}"
-  ignore_errors: yes
-
-- name: Set root passwd
-  mysql_user:
-    name: "{{ admin_user.name }}"
-    password: "{{ admin_user.passwd }}"
-    priv: "{{ admin_user.priv }}"
-    state: present 
-    login_user: "{{ admin_user.name }}"
-    login_port: "{{ mysqld.port }}"
-    login_password: ''
-    login_host: localhost
-    host: "{{ item }}"
-  with_items: 
-    - 127.0.0.1
-    - ::1   
-    - localhost
-  ignore_errors: yes
+- name: Change root passwd and make something securely
+  shell: /tmp/mysql_secure.sh
 
 - name: Set /root/.my.cnf
   template:
@@ -176,5 +139,3 @@
 - name: Check mysqld status
   command: service mysqld status
   tags: check_service
-
-

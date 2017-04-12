@@ -35,3 +35,15 @@ test4_mariadb_galera_cluster ansible_host=192.168.10.124 hostname=test4 mariadb_
 [test_gitlabci]
 gitlab ansible_host=192.168.10.127 hostname=gitlab
 gitlab-runner ansible_host=192.168.10.128 hostname=gitlab-runner
+
+[test_mongo]
+test_mongo_2 ansible_host=192.168.10.122 hostname=test2
+test_mongo_3 ansible_host=192.168.10.123 hostname=test3
+test_mongo_4 ansible_host=192.168.10.124 hostname=test4
+
+[test_mysqld]
+#test_mysqld_2 ansible_host=192.168.10.122 hostname=test2
+#test_mysqld_3 ansible_host=192.168.10.123 hostname=test3
+#test_mysqld_4 ansible_host=192.168.10.124 hostname=test4
+test_mysqld_5 ansible_host=192.168.10.223 hostname=test5 mysqld_server_id=5
+test_mysqld_6 ansible_host=192.168.10.224 hostname=test6 mysqld_server_id=6

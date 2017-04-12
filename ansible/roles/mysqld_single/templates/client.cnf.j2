@@ -1,7 +1,15 @@
 [client]
-user={{ admin_user.name }}
-password={{ admin_user.passwd }}
+user={{ mysqld_root_name }}
+{% if mysqld_version == "5.7" %}
+password={{ mysqld_57_root_passwd }}
+{% else %}
+password={{ mysqld_root_passwd }}
+{% endif %}
 
 [mysql]
-user={{ admin_user.name }}
-password={{ admin_user.passwd }}
+user={{ mysqld_root_name }}
+{% if mysqld_version == "5.7" %}
+password={{ mysqld_57_root_passwd }}
+{% else %}
+password={{ mysqld_root_passwd }}
+{% endif %}

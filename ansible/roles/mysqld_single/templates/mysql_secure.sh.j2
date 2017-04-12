@@ -1,0 +1,16 @@
+#!/bin/bash
+
+mysql=`which mysql`
+
+# Replace for mysql_secure_installation.
+
+TEMP_PASS=`grep -F 'temporary password'  /var/log/mysqld/mysql_error.log | awk -F ': ' '{print $2}'`
+
+{% if mysqld_version == "5.7" %}
+NEW_PASS={{ mysqld_57_root_passwd }}
+{% else %}
+NEW_PASS={{ mysqld_root_passwd }}
+{% endif %}
+
+mysql -u root -p"${TEMP_PASS}" --connect-expired-password -Ane "ALTER USER 'root'@'localhost' IDENTIFIED BY '${NEW_PASS}';"
+mysql -u root -p"${NEW_PASS}" -Ane "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost',  '127.0.0.1', '::1');DELETE FROM mysql.user WHERE User='';DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';FLUSH PRIVILEGES;"

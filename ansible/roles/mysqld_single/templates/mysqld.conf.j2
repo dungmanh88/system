@@ -1,98 +1,104 @@
-[server]
-
 [mysqld]
 
-[embedded]
+#
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove leading # to turn on a very important data integrity option: logging
+# changes to the binary log between backups.
+# log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
 
-[mariadb]
 ### basic ###
-user = mysql
-datadir = {{ dir.datadir }}
-socket = {{ mysqld.socket }}
-port = {{ mysqld.port }}
-skip_name_resolve = {{ mysqld.skip_name_resolve }}
-max_allowed_packet = {{ mysqld.max_allowed_packet }}
+user = {{ mysqld_user }}
+datadir = {{ mysqld_datadir }}
+socket = {{ mysqld_socket }}
+port = {{ mysqld_port }}
+skip_name_resolve = {{ mysqld_skip_name_resolve }}
+max_allowed_packet = {{ mysqld_max_allowed_packet }}
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links = {{ mysqld_symbolic_links }}
+pid-file = {{ mysqld_pid }}
+bind_address = {{ mysqld_bind_address }}
 
 ### innodb ###
-default_storage_engine = InnoDB
-innodb_autoinc_lock_mode = {{ mysqld.innodb_autoinc_lock_mode }}
-innodb_doublewrite = {{ mysqld.innodb_doublewrite }}
-innodb_flush_log_at_trx_commit = {{ mysqld.innodb_flush_log_at_trx_commit }}
-innodb_buffer_pool_size = {{ mysqld.innodb_buffer_pool_size }}
-innodb_buffer_pool_instances = {{ mysqld.innodb_buffer_pool_instances }}
-innodb_file_per_table = 1
-innodb_flush_method = {{ mysqld.innodb_flush_method }}
-innodb_log_buffer_size = {{ mysqld.innodb_log_buffer_size }}
+default_storage_engine = {{ mysqld_default_storage_engine }}
+innodb_autoinc_lock_mode = {{ mysqld_innodb_autoinc_lock_mode }}
+innodb_doublewrite = {{ mysqld_innodb_doublewrite }}
+innodb_flush_log_at_trx_commit = {{ mysqld_innodb_flush_log_at_trx_commit }}
+innodb_buffer_pool_size = {{ mysqld_innodb_buffer_pool_size }}
+innodb_buffer_pool_instances = {{ mysqld_innodb_buffer_pool_instances }}
+innodb_file_per_table = {{ mysqld_innodb_file_per_table }}
+innodb_flush_method = {{ mysqld_innodb_flush_method }}
+innodb_log_buffer_size = {{ mysqld_innodb_log_buffer_size }}
 
 ### query cache ###
-query_cache_size = 0
-query_cache_type = 0
+query_cache_size = {{ mysqld_query_cache_size }}
+query_cache_type = {{ mysqld_query_cache_type }}
 
 ### timeout ###
-wait_timeout = {{ mysqld.wait_timeout }}
-interactive_timeout = {{ mysqld.interactive_timeout }}
-connect_timeout = {{ mysqld.connect_timeout }}
+wait_timeout = {{ mysqld_wait_timeout }}
+interactive_timeout = {{ mysqld_interactive_timeout }}
+connect_timeout = {{ mysqld_connect_timeout }}
 
 ### Redo log
-innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
-innodb_log_file_size = {{ mysqld.innodb_log_file_size }}
+innodb_log_files_in_group = {{ mysqld_innodb_log_files_in_group }}
+innodb_log_file_size = {{ mysqld_innodb_log_file_size }}
 
 ### temporary tables ###
-tmp_table_size = {{ mysqld.tmp_table_size }}
-max_heap_table_size = {{ mysqld.max_heap_table_size }}
-tmpdir = {{ mysqld.tmpdir }}
+tmp_table_size = {{ mysqld_tmp_table_size }}
+max_heap_table_size = {{ mysqld_max_heap_table_size }}
+tmpdir = {{ mysqld_tmpdir }}
 
-### thread pool ###
-{% if use_thread_pool == 1 %}
-thread_handling = {{ mysqld.thread_handling }}
-thread_pool_size = {{ mysqld.thread_pool_size }}
-extra_port = {{ mysqld.extra_port }}
-extra_max_connections = {{ mysqld.extra_max_connections }}
-max_connections = {{ mysqld.max_connections }}
-{% else %}
-# I do not use thread pool
-{% endif %}
+### open cache
+table_open_cache = {{ mysqld_table_open_cache }}
 
 ### thread cache ###
-{% if use_thread_cache == 1 %}
-thread_cache_size = {{ mysqld.thread_cache_size }}
-max_connections = {{ mysqld.max_connections }}
+{% if my_enable_thread_cache == 1 %}
+thread_cache_size = {{ mysqld_thread_cache_size }}
+max_connections = {{ mysqld_max_connections }}
 {% else %}
 # I do not use thread cache
 {% endif %}
 
 ### log ###
-log_output = {{ mysqld.log_output }}
-log_error = {{ mysqld.log_error }}
-slow_query_log = 1
-log_queries_not_using_indexes = {{ mysqld.log_queries_not_using_indexes }}
-log_warnings = {{ mysqld.log_warnings }}
-long_query_time = {{ mysqld.long_query_time }}
-slow_query_log_file = {{ mysqld.slow_query_log_file }}
-general_log = 0
-general_log_file = {{ mysqld.general_log_file }}
+log_output = {{ mysqld_log_output }}
+log_error = {{ mysqld_log_error }}
+slow_query_log = {{ mysqld_slow_query_log }}
+log_queries_not_using_indexes = {{ mysqld_log_queries_not_using_indexes }}
+log_warnings = {{ mysqld_log_warnings }}
+long_query_time = {{ mysqld_long_query_time }}
+slow_query_log_file = {{ mysqld_slow_query_log }}
+general_log = {{ mysqld_general_log }}
+general_log_file = {{ mysqld_general_log_file }}
 
 ### replication ###
-{% if use_gtid == 1 %}
-gtid_domain_id = {{ mysqld.gtid_domain_id }}
+{% if my_enable_replication == 1 %}
+{% if my_enable_gtid == 1 %}
 {% endif %}
-report_host = {{ mysqld.report_host }}
-report_port = {{ mysqld.port }}
-expire_logs_days = {{ mysqld.expire_logs_days }}
-log_bin = {{ mysqld.report_host }}-bin
-log_bin_index = {{ mysqld.report_host }}-bin.log.index
-relay_log = {{ mysqld.report_host }}-relay-bin
-relay_log_index = {{ mysqld.report_host }}-relay-bin.index
-server_id = {{ mysqld.server_id }}
-log_slave_updates = 1
-binlog_format = ROW
-max_binlog_size = {{ mysqld.max_binlog_size }}
-
-[mariadb-{{ base_version }}]
+report_host = {{ mysqld_report_host }}
+report_port = {{ mysqld_report_port }}
+expire_logs_days = {{ mysqld_expire_logs_days }}
+log_bin = {{ mysqld_report_host }}-bin
+log_bin_index = {{ mysqld_report_host }}-bin.log.index
+relay_log = {{ mysqld_report_host }}-relay-bin
+relay_log_index = {{ mysqld_report_host }}-relay-bin.index
+server_id = {{ mysqld_server_id }}
+log_slave_updates = {{ mysqld_log_slave_updates }}
+binlog_format = {{ mysqld_binlog_format }}
+max_binlog_size = {{ mysqld_max_binlog_size }}
+{% endif %}
 
 [xtrabackup]
-datadir = {{ dir.datadir }}
-socket = {{ mysqld.socket }}
-streamfmt = xbstream
-innodb_log_files_in_group = {{ mysqld.innodb_log_files_in_group }}
-innodb_log_file_size = {{ mysqld.innodb_log_file_size }}
+datadir = {{ mysqld_datadir }}
+socket = {{ mysqld_socket }}
+streamfmt = {{ xtrabackup_streamfmt }}
+innodb_log_files_in_group = {{ mysqld_innodb_log_files_in_group }}
+innodb_log_file_size = {{ mysqld_innodb_log_file_size }}
