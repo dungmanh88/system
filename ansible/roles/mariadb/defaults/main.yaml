@@ -12,7 +12,7 @@ mariadb_log_error: "{{ mariadb_logdir }}/mysql_error.log"
 mariadb_slow_query_log_file: "{{ mariadb_logdir }}/mysql_slow.log"
 mariadb_general_log_file: "{{ mariadb_logdir }}/mysql_general.log"
 
-mariadb_port: 3306
+mysql_port: 3306
 mariadb_bind_address: 0.0.0.0
 mariadb_socket: "{{ mariadb_datadir }}/mysql.sock"
 
@@ -62,7 +62,7 @@ mariadb_extra_max_connections: 10
 ### ma_enable_gtid: 0|1
 mariadb_gtid_domain_id: NA
 mariadb_report_host: "{{ ansible_host }}"
-mariadb_report_port: "{{ mariadb_port }}"
+mariadb_report_port: "{{ mysql_port }}"
 project_name: NA
 mariadb_server_id: NA
 mariadb_log_slave_updates: 1

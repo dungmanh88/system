@@ -38,8 +38,8 @@
 
 - name: Create user galera
   mysql_user:
-    login_user: "{{ mariadb_root_name }}"
-    login_port: "{{ mariadb_port }}"
+    login_user: root
+    login_port: "{{ mysql_port }}"
     login_password: "{{ mariadb_root_passwd }}"
     name: "{{ mag_galera_name }}"
     password: "{{ mag_galera_passwd }}"

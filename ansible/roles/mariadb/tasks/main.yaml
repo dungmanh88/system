@@ -135,7 +135,7 @@
 - name: Remove anonymous user
   mysql_user:
     login_user: root
-    login_port: "{{ mariadb_port }}"
+    login_port: "{{ mysql_port }}"
     login_password: ''
     name: ''
     host_all: yes
@@ -145,7 +145,7 @@
 - name: Remove test db
   mysql_db:
     login_user: root
-    login_port: "{{ mariadb_port }}"
+    login_port: "{{ mysql_port }}"
     login_password: ''
     name: test
     state: absent
@@ -154,7 +154,7 @@
 - name: Disallow remote login for root
   mysql_user:
     login_user: root
-    login_port: "{{ mariadb_port }}"
+    login_port: "{{ mysql_port }}"
     login_password: ''
     name: root
     state: absent
@@ -164,7 +164,7 @@
 - name: Create the replication users
   mysql_user:
     login_user: root
-    login_port: "{{ mariadb_port }}"
+    login_port: "{{ mysql_port }}"
     login_password: ''
     name: repl_user
     host: "{{ mariadb_repl_user_host }}"
@@ -205,7 +205,7 @@
     priv: "*.*:ALL,GRANT"
     state: present
     login_user: root
-    login_port: "{{ mariadb_port }}"
+    login_port: "{{ mysql_port }}"
     login_password: ''
     login_host: localhost
     host: "{{ item }}"

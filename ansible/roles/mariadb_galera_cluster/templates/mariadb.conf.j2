@@ -38,7 +38,7 @@ wsrep_retry_autocommit = {{ mag_wsrep_retry_autocommit }}
 user = {{ mariadb_user }}
 datadir = {{ mariadb_datadir }}
 socket = {{ mariadb_socket }}
-port = {{ mariadb_port }}
+port = {{ mysql_port }}
 skip_name_resolve = {{ mariadb_skip_name_resolve }}
 max_allowed_packet = {{ mariadb_max_allowed_packet }}
 
@@ -110,7 +110,7 @@ general_log_file = {{ mariadb_general_log_file }}
 gtid_domain_id = {{ mariadb_gtid_domain_id }}
 {% endif %}
 report_host = {{ mariadb_report_host }}
-report_port = {{ mariadb_port }}
+report_port = {{ mysql_port }}
 expire_logs_days = {{ mariadb_expire_logs_days }}
 log_bin = {{ mariadb_report_host }}-bin
 log_bin_index = {{ mariadb_report_host }}-bin.log.index
