@@ -163,12 +163,14 @@
 
 - name: Create the replication users
   mysql_user:
+    login_user: root
+    login_port: "{{ mariadb_port }}"
+    login_password: ''
     name: repl_user
     host: "{{ mariadb_repl_user_host }}"
     password: "{{ mariadb_repl_user_passwd }}"
     priv: "*.*:REPLICATION SLAVE"
     state: present
-  when: mysql_repl_role == 'master'
 
 - name: Check if slave is already configured for replication
   mysql_replication: mode=getslave
