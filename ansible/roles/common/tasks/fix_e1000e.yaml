@@ -1,0 +1,8 @@
+- name: Copy script fix e1000e
+  copy: src=e1000e_fix.sh.j2 dest=/tmp/e1000e_fix.sh owner=root group=root mode=0744
+
+- name: Run script fix e1000e
+  shell: /tmp/e1000e_fix.sh
+
+- name: Show msg
+  debug: msg="You should recheck /tmp/e1000e_fix.sh"

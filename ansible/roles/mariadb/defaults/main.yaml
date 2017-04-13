@@ -1,4 +1,6 @@
+# Change it if you need
 mariadb_base_version: "10.0"
+# Change it if you need
 mariadb_version: "10.0.21"
 
 mariadb_datadir: /var/lib/mysql
@@ -18,20 +20,25 @@ mariadb_socket: "{{ mariadb_datadir }}/mysql.sock"
 mariadb_skip_name_resolve: 1
 
 mariadb_default_storage_engine: InnoDB
+# Change it if you need
 mariadb_innodb_buffer_pool_size: 2048M
+# Change it if you need
 mariadb_innodb_buffer_pool_instances: 1
 mariadb_innodb_autoinc_lock_mode: 2
 mariadb_innodb_doublewrite: 1
 mariadb_innodb_flush_log_at_trx_commit: 1
 mariadb_innodb_flush_method: O_DIRECT
+# Change it if you need
 mariadb_innodb_log_buffer_size: 16M
 
 mariadb_innodb_file_per_table: 1
 
 ### packet size ###
+# Change it if you need
 mariadb_max_allowed_packet: 32M
 
 ### Open cache ###
+# Change it if you need
 mariadb_table_open_cache: 1000
 
 ### query cache ###
@@ -39,7 +46,9 @@ mariadb_query_cache_size: 0
 mariadb_query_cache_type: 0
 
 ### ma_enable_thread_cache: 0|1
+# Change it if you need
 mariadb_thread_cache_size: 4
+# Change it if you need
 mariadb_max_connections: 64
 
 ### Timeout ###
@@ -48,6 +57,7 @@ mariadb_interactive_timeout: 30
 mariadb_connect_timeout: 30
 
 ### Temporary ###
+# Change it if you need
 mariadb_tmp_table_size: 64M
 mariadb_max_heap_table_size: 64M
 
@@ -65,6 +75,7 @@ mariadb_innodb_log_file_size: 64M
 
 ### ma_enable_thread_pool: 0|1
 mariadb_thread_handling: pool-of-threads
+# Change it if you need
 mariadb_thread_pool_size: 4
 mariadb_extra_port: 6033
 mariadb_extra_max_connections: 10
@@ -72,8 +83,9 @@ mariadb_extra_max_connections: 10
 ### ma_enable_replication: 0|1
 ### ma_enable_gtid: 0|1
 mariadb_gtid_domain_id: NA
-mariadb_report_host: NA
+mariadb_report_host: "{{ ansible_host }}"
 mariadb_report_port: "{{ mariadb_port }}"
+project_name: NA
 mariadb_expire_logs_days: 5
 mariadb_server_id: NA
 mariadb_max_binlog_size: 200M
@@ -86,12 +98,21 @@ xtrabackup_streamfmt: xbstream
 sysctl_vm_swappiness: 10
 
 ### vault
-mariadb_root_name: "{{ vault_mariadb_default_root_name }}"
+# Change it if you need. You need vault.yaml in group_vars.
+# Change default to service name or project name
+mariadb_root_name: root
 mariadb_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
-mariadb_root_priv: "{{ vault_mariadb_default_root_priv }}"
+mariadb_root_priv: "*.*:ALL,GRANT"
+
+mariadb_repl_user_name: repl_user
+mariadb_repl_user_passwd: "{{ vault_mariadb_default_repl_user_passwd }}"
+mariadb_repl_user_priv: "*.*:REPLICATION SLAVE"
+mariadb_repl_user_host: "%"
 
 ### Control param
+# Change it if you need
 ma_enable_thread_cache: 1
 ma_enable_thread_pool: 0
 ma_enable_replication: 0
+mysql_repl_role: NA
 ma_enable_gtid: 0

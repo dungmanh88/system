@@ -1,13 +1,17 @@
 - include_vars: vault/main.yaml
-
-- name: Throw error if monitor_what is replication and is_monitor_replication is 0
-  fail: msg="I will not install mysql replication monitoring on this server"
-  when:
-  - monitor_what == "replication"
-  - is_monitor_replication == 0
-
 - name: Install xinetd
   yum: name=xinetd update_cache=yes
+
+- name: Create the replication users
+  mysql_user:
+    login_user: "{{ mariadb_root_name }}"
+    login_port: "{{ mariadb_port }}"
+    login_password: "{{ mariadb_root_passwd }}"
+    name: "{{ checker_name }}"
+    host: "{{ checker_host }}"
+    password: "{{ checker_passwd }}"
+    state: present
+  when: mysql_repl_role == 'master'
 
 - name: Install script
   template:
@@ -27,7 +31,6 @@
     mode: 0744
   when:
   - monitor_what == "replication"
-  - is_monitor_replication == 1
 
 - name: Install mysqlchk in xinetd.d
   template: src=mysqlchk.j2 dest=/etc/xinetd.d/mysqlchk owner=root group=root mode=0644

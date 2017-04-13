@@ -1,49 +1,5 @@
-[lab:children]
-test_nginx
-test_named
-test_mysqld57
-test_phpmyadmin
-test_mariadb
-test_mariadb_galera_cluster
-test_gitlabci
-
-[lab:vars]
-gateway_ip=192.168.10.1
-gateway_persistent=true
-
-[test_nginx]
-test2 ansible_host=192.168.10.122 hostname=test2 ngx_built=1 ngx_enable_php=1 ngx_role=web pfm_enable=1
-test3 ansible_host=192.168.10.123 hostname=test3 ngx_built=1 ngx_role=proxy_cache
-
-[test_named]
-test2 ansible_host=192.168.10.122 hostname=test2
-
-[test_mysqld57]
-test4 ansible_host=192.168.10.124 hostname=test4
-
-[test_phpmyadmin]
-test2 ansible_host=192.168.10.122 hostname=test2 pma_install_dependency=0
-
-[test_mariadb]
-test2 ansible_host=192.168.10.122 hostname=test2
-
-[test_mariadb_galera_cluster]
-test2_mariadb_galera_cluster ansible_host=192.168.10.122 hostname=test2 mariadb_report_host=test2 mariadb_server_id=2 mag_wsrep_node_name=test2
-test3_mariadb_galera_cluster ansible_host=192.168.10.123 hostname=test3 mariadb_report_host=test3 mariadb_server_id=3 mag_wsrep_node_name=test3
-test4_mariadb_galera_cluster ansible_host=192.168.10.124 hostname=test4 mariadb_report_host=test4 mariadb_server_id=4 mag_wsrep_node_name=test4
-
-[test_gitlabci]
-gitlab ansible_host=192.168.10.127 hostname=gitlab
-gitlab-runner ansible_host=192.168.10.128 hostname=gitlab-runner
-
-[test_mongo]
-test_mongo_2 ansible_host=192.168.10.122 hostname=test2
-test_mongo_3 ansible_host=192.168.10.123 hostname=test3
-test_mongo_4 ansible_host=192.168.10.124 hostname=test4
-
-[test_mysqld]
-#test_mysqld_2 ansible_host=192.168.10.122 hostname=test2
-#test_mysqld_3 ansible_host=192.168.10.123 hostname=test3
-#test_mysqld_4 ansible_host=192.168.10.124 hostname=test4
-test_mysqld_5 ansible_host=192.168.10.223 hostname=test5 mysqld_server_id=5
-test_mysqld_6 ansible_host=192.168.10.224 hostname=test6 mysqld_server_id=6
+# Fix group name, host name, hostname, ansible_host if you need.
+[example_mariadb_replication]
+example_mariadb_replication_1 ansible_host=192.168.10.122 hostname=test2 mysql_repl_role=master mariadb_server_id=122 mysql_repl_master=example1
+example_mariadb_replication_2 ansible_host=192.168.10.123 hostname=test3 mysql_repl_role=slave mariadb_server_id=123
+example_mariadb_replication_3 ansible_host=192.168.10.124 hostname=test4 mysql_repl_role=slave mariadb_server_id=124

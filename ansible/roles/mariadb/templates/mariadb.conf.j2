@@ -82,12 +82,12 @@ general_log_file = {{ mariadb_general_log_file }}
 gtid_domain_id = {{ mariadb_gtid_domain_id }}
 {% endif %}
 report_host = {{ mariadb_report_host }}
-report_port = {{ mariadb_port }}
+report_port = {{ mariadb_report_port }}
 expire_logs_days = {{ mariadb_expire_logs_days }}
-log_bin = {{ mariadb_report_host }}-bin
-log_bin_index = {{ mariadb_report_host }}-bin.log.index
-relay_log = {{ mariadb_report_host }}-relay-bin
-relay_log_index = {{ mariadb_report_host }}-relay-bin.index
+log_bin = {{ project_name }}-bin
+log_bin_index = {{ project_name }}-bin.log.index
+relay_log = {{ project_name }}-relay-bin
+relay_log_index = {{ project_name }}-relay-bin.index
 server_id = {{ mariadb_server_id }}
 log_slave_updates = {{ mariadb_log_slave_updates }}
 binlog_format = {{ mariadb_binlog_format }}
@@ -95,10 +95,3 @@ max_binlog_size = {{ mariadb_max_binlog_size }}
 {% endif %}
 
 [mariadb-{{ mariadb_base_version }}]
-
-[xtrabackup]
-datadir = {{ mariadb_datadir }}
-socket = {{ mariadb_socket }}
-streamfmt = {{ xtrabackup_streamfmt }}
-innodb_log_files_in_group = {{ mariadb_innodb_log_files_in_group }}
-innodb_log_file_size = {{ mariadb_innodb_log_file_size }}

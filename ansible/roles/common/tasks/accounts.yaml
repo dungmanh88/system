@@ -1,0 +1,37 @@
+- name: Create admin group
+  group:
+    name: "{{ admin_group }}"
+    state: present
+
+- name: Create sudoers for admin group
+  template:
+    src: admins.conf.j2
+    dest: "{{ admin_sudo_file }}"
+    owner: root
+    group: root
+    mode: 0440
+    validate: 'visudo -cf %s'
+
+- name: Create administrator accounts
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.passwd }}"
+    comment: "{{ item.full_name }}"
+    shell: /bin/bash
+    groups: "{{ admin_group }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  when: item.active == 1
+  with_items: "{{ admin_users }}"
+
+- name: Config basic vim
+  copy: src=vimrc.conf.j2 dest="/home/{{ item.name }}/.vimrc"
+  when: item.active == 1
+  with_items: "{{ admin_users }}"
+
+- name: Config basic tmux
+  copy: src=tmux.conf.j2 dest="/home/{{ item.name }}/.tmux.conf"
+  when: item.active == 1
+  with_items: "{{ admin_users }}"

@@ -1,0 +1,38 @@
+- name: Check if filter user in sshd
+  command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
+  register: check_sshd
+  ignore_errors: yes
+  changed_when: False
+  check_mode: no
+
+- name: Allow user in sshd
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'AllowUsers {{ item.name }}'
+    state: present
+    validate: '/usr/sbin/sshd -T -t -f %s'
+  when:
+    - item.active == 1
+    - check_sshd.rc == 0
+  with_items: "{{ admin_users }}"
+
+- name: Restart sshd to apply config
+  service: name="sshd" enabled=yes state=restarted
+  when: check_sshd.rc == 0
+
+- name: Change passwd root and enable root login console
+  user:
+    name: "{{ root_user.name }}"
+    password: "{{ root_user.recovery_passwd }}"
+    shell: /bin/bash
+
+- name: Disallow root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+    validate: '/usr/sbin/sshd -T -t -f %s'
+
+- name: Restarted sshd
+  service: name="sshd" enabled=yes state=restarted

@@ -1,4 +1,0 @@
-- name: Deploy mongo
-  hosts: test_mongo
-  roles:
-  - mongodb_single

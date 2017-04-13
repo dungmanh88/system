@@ -1,6 +1,5 @@
 monitor_what: replication
-is_monitor_replication: 0
-checker_name: "{{ vault_monitoring_default_checker_name }}"
+checker_name: haproxyUser
 checker_passwd: "{{ vault_monitoring_default_checker_passwd }}"
 checker_port: 3306
 checker_host: localhost

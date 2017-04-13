@@ -1,4 +1,0 @@
-- name: Deploy common things
-  hosts: all
-  roles:
-  - role: common

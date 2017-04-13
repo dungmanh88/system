@@ -1,0 +1,37 @@
+- name: Config hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Config /etc/hosts follow hostname
+  lineinfile:
+    dest: /etc/hosts
+    state: present
+    line: '{{ item }}'
+  with_items:
+    - "127.0.0.1 {{ hostname }}"
+#    - "{{ ansible_default_ipv4.address }} {{ hostname }}"
+    - "{{ ansible_host }} {{ hostname }}"
+
+- name: Config nameserver
+  blockinfile:
+    dest: /etc/resolv.conf
+    block: |
+      {{ nameservers }}
+
+- name: Disable selinux
+  selinux: state=disabled
+
+- name: Disable firewall
+  service: name="firewalld" enabled=no state=stopped
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+
+- name: Disable firewall
+  service: name="iptables" enabled=no state=stopped
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
+
+- name: Restart and enable ntpd
+  service: name="ntpd" enabled=yes state=restarted

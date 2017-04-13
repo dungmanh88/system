@@ -85,6 +85,10 @@
   template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
   tags: reconfig
 
+- name: Config MariaDB
+  template: src=xtrabackup.conf.j2 dest=/etc/my.cnf.d/xtrabackup.cnf backup=yes
+  tags: reconfig
+
 - name: set vm.swappiness in sysctl.conf
   sysctl: name=vm.swappiness value="{{ sysctl_vm_swappiness }}" state=present sysctl_set=yes reload=yes ignoreerrors=yes
 
@@ -156,6 +160,41 @@
     state: absent
     host: "{{ ansible_hostname }}"
   ignore_errors: yes
+
+- name: Create the replication users
+  mysql_user:
+    name: "{{ mariadb_repl_user_name }}"
+    host: "{{ mariadb_repl_user_host }}"
+    password: "{{ mariadb_repl_user_passwd }}"
+    priv: "{{ mariadb_repl_user_priv }}"
+    state: present
+  when: mysql_repl_role == 'master'
+
+- name: Check if slave is already configured for replication
+  mysql_replication: mode=getslave
+  ignore_errors: true
+  register: slave
+  when: mysql_repl_role == 'slave'
+
+- name: Ensure the hostname entry for master is available for the client.
+  lineinfile: dest=/etc/hosts regexp="{{ mysql_repl_master }}" line="{{ hostvars[mysql_repl_master].ansible_default_ipv4.address + "   " + mysql_repl_master }}" state=present
+  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
+
+- name: Get the current master servers replication status
+  mysql_replication: mode=getmaster
+  delegate_to: "{{ mysql_repl_master }}"
+  register: repl_stat
+  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
+
+- name: Change the master in slave to start the replication
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ mysql_repl_master }}"
+    master_log_file: "{{ repl_stat.File }}"
+    master_log_pos: "{{ repl_stat.Position }}"
+    master_user: "{{ mariadb_repl_user_name }}"
+    master_password: "{{ mariadb_repl_user_passwd }}"
+  when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
 
 - name: Set root passwd
   mysql_user:

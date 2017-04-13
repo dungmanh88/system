@@ -1,5 +1,0 @@
-- name: Deploy nginx web server
-  hosts: test_nginx
-  roles:
-  - {name: php-fpm, tags: php-fpm}
-  - {name: nginx, tags: nginx}

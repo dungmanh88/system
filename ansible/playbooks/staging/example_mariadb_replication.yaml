@@ -1,0 +1,6 @@
+- name: Deploy mariadb
+  hosts: example_mariadb
+  roles:
+  - role: common
+  - role: mariadb
+  - role: monitoring
