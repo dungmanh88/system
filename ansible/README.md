@@ -3,6 +3,8 @@ ma_: mariadb
 ngx_: nginx
 pfm_: php-fpm
 
+Use example_ as sample config in group_vars, inventories, playbooks
+
 change inventories/staging|production/all/vars.yaml
 ```
 ### For fresh servers
