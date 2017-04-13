@@ -1,3 +1,0 @@
-# monitor_what: galera|replication
-monitor_what: replication
-checker_passwd: "{{ vault_monitoring_default_checker_passwd }}"
