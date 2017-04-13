@@ -6,33 +6,33 @@
 
 [mariadb]
 ### basic ###
-user = {{ mariadb_user }}
+user = mysql
 datadir = {{ mariadb_datadir }}
 socket = {{ mariadb_socket }}
 port = {{ mariadb_port }}
 bind_address = {{ mariadb_bind_address }}
-skip_name_resolve = {{ mariadb_skip_name_resolve }}
+skip_name_resolve = 1
 max_allowed_packet = {{ mariadb_max_allowed_packet }}
 
 ### innodb ###
-default_storage_engine = {{ mariadb_default_storage_engine }}
-innodb_autoinc_lock_mode = {{ mariadb_innodb_autoinc_lock_mode }}
-innodb_doublewrite = {{ mariadb_innodb_doublewrite }}
-innodb_flush_log_at_trx_commit = {{ mariadb_innodb_flush_log_at_trx_commit }}
+default_storage_engine = InnoDB
+innodb_autoinc_lock_mode = 2
+innodb_doublewrite = 1
+innodb_flush_log_at_trx_commit = 1
 innodb_buffer_pool_size = {{ mariadb_innodb_buffer_pool_size }}
 innodb_buffer_pool_instances = {{ mariadb_innodb_buffer_pool_instances }}
-innodb_file_per_table = {{ mariadb_innodb_file_per_table }}
-innodb_flush_method = {{ mariadb_innodb_flush_method }}
+innodb_file_per_table = 1
+innodb_flush_method = O_DIRECT
 innodb_log_buffer_size = {{ mariadb_innodb_log_buffer_size }}
 
 ### query cache ###
-query_cache_size = {{ mariadb_query_cache_size }}
-query_cache_type = {{ mariadb_query_cache_type }}
+query_cache_size = 0
+query_cache_type = 0
 
 ### timeout ###
-wait_timeout = {{ mariadb_wait_timeout }}
-interactive_timeout = {{ mariadb_interactive_timeout }}
-connect_timeout = {{ mariadb_connect_timeout }}
+wait_timeout = 30
+interactive_timeout = 30
+connect_timeout = 30
 
 ### Redo log
 innodb_log_files_in_group = {{ mariadb_innodb_log_files_in_group }}
@@ -66,24 +66,24 @@ max_connections = {{ mariadb_max_connections }}
 {% endif %}
 
 ### log ###
-log_output = {{ mariadb_log_output }}
+log_output = FILE
 log_error = {{ mariadb_log_error }}
-slow_query_log = {{ mariadb_slow_query_log }}
+slow_query_log = 1
 log_queries_not_using_indexes = {{ mariadb_log_queries_not_using_indexes }}
 log_warnings = {{ mariadb_log_warnings }}
 long_query_time = {{ mariadb_long_query_time }}
 slow_query_log_file = {{ mariadb_slow_query_log_file }}
-general_log = {{ mariadb_general_log }}
+general_log = 0
 general_log_file = {{ mariadb_general_log_file }}
 
 ### replication ###
-{% if ma_enable_replication == 1 %}
+{% if mysql_repl_role != "NA" %}
 {% if ma_enable_gtid == 1 %}
 gtid_domain_id = {{ mariadb_gtid_domain_id }}
 {% endif %}
 report_host = {{ mariadb_report_host }}
 report_port = {{ mariadb_report_port }}
-expire_logs_days = {{ mariadb_expire_logs_days }}
+expire_logs_days = 5
 log_bin = {{ project_name }}-bin
 log_bin_index = {{ project_name }}-bin.log.index
 relay_log = {{ project_name }}-relay-bin
@@ -91,7 +91,7 @@ relay_log_index = {{ project_name }}-relay-bin.index
 server_id = {{ mariadb_server_id }}
 log_slave_updates = {{ mariadb_log_slave_updates }}
 binlog_format = {{ mariadb_binlog_format }}
-max_binlog_size = {{ mariadb_max_binlog_size }}
+max_binlog_size = 200M
 {% endif %}
 
 [mariadb-{{ mariadb_base_version }}]

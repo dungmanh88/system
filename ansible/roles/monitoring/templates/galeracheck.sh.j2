@@ -5,9 +5,9 @@ READY="ON"
 CLUSTER_STATUS="Primary"
 CONNECTED="ON"
 
-MYSQL_HOST="{{ checker_host }}"
-MYSQL_PORT="{{ checker_port }}"
-MYSQL_USERNAME="{{ checker_name }}"
+MYSQL_HOST="localhost"
+MYSQL_PORT="{{ mariadb_port }}"
+MYSQL_USERNAME="haproxyUser"
 MYSQL_PASSWORD="{{ checker_passwd }}"
 
 echo=`which echo`

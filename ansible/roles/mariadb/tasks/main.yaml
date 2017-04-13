@@ -47,7 +47,7 @@
   pip: name=MySQL-python
 
 - name: Create tmpdir, logdir and datadir
-  file: path="{{ item }}" state=directory owner="{{ mariadb_user }}" group="{{ mariadb_group }}"
+  file: path="{{ item }}" state=directory owner=mysql group=mysql
   with_items:
   - "{{ mariadb_logdir }}"
   - "{{ mariadb_tmpdir }}"
@@ -76,10 +76,10 @@
   when: mariadb_datadir_origin != mariadb_datadir and datadir.stat.islnk is defined and datadir.stat.islnk == False
 
 - name: Ensure all are mysql:mysql mariadb_datadir_origin
-  command: chown -R {{ mariadb_user }}:{{ mariadb_group }} {{ mariadb_datadir_origin }}
+  command: chown -R mysql:mysql {{ mariadb_datadir_origin }}
 
 - name: Ensure all are mysql:mysql on softlink
-  command: chown {{ mariadb_user }}:{{ mariadb_group }} {{ mariadb_datadir }}
+  command: chown mysql:mysql {{ mariadb_datadir }}
 
 - name: Config MariaDB
   template: src=mariadb.conf.j2 dest=/etc/my.cnf.d/server.cnf backup=yes
@@ -134,7 +134,7 @@
 
 - name: Remove anonymous user
   mysql_user:
-    login_user: "{{ mariadb_root_name }}"
+    login_user: root
     login_port: "{{ mariadb_port }}"
     login_password: ''
     name: ''
@@ -144,7 +144,7 @@
 
 - name: Remove test db
   mysql_db:
-    login_user: "{{ mariadb_root_name }}"
+    login_user: root
     login_port: "{{ mariadb_port }}"
     login_password: ''
     name: test
@@ -153,20 +153,20 @@
 
 - name: Disallow remote login for root
   mysql_user:
-    login_user: "{{ mariadb_root_name }}"
+    login_user: root
     login_port: "{{ mariadb_port }}"
     login_password: ''
-    name: "{{ mariadb_root_name }}"
+    name: root
     state: absent
     host: "{{ ansible_hostname }}"
   ignore_errors: yes
 
 - name: Create the replication users
   mysql_user:
-    name: "{{ mariadb_repl_user_name }}"
+    name: repl_user
     host: "{{ mariadb_repl_user_host }}"
     password: "{{ mariadb_repl_user_passwd }}"
-    priv: "{{ mariadb_repl_user_priv }}"
+    priv: "*.*:REPLICATION SLAVE"
     state: present
   when: mysql_repl_role == 'master'
 
@@ -192,17 +192,17 @@
     master_host: "{{ mysql_repl_master }}"
     master_log_file: "{{ repl_stat.File }}"
     master_log_pos: "{{ repl_stat.Position }}"
-    master_user: "{{ mariadb_repl_user_name }}"
+    master_user: repl_user
     master_password: "{{ mariadb_repl_user_passwd }}"
   when: slave|failed and mysql_repl_role == 'slave' and mysql_repl_master is defined
 
 - name: Set root passwd
   mysql_user:
-    name: "{{ mariadb_root_name }}"
+    name: root
     password: "{{ mariadb_root_passwd }}"
-    priv: "{{ mariadb_root_priv }}"
+    priv: "*.*:ALL,GRANT"
     state: present
-    login_user: "{{ mariadb_root_name }}"
+    login_user: root
     login_port: "{{ mariadb_port }}"
     login_password: ''
     login_host: localhost

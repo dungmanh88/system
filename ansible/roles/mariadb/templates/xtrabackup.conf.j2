@@ -1,6 +1,6 @@
 [xtrabackup]
 datadir = {{ mariadb_datadir }}
 socket = {{ mariadb_socket }}
-streamfmt = {{ xtrabackup_streamfmt }}
+streamfmt = xbstream
 innodb_log_files_in_group = {{ mariadb_innodb_log_files_in_group }}
 innodb_log_file_size = {{ mariadb_innodb_log_file_size }}

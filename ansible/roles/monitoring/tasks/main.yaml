@@ -2,13 +2,13 @@
 - name: Install xinetd
   yum: name=xinetd update_cache=yes
 
-- name: Create the replication users
+- name: Create the checker users
   mysql_user:
     login_user: "{{ mariadb_root_name }}"
     login_port: "{{ mariadb_port }}"
     login_password: "{{ mariadb_root_passwd }}"
-    name: "{{ checker_name }}"
-    host: "{{ checker_host }}"
+    name: haproxyUser
+    host: localhost
     password: "{{ checker_passwd }}"
     state: present
   when: mysql_repl_role == 'master'
@@ -38,7 +38,7 @@
 - name: Add service into /etc/services
   lineinfile:
     dest: /etc/services
-    line: 'mysqlchk {{ monitor_port }}/tcp'
+    line: 'mysqlchk 9302/tcp'
     state: present
 
 - name: enable and restart xinetd
