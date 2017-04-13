@@ -12,7 +12,7 @@ galera_param="--galera-info"
 myisam_param="--lock-wait-timeout=180 --lock-wait-threshold=20 --lock-wait-query-type=all --kill-long-queries-timeout=20 --kill-long-query-type=all"
 root_open_file_limit={{ backup.max_open_file }}
 email_list="{{ backup.email_list }}"
-mail_sender="localbackup@appota.com"
+mail_sender="localbackup@me.com"
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 route add default gw {{ gateway_ip }} &> /dev/null

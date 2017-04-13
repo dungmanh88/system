@@ -1,9 +1,9 @@
-backup:  
+backup:
   user_name: "{{ vault_mysqld_root_user }}"
   user_passwd: "{{ default_mysqld_root_passwd }}"
   port: "{{ default_backup_port }}"
   host: localhost
-  name: "{{ default_backup_name }}" 
+  name: "{{ default_backup_name }}"
   parallel: 4
   max_open_file: 8192
   table_engine: "{{ default_backup_table_engine }}"
@@ -13,11 +13,10 @@ backup:
 bacula_version: 7.4.0
 bacula:
   url: "http://downloads.sourceforge.net/project/bacula/bacula/{{ bacula_version }}/bacula-{{ bacula_version }}.tar.gz"
-  dir_name: appota-backup-dir
+  dir_name: me-backup-dir
   dir_passwd: "{{ vault_bacula_dir_passwd }}"
-  mon_name: appota-backup-mon
+  mon_name: me-backup-mon
   mon_passwd: "{{ vault_bacula_mon_passwd }}"
   fd_name: "{{ default_bacula_fd_name }}"
   server_ip: "{{ default_bacula_server_ip }}"
-  server_name: backup.appota
-
+  server_name: backup.me
