@@ -190,6 +190,7 @@
 - name: Print Slave Status
   debug: var=mysql_repl_master
 
+#### Need to be fixed
 - name: Ensure the hostname entry for master is available for the client.
   lineinfile: dest=/etc/hosts regexp="{{ mysql_repl_master }}" line="{{ hostvars[mysql_repl_master].ansible_default_ipv4.address + "   " + mysql_repl_master }}" state=present
   when: not slave.Is_Slave and mysql_repl_role == 'slave' and mysql_repl_master is defined
@@ -209,7 +210,7 @@
     master_user: repl_user
     master_password: "{{ mariadb_repl_user_passwd }}"
   when: not slave.Is_Slave and mysql_repl_role == 'slave' and mysql_repl_master is defined
-
+##########################
 - name: Set root passwd
   mysql_user:
     name: root

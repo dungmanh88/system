@@ -3,6 +3,8 @@ ma_: mariadb
 ngx_: nginx
 pfm_: php-fpm
 
+Run install_ansible.sh
+
 Copy ansible production if you need
 
 Use example_ as sample config in group_vars, inventories, playbooks
