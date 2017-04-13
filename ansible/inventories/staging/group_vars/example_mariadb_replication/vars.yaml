@@ -85,6 +85,7 @@ mariadb_repl_user_host: "%"
 ma_enable_thread_cache: 1
 ma_enable_thread_pool: 0
 mysql_repl_role: NA
+mysql_repl_master: example1
 ma_enable_gtid: 0
 
 # monitor_what: galera|replication

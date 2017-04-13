@@ -1,5 +1,5 @@
 # Fix group name, host name, hostname, ansible_host if you need.
 [example_mariadb_replication]
-example_mariadb_replication_1 ansible_host=192.168.10.122 hostname=test2 mysql_repl_role=master mariadb_server_id=122 mysql_repl_master=example1
+example_mariadb_replication_1 ansible_host=192.168.10.122 hostname=test2 mysql_repl_role=master mariadb_server_id=122
 example_mariadb_replication_2 ansible_host=192.168.10.123 hostname=test3 mysql_repl_role=slave mariadb_server_id=123
 example_mariadb_replication_3 ansible_host=192.168.10.124 hostname=test4 mysql_repl_role=slave mariadb_server_id=124
