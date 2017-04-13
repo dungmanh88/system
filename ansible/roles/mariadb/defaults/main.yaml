@@ -74,7 +74,7 @@ sysctl_vm_swappiness: 10
 ### vault
 # Change it if you need. You need vault.yaml in group_vars.
 # Change default to service name or project name
-mariadb_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
+mysql_root_passwd: "{{ vault_mariadb_default_root_passwd }}"
 
 mariadb_repl_user_passwd: "{{ vault_mariadb_default_repl_user_passwd }}"
 mariadb_repl_user_host: "%"

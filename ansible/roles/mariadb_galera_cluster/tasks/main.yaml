@@ -40,7 +40,7 @@
   mysql_user:
     login_user: root
     login_port: "{{ mysql_port }}"
-    login_password: "{{ mariadb_root_passwd }}"
+    login_password: "{{ mysql_root_passwd }}"
     name: "{{ mag_galera_name }}"
     password: "{{ mag_galera_passwd }}"
     priv: "{{ mag_galera_priv }}"

@@ -4,3 +4,4 @@
   - role: common
   - role: mariadb
   - role: monitoring
+  - role: backup

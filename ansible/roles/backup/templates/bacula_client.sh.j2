@@ -5,16 +5,16 @@ set -e
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 BACULA_VERSION={{ bacula_version }}
-BACULA_DOWNLOAD="{{ bacula.url }}"
+BACULA_DOWNLOAD={{ bacula_url }}
 TEMP_INSTALLATION=/tmp
 DEFAULT_INSTALLTION=/usr/local/bin/bacula/bin
-BACULA_SERVICE_DIR_NAME={{ bacula.dir_name }}
-BACULA_SERVICE_DIR_PASSWD={{ bacula.dir_passwd }}
-BACULA_SERVICE_MON_NAME={{ bacula.mon_name }}
-BACULA_SERVICE_MON_PASSWD={{ bacula.mon_passwd }}
-BACULA_FILE_DAEMON_NAME={{ bacula.fd_name }}
-BACULA_DIR_ADDRESS={{ bacula.server_ip }}
-BACULA_DIR_NAME={{ bacula.server_name }}
+BACULA_SERVICE_DIR_NAME={{ bacula_dir_name }}
+BACULA_SERVICE_DIR_PASSWD={{ bacula_dir_passwd }}
+BACULA_SERVICE_MON_NAME={{ bacula_mon_name }}
+BACULA_SERVICE_MON_PASSWD={{ bacula_mon_passwd }}
+BACULA_FILE_DAEMON_NAME={{ bacula_fd_name }}
+BACULA_DIR_ADDRESS={{ bacula_server_ip }}
+BACULA_DIR_NAME={{ bacula_server_name }}
 
 function install_dependencies() {
   echo "INSTALL DEPENDENCIES"
@@ -111,4 +111,3 @@ function main() {
 }
 
 main
-

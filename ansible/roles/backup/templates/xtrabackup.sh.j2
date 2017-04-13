@@ -1,18 +1,18 @@
 #!/bin/bash
 
-user_name={{ backup.user_name }}
-user_password={{ backup.user_passwd }}
-backup_name={{ backup.name }}
-host={{ backup.host }}
-parallel={{ backup.parallel }}
+user_name=root
+user_password={{ mysql_root_passwd }}
+backup_name={{ backup_name }}
+host=localhost
+parallel=4
 backup_output="/data/local-backup"
 temp_log="/var/log/mysql_backup.log.tmp"
 log="/var/log/mysql_backup.log"
 galera_param="--galera-info"
 myisam_param="--lock-wait-timeout=180 --lock-wait-threshold=20 --lock-wait-query-type=all --kill-long-queries-timeout=20 --kill-long-query-type=all"
-root_open_file_limit={{ backup.max_open_file }}
-email_list="{{ backup.email_list }}"
-mail_sender="localbackup@me.com"
+root_open_file_limit=8192
+email_list="{{ email_list }}"
+mail_sender="{{ mail_sender }}"
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 route add default gw {{ gateway_ip }} &> /dev/null
@@ -75,6 +75,6 @@ fi
 flock -x -w 80 200 || exit 1
     do_rm_backup
     # DEPEND YOUR DB, CUSTOMIZE THIS COMMAND
-    do_backup {{ backup.table_engine }} {{ backup.use_galera }} && do_mv_backup
+    do_backup {{ table_engine }} {{ use_galera }} && do_mv_backup
     do_save_log
 ) 200>/var/lock/.mysql_backup.lock
