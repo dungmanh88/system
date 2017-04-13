@@ -173,7 +173,11 @@
     state: present
 
 - name: Check if slave is already configured for replication
-  mysql_replication: mode=getslave
+  mysql_replication:
+    login_user: root
+    login_port: "{{ mysql_port }}"
+    login_password: ''
+    mode: getslave
   ignore_errors: true
   register: slave
   when: mysql_repl_role == 'slave'
