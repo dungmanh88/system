@@ -9,21 +9,23 @@ yum -y install epel-release \
 
 cat /etc/*release | grep -q "7\."
 if [ $? -eq 0 ]; then
-  cd /tmp
   if [ ! -f /tmp/get-pip.py ]; then
-      wget https://bootstrap.pypa.io/get-pip.py
+      wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
   fi
   ### support ansible vault
   # then
   ### generate crypted passwords for the user module
-  python get-pip.py \
+  python /tmp/get-pip.py \
   && pip install cryptography \
   && pip install passlib
 fi
 
-echo "y\n" | mv /etc/ansible /etc/ansible.bak
+if [ -d /etc/ansible ]; then
+  mv /etc/ansible /etc/ansible.bak
+fi
 
-ln -s $(pwd) /etc/ansible
+# get parent dir of current dir
+ln -s "$(dirname "$(pwd)")" /etc/ansible
 
 mkdir -p /etc/.ssh && \
 echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
