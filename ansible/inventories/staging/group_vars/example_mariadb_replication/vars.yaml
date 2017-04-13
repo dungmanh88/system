@@ -109,7 +109,7 @@ mariadb_root_priv: "*.*:ALL,GRANT"
 
 mariadb_repl_user_name: repl_user
 mariadb_repl_user_passwd: "{{ vault_mariadb_default_repl_user_passwd }}"
-mariadb_repl_user_passwd: "*.*:REPLICATION SLAVE"
+mariadb_repl_user_priv: "*.*:REPLICATION SLAVE"
 
 ### Control param
 # Change it if you need
