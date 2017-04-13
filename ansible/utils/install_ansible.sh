@@ -21,6 +21,10 @@ if [ $? -eq 0 ]; then
   && pip install passlib
 fi
 
+echo "y\n" | mv /etc/ansible /etc/ansible.bak
+
+ln -s $(pwd) /etc/ansible
+
 mkdir -p /etc/.ssh && \
 echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
 
