@@ -7,7 +7,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 yum -y install epel-release \
 && yum -y install ansible git gcc gcc-c++ python-devel mariadb-devel openssl-devel wget python-cffi
 
-cat /etc/*release | grep "7\."
+cat /etc/*release | grep -q "7\."
 if [ $? -eq 0 ]; then
   cd /tmp
   if [ ! -f /tmp/get-pip.py ]; then
@@ -20,13 +20,9 @@ if [ $? -eq 0 ]; then
   && pip install cryptography \
   && pip install passlib
 fi
-cat /etc/*release | grep "6\."
-if [ $? -eq 0 ]; then
-  echo "chmod u+x install_pip_centos6.sh and run the script"
-fi
 
 mkdir -p /etc/.ssh && \
-ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
+echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
 
 touch /etc/.vault_pass.txt
 echo "Your vault passwd: "
