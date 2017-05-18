@@ -1,0 +1,5 @@
+netstat -tulpn | grep LISTEN | awk '{print $4}' | awk -F ":" '$2 > 31000 && $2 < 32000 {print $2}' > /tmp/file
+
+while IFS='' read -r line; do echo "port $line"; openssl s_client -connect 127.0.0.1:$line; done < /tmp/file
+
+openssl s_client -ign_eof  -connect localhost:31790

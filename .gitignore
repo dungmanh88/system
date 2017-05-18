@@ -7,3 +7,9 @@
 venv
 production
 initial_setup.sh.j2
+rsync_code.sh
+scan_my_network.py
+scan_my_network.pyc
+we.log
+mbox.txt
+mbox-short.txt

@@ -31,7 +31,7 @@ if [ ${is_centos} -eq 0 ] && [ ${is_driver_82574L} -eq 0 ]; then
     rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
   fi
 
-  yum -y install kmod-e1000e
+  yum -y install kmod-e1000e kmod-e1000
 
   echo "Checking..."
 
@@ -42,4 +42,3 @@ if [ ${is_centos} -eq 0 ] && [ ${is_driver_82574L} -eq 0 ]; then
 
   echo "You will reboot to apply completely and recheck by run modinfo e1000e | head | grep -iq 3.3.4-NAPI"
 fi
-
