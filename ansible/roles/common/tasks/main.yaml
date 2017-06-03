@@ -1,6 +1,7 @@
 - include: basic.yaml
 - include: install_packages.yaml
 - include: ntpd.yaml
-- include: accounts.yaml
+- include: admin_accounts.yaml
+- include: dev_accounts.yaml
 - include: secure.yaml
-- include: fix_e1000e.yaml
+#- include: fix_e1000e.yaml

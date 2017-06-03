@@ -1,7 +1,0 @@
-- name: Deploy mariadb
-  hosts: example_mariadb_replication
-  roles:
-  - role: common
-  - role: mariadb
-  - role: monitoring
-  - role: backup

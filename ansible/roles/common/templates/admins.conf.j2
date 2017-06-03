@@ -1,3 +1,7 @@
-{{ admin_cmd_alias }}
-### /bin/sh in cmd_alias will prevent ansible to use all users in admins group 
-%{{ admin_group }} {{ admin_cmd }}
+Cmnd_Alias  SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/init, /sbin/telinit
+Cmnd_Alias  SHELLS = /bin/sh, /bin/bash, /sbin/nologin, /bin/tcsh, /bin/csh, /bin/zsh, /bin/ksh
+Cmnd_Alias  SU = /bin/su
+Cmnd_Alias  NDD = /bin/dd
+
+### /bin/sh in cmd_alias will prevent ansible to use all users in admins group
+%{{ admin_group }} ALL=(ALL) ALL, !SHELLS, !SU, !SHUTDOWN, !NDD

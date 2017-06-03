@@ -1,0 +1,4 @@
+[test]
+test1 ansible_host=103.53.170.69 hostname=test1
+#test2 ansible_host=103.53.170.70 hostname=test2
+#test3 ansible_host=103.53.171.121 hostname=test3

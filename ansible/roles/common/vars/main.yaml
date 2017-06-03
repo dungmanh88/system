@@ -44,7 +44,7 @@ packages:
    - tmux
    - tcpdump
    - ncdu
-   - git
+   - git-all
    - siege
    - httpd-tools
    - nmap

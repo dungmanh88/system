@@ -1,0 +1,33 @@
+ansible_connection: ssh
+ansible_port: 1102
+
+### For fresh servers
+#ansible_ssh_user: "{{ vault_default_ansible_ssh_user }}"
+#ansible_ssh_pass: "{{ vault_default_ansible_ssh_pass }}"
+
+### For running servers
+ansible_ssh_user: "{{ vault_ansible_ssh_user }}"
+ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
+
+### For modifying on existing servers
+#ansible_ssh_user: "{{ vault_init_ansible_ssh_user }}"
+#ansible_become_pass: "{{ ansible_ssh_pass }}"
+
+### For privilege escalaton
+### becoming to root
+ansible_become: true
+ansible_become_method: sudo
+
+admin_users:
+  - name: dungnm
+    passwd: "{{ vault_dungnm_passwd }}"
+    full_name:  Nguyen Manh Dung
+    active: 1
+    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCb6RD44udUAnsqe4+0YTbQwj5G3H0YZoUyud3r2FyZHeg33VZANfKtUX+cBlr8GHyoCKSpZc04zhvQagh26S5T1Lnb8ioo0j3vPDU9zR4r3DrrntIJWRxobZgCkzBn7took6dNiqs1/rA2/Nfv2AxCNk12X+1EhxrvOVB1oyC5ZqbaG07jGUPok8hQwLn9i6cdKhZIRc/Felsxfw5FJH+fyHe6H1xU9HeF3u3TrPcUNCzwaHJei3AHk+O+cfNJJL7TP0sjQWgLNk4s7M2N55wTDv68TBTBT4Im8FidV6b+X2kZmjHx/rxMDR+vPUQ+SdqKGgvrFzJibpJInDRzyXkL dungnm@devops
+
+admin_group: admins
+admin_sudo_file: /etc/sudoers.d/admins
+
+root_user:
+  name: root
+  recovery_passwd: "{{ vault_root_recovery_passwd }}"

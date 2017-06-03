@@ -1,0 +1,58 @@
+- name: Create dev group
+  group:
+    name: "{{ dev_group }}"
+    state: present
+
+- name: Create developer accounts
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.passwd }}"
+    comment: "{{ item.full_name }}"
+    shell: /bin/bash
+    groups: "{{ dev_group }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  when: item.active == 1
+  with_items: "{{ dev_users }}"
+
+- name: Set authorized key took from file
+  authorized_key:
+    user: "{{ item.name }}"
+    state: present
+    key: "{{ item.public_key }}"
+  when: item.active == 1
+  with_items: "{{ dev_users }}"
+
+- name: Config basic vim
+  copy: src=vimrc.conf.j2 dest="/home/{{ item.name }}/.vimrc"
+  when: item.active == 1
+  with_items: "{{ dev_users }}"
+
+- name: Config basic tmux
+  copy: src=tmux.conf.j2 dest="/home/{{ item.name }}/.tmux.conf"
+  when: item.active == 1
+  with_items: "{{ dev_users }}"
+
+- name: Check if filter user in sshd
+  command: grep -Fq "AllowUsers" /etc/ssh/sshd_config
+  register: check_sshd
+  ignore_errors: yes
+  changed_when: False
+  check_mode: no
+
+- name: Allow user in sshd
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'AllowUsers {{ item.name }}'
+    state: present
+    validate: '/usr/sbin/sshd -T -t -f %s'
+  when:
+    - item.active == 1
+    - check_sshd.rc == 0
+  with_items: "{{ dev_users }}"
+
+- name: Restart sshd to apply config
+  service: name="sshd" enabled=yes state=restarted
+  when: check_sshd.rc == 0

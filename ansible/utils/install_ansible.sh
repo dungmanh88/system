@@ -4,8 +4,10 @@ set -e
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
+echo "=================== Setup ansible ==================="
+
 yum -y install epel-release \
-&& yum -y install ansible git gcc gcc-c++ python-devel mariadb-devel openssl-devel wget python-cffi
+&& yum -y install ansible git-all gcc gcc-c++ python-devel mariadb-devel openssl-devel wget python-cffi libffi-devel
 
 cat /etc/*release | grep -q "7\."
 if [ $? -eq 0 ]; then
@@ -20,13 +22,6 @@ if [ $? -eq 0 ]; then
   && pip install passlib
 fi
 
-if [ -d /etc/ansible ]; then
-  mv /etc/ansible /etc/ansible.bak
-fi
-
-# get parent dir of current dir
-ln -s "$(dirname "$(pwd)")" /etc/ansible
-
 mkdir -p /etc/.ssh && \
 echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
 
@@ -35,3 +30,15 @@ echo "Your vault passwd: "
 read vault_pass
 echo "You entered: ${vault_pass}"
 echo ${vault_pass} > /etc/.vault_pass.txt
+
+echo "=================== Create gen_sha512_password file ==================="
+
+genpass_file=/etc/ansible/gen_sha512_password.sh
+
+cat << EOF > ${genpass_file}
+#!/bin/bash
+set -e
+/usr/bin/python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"
+EOF
+
+chmod u+x ${genpass_file}
