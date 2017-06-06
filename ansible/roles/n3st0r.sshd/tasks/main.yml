@@ -1,0 +1,26 @@
+---
+- name: add the OS specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: ['package', 'configuration', 'service']
+
+- name: install sshd for Debian
+  apt: pkg={{ sshd_pkg_name }} state={{ sshd_pkg_state }}
+  when: ansible_os_family == 'Debian'
+  tags: package
+
+- name: install sshd for RedHat
+  yum: name={{ sshd_pkg_name }} state={{ sshd_pkg_state }}
+  when: ansible_os_family == 'RedHat'
+  tags: package
+
+- name: configure sshd
+  template: >
+    src=sshd_config.j2
+    dest={{ sshd_config_basedir }}/sshd_config
+    validate="/usr/sbin/sshd -t -f %s"
+  notify: restart sshd
+  tags: configuration
+
+- name: enable sshd
+  service: name={{ sshd_service_name }} state=running enabled=yes
+  tags: service

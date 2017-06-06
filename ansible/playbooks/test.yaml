@@ -1,3 +1,11 @@
-- hosts: test
+- hosts: development_test
+  roles:
+    - role: common
+
+- hosts: staging_test
+  roles:
+    - role: common
+
+- hosts: production_test
   roles:
     - role: common

@@ -1,0 +1,2 @@
+sshd_port: 1102
+sshd_listen_addresses: [0.0.0.0]

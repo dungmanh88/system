@@ -17,18 +17,3 @@
     dest: /etc/resolv.conf
     block: |
       {{ nameservers }}
-
-- name: Disable selinux
-  selinux: state=disabled
-
-- name: Disable firewall
-  service: name="firewalld" enabled=no state=stopped
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
-
-- name: Disable firewall
-  service: name="iptables" enabled=no state=stopped
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"

@@ -1,4 +1,0 @@
-- name: Install ntpd
-  yum: name="ntp" update_cache=yes
-- name: Restart and enable ntpd
-  service: name="ntpd" enabled=yes state=restarted

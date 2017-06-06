@@ -3,7 +3,7 @@
 set -e
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
+ANSIBLE_SERVER_PORT=1102
 echo "=================== Setup ansible ==================="
 
 yum -y install epel-release \
@@ -22,8 +22,10 @@ if [ $? -eq 0 ]; then
   && pip install passlib
 fi
 
-mkdir -p /etc/.ssh && \
-echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
+#mkdir -p /etc/.ssh && \
+#echo -e  'y\n' | ssh-keygen -t rsa -N "" -f /etc/.ssh/ansible_id_rsa
+#Copy ansible_id_rsa from personal computer to ansible server
+echo "YOU MUST ASK PREMIUM SYSTEM ADMIN TO GET PRIVATE KEY FOR ANSIBLE SERVER. Copy ansible_id_rsa to /etc/.ssh/ansible_id_rsa on ansible server"
 
 touch /etc/.vault_pass.txt
 echo "Your vault passwd: "

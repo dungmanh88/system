@@ -1,0 +1,6 @@
+- hosts: localhost
+  remote_user: root
+  vars:
+    sshd_permit_root_login: without-password
+  roles:
+    - ansible-role-sshd

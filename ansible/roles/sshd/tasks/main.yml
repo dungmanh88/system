@@ -1,0 +1,15 @@
+- name: install sshd
+  yum: name={{ sshd_pkg_name }} state=installed
+  tags: package
+
+- name: configure sshd
+  template: >
+    src=sshd_config.j2
+    dest={{ sshd_config_basedir }}/sshd_config
+    validate="/usr/sbin/sshd -t -f %s"
+  notify: restart sshd
+  tags: configuration
+
+- name: enable sshd
+  service: name={{ sshd_service_name }} state=running enabled=yes
+  tags: service

@@ -1,0 +1,5 @@
+---
+sshd_service_name: sshd
+sshd_subsystems:
+  - name: sftp
+    path: /usr/libexec/openssh/sftp-server

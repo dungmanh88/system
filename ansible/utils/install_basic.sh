@@ -4,12 +4,19 @@ echo "=================== Setup deployer user ==================="
 
 deployer_user=deployer
 deployer_group=ansible
+gw=""
+
 ssh_dir=/home/${deployer_user}/.ssh
 authorized_keys=${ssh_dir}/authorized_keys
 sshd_cnf=/etc/ssh/sshd_config
 jail_cnf_orig=/etc/fail2ban/jail.conf
 jail_cnf=/etc/fail2ban/jail.local
 iptables_jail_cnf=/etc/fail2ban/jail.d/00-ssh-iptables.conf
+
+if route -n | grep -q UG; then
+  echo "default gw is set"
+else
+  route add default gw ${gw}
 
 if grep -q ${deployer_user} /etc/passwd; then
   echo "user ${deployer_user} is exists"

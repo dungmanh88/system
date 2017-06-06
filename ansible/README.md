@@ -1,41 +1,51 @@
+1 - Run install_ansible.sh on ansible server
 
-OUT OF DATE
+2 - Run install_basic.sh on monitored server
 
-dbm_: dbadmin
-ma_: mariadb
-ngx_: nginx
-pfm_: php-fpm
-
-Run install_ansible.sh
-
-Copy ansible production if you need
-
-Use example_ as sample config in group_vars, inventories, playbooks
-
-change inventories/staging|production/all/vars.yaml
+3 - Make sure inventories/group_vars/all/vars.yaml
 ```
-### For fresh servers
-ansible_ssh_user: "{{ vault_default_ansible_ssh_user }}"
-ansible_ssh_pass: "{{ vault_default_ansible_ssh_pass }}"
-
-### For running servers
-#ansible_ssh_user: "{{ vault_ansible_ssh_user }}"
-#ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
-```
-
-ansible -i inventories/staging|production/hosts.yaml group_name -m ping
-
-ansible-playbook -i inventories/staging|production/hosts.yaml --limit group_name -s roles/init/create_deployer.yaml
-
-change inventories/staging|production/all/vars.yaml
-```
-### For fresh servers
-#ansible_ssh_user: "{{ vault_default_ansible_ssh_user }}"
-#ansible_ssh_pass: "{{ vault_default_ansible_ssh_pass }}"
-
 ### For running servers
 ansible_ssh_user: "{{ vault_ansible_ssh_user }}"
 ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
 ```
+4 - Set group and host_vars in inventories file
+hostname must distinct.
+```
+[development_test]
+test1 ansible_host=103.53.170.69 hostname=test1
 
-ansible-playbook -i inventories/staging|production/hosts.yaml --limit group_name -s playbooks/staging|production/group_name.yaml
+[staging_test]
+test2 ansible_host=103.53.170.70 hostname=test2
+
+[production_test]
+test3 ansible_host=103.53.171.121 hostname=test3
+```
+
+5 - Create group, set vars.yaml and/or vault.yaml
+
+6 - Create playbook
+```
+- hosts: development_test
+  roles:
+    - role: common
+
+- hosts: staging_test
+  roles:
+    - role: common
+
+- hosts: production_test
+  roles:
+    - role: common
+```
+
+7 - Test
+ansible -i inventories/hosts.yaml group_name -m ping
+
+8 - Do it
+ansible-playbook -i inventories/hosts.yaml --limit group_name -s playbooks/group_name.yaml
+
+```
+ansible-playbook --limit development_test -s playbooks/test.yaml
+ansible-playbook --limit staging_test -s playbooks/test.yaml
+ansible-playbook --limit production_test -s playbooks/test.yaml
+```

@@ -1,0 +1,14 @@
+- name: install ntpd
+  yum: name={{ ntpd_pkg_name }} update_cache=yes
+  tags: package
+
+- name: configure ntpd
+  template: >
+    src=ntpd_config.j2
+    dest=/etc/ntp.conf
+  notify: restart ntpd
+  tags: configuration
+
+- name: enable ntpd
+  service: name={{ ntpd_service_name }} state=running enabled=yes
+  tags: service

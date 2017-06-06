@@ -1,0 +1,5 @@
+- name: Change passwd root and enable root login console
+  user:
+    name: "{{ root_user.name }}"
+    password: "{{ root_user.recovery_passwd }}"
+    shell: /bin/bash
