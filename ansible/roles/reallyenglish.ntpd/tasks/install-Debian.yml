@@ -1,0 +1,6 @@
+---
+
+- name: Install ntpd
+  apt:
+    name: "{{ ntpd_package }}"
+    state: present

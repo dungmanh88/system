@@ -1,0 +1,10 @@
+# ntp sources (ipv4 | ipv6 | fqdn)
+ntpd_sources:
+  - 192.168.56.71
+  - 192.168.56.72
+
+# restrict statement on local network
+ntpd_restrict:
+  - restrict 10.0.0.0 mask 255.0.0.0 nomodify notrap nopeer
+  - restrict 192.168.0.0 mask 255.255.0.0 nomodify notrap nopeer
+  - restrict 172.16.0.0 mask 255.240.0.0 nomodify notrap nopeer

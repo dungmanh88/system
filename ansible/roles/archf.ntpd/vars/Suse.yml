@@ -1,0 +1,10 @@
+---
+ntpd_pkgs:
+  - python-selinux
+  - ntp
+
+ntpd_svc_name: ntp
+
+# Deliberately left indefined.
+# see https://bugzilla.novell.com/show_bug.cgi?id=542098
+# ntpd_keysfile: "/etc/ntp.keys"

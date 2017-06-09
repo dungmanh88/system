@@ -1,2 +1,3 @@
 sshd_config: /etc/ssh/sshd_config
 git_user: git
+sshd_service_name: sshd

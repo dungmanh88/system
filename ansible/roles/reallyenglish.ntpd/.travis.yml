@@ -1,0 +1,62 @@
+---
+language: python
+python: "2.7"
+
+# Use the new container infrastructure
+sudo: false
+
+# Install ansible
+addons:
+  apt:
+    packages:
+    - python-pip
+    - curl
+
+install:
+  # Install ansible
+  - pip install ansible
+
+  # Check ansible version
+  - ansible --version
+
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../:extra_roles' >ansible.cfg
+
+script:
+  # See if the repo is private
+  - if curl --silent --output /dev/null --dump-header - "https://github.com/${TRAVIS_REPO_SLUG}" | grep "Status:[[:space:]]*404"; then touch .private_repo; fi
+
+  # Download depended roles
+  - if [ -f requirements.yml ]; then ansible-galaxy install -r requirements.yml -p extra_roles; fi
+
+  # Basic role syntax check
+  #
+  # If it is a private repo, it _usually_ has secret information, or encrypted
+  # file. As the information security policy does not allow decryption key to
+  # be transfered to third-party, encrypted files cannot be decrypted in travis
+  # CI environment. Skip syntax check when it is a private repo.
+  #
+  - "if [ ! -f .private_repo ]; then ansible-playbook tests/travisci/tests.yml -i tests/travisci/inventory --syntax-check; fi"
+
+  # use recent ruby, instead of default ruby 1.9
+  - rvm install ruby-2.1.10
+  - rvm use 2.1.10
+
+  # download the QA scripts
+  - git clone https://github.com/trombik/qansible.git
+  - ( cd qansible && bundle install --path vendor/bundle --with "test" && bundle exec rake build && gem install pkg/*.gem )
+  - rm -rf qansible
+
+  # git complains if user and email are not set
+  - git config --global user.name "Your Name"
+  - git config --global user.email "you@example.com"
+
+  # surpress a warning from `qansible qa
+  - touch .kitchen.local.yml
+
+  # run the QA test
+  - export PATH="${PATH}:`rvm gemdir`/bin"
+  - qansible qa
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

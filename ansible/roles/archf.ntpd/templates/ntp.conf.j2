@@ -1,0 +1,92 @@
+# {{ ansible_managed }}
+# configuration for ntpd, see the man pages
+# ntp.conf(5), ntpd_acc(5), ntpd_auth(5), ntpd_clock(5), ntpd_misc(5), ntpd_mon(5).
+
+driftfile /var/lib/ntp/drift
+
+# see ntpd_acc manual page for details on restrict.
+#
+# default: prevents access to everything not explicitly allowed
+# notrap: prevents ntpdc control message protocol traps
+# nopeer: prevents a peer association being formed
+# noquery: prevents ntpq and ntpdc queries, time queries are answered
+# kod: a “Kiss-o'-death” packet is to be sent to reduce unwanted queries
+
+# Apply tight default settings wich we are going to loosen with exceptions.
+# By default, permit time synchronization with our time source, but do not
+# permit the source to query or modify the client.
+restrict -4 default limited kod nomodify notrap nopeer noquery
+restrict -6 default limited kod nomodify notrap nopeer noquery
+
+# Permit all access over the loopback interface.
+restrict 127.0.0.1
+restrict ::1
+
+# Relax access on a per network or IP basis.
+{% for i in ntpd_restrict %}
+{{ i }}
+{% endfor %}
+
+# server(s) we time sync to.
+{% for ntpd_source in ntpd_sources %}
+server {{ ntpd_source }} iburst
+{% endfor %}
+
+# Undisciplined Local Clock. Intended for backup when no outside source of
+# synchronized time is available.
+server 127.127.1.0
+fudge  127.127.1.0 stratum 11
+
+{% if ntpd_crypto is defined %}
+# Enable public key cryptography.
+crypto
+{# must be here to avoid file/dir not found issues #}
+includefile /etc/ntp/crypto/pw
+{% else %}
+# Uncomment to enable public key cryptography.
+#crypto
+
+# Key file containing the keys and key identifiers used when operating
+# with symmetric key cryptography.
+{% if ntpd_keysfile is defined %}
+keys {{ ntpd_keysfile }}
+{% endif %}
+
+# Specify the key identifiers which are trusted ex:.
+#trustedkey 4 8 42
+{% if ntpd_trustedkey is defined %}
+trustedkey {{ ntpd_trustedkey }}
+{% endif %}
+
+# Specify the key identifier to use with the ntpdc utility ex:.
+#requestkey 8
+{% if ntpd_requestkey is defined %}
+requestkey  {{ ntpd_requestkey }}
+{% endif %}
+
+# Specify the key identifier to use with the ntpq utility ex:.
+#controlkey 8
+{% if ntpd_controlkey is defined %}
+controlkey {{ ntpd_controlkey }}
+{% endif %}
+{% endif %}
+
+# Enable this if you want statistics to be logged to disk.
+{% if ntpd_log_stats %}
+statsdir /var/log/ntpstats/
+{% endif %}
+
+#statistics clockstats cryptostats loopstats peerstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+# Disable the monitoring facility to prevent amplification attacks using ntpdc
+# monlist command when default restrict does not include the noquery flag. See
+# CVE-2013-5211 for more details.
+# Note: Monitoring will not be disabled with the limited restriction flag.
+#disable monitor
+
+# logging (The default is the system log file)
+logfile /var/log/ntp.log
+logconfig =all

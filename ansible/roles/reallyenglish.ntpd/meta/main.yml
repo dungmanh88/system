@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  author: Tomoyuki Sakurai
+  description: Configures ntpd from ntp.org
+  company: Reallyenglish
+  license: BSD
+  min_ansible_version: 2.0
+  platforms:
+  - name: FreeBSD
+    versions:
+    - 10.3
+#  - name: OpenBSD
+#    versions:
+#    - 6.0
+  - name: Ubuntu
+    versions:
+    - trusty
+  - name: EL
+    versions:
+    - 7
+
+  galaxy_tags:
+    - system
+#    - installer
+#    - web
+dependencies:
+#  - { role: username.common, some_parameter: 3 }

@@ -1,0 +1,4 @@
+__ntpd_service: ntpd
+__ntpd_conf: /etc/ntp.conf
+__ntpd_db_dir: /var/lib/ntp
+__ntpd_package: ntp

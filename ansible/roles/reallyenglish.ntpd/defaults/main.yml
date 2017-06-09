@@ -1,0 +1,14 @@
+ntpd_service: "{{ __ntpd_service }}"
+ntpd_conf: "{{ __ntpd_conf }}"
+ntpd_db_dir: "{{ __ntpd_db_dir }}"
+ntpd_leapfile: "{{ __ntpd_db_dir }}/leap-seconds.list"
+ntpd_package: "{{ __ntpd_package }}"
+ntpd_driftfile: "{{ __ntpd_db_dir }}/ntp.drift"
+ntpd_leap_seconds_url: "https://www.ietf.org/timezones/data/leap-seconds.list"
+
+ntpd_role: client
+ntpd_upstreams:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org

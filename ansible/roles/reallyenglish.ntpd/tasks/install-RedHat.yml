@@ -1,0 +1,12 @@
+---
+
+- name: Install libselinux-python
+  yum:
+    name: libselinux-python
+    state: present
+  when: "{{ ansible_selinux is defined and 'status' in ansible_selinux and ansible_selinux.status == 'enabled' }}"
+
+- name: Install ntpd
+  yum:
+    name: "{{ ntpd_package }}"
+    state: present

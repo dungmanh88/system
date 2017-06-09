@@ -1,0 +1,13 @@
+---
+# tasks file for ntp
+
+- name: Ensure NTP (for time synchronization) is installed.
+  yum: name=ntp state=installed
+- name: set timezone to Europe/Rome
+  timezone: name={{ ntp_timezone }}
+  register: contains
+- name: Print timezone
+  debug: msg="New timezone set {{ contains.diff.after.name }}"
+- name: Ensure NTP is running.
+  service: name=ntpd state=started enabled=yes
+

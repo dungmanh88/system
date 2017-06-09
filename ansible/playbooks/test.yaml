@@ -5,7 +5,8 @@
 
 - hosts: staging_test
   roles:
-    - role: common
+    - role: sshd
+    - role: gitlab
 
 - hosts: production_test
   roles:

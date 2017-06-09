@@ -1,0 +1,39 @@
+---
+
+# Enable/disable ntpd service.
+ntpd_enabled: yes
+
+# Stop/start ntpd service
+ntpd_state: "started"
+
+# Define ntpd sources. The [0-3].pool.ntp.org names point to a random set of
+# servers that will change every hour.
+ntpd_sources:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org
+
+# Install (`present', `latest'), or remove (`absent') a package.
+ntpd_pkg_state: latest
+
+# Restrict statements within `ntpd_restrict` will relax defaults from
+# configuration file template which are:
+#   *restrict -4 default limited kod nomodify notrap nopeer noquery
+#   *restrict -6 default limited kod nomodify notrap nopeer noquery
+
+# By default, client hosts on local network are less restricted. Override this
+# for more specifics needs. Elements of this list will be literally inserted
+# into ntp.conf. You could define defaults for those for each of your dev,
+# staging and production environnement and also create groups for your stratum
+# servers.
+ntpd_restrict:
+  - restrict 10.0.0.0 mask 255.0.0.0 nomodify notrap nopeer
+  - restrict 192.168.0.0 mask 255.255.0.0 nomodify notrap nopeer
+  - restrict 172.16.0.0 mask 255.240.0.0 nomodify notrap nopeer
+
+# no stats logging
+ntpd_log_stats: no
+
+# undefined crypto settings
+# ntpd_crypto: ''

@@ -1,0 +1,28 @@
+---
+
+- name: include OS specific varibles
+  include_vars: "{{ansible_os_family}}.yml"
+  tags: ntp
+
+- name: Install ntp packages
+  apt:
+    name: "{{ntpd_pkgs}}"
+    state: "{{ntpd_pkg_state}}"
+  tags: ntp
+  when: ansible_os_family == "Debian"
+
+- include: "{{ansible_os_family}}.yml"
+  when: ansible_os_family == "RedHat"
+
+- name: Copy the ntp.conf template file
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+  notify:
+   - restart ntpd
+  tags: ntp
+
+- name: start/stop/enable ntpd service
+  service:
+    name: "{{ntpd_svc_name}}"
+    state: "{{ntpd_state}}"
+    enabled: "{{ntpd_enabled}}"
+  tags: ntp

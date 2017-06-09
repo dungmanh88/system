@@ -1,0 +1,4 @@
+---
+# defaults file for ntp
+#
+ntp_timezone: Europe/Rome

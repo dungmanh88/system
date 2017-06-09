@@ -1,0 +1,12 @@
+# ntp sources (ipv4 | ipv6 | fqdn)
+ntpd_sources:
+  - 0.ca.pool.ntp.org
+  - 1.ca.pool.ntp.org
+  - 2.ca.pool.ntp.org
+  - 3.ca.pool.ntp.org
+
+# restrict statement on local network
+ntpd_restrict:
+  - restrict 10.0.0.0 mask 255.0.0.0 nomodify notrap nopeer noquery
+  - restrict 192.168.0.0 mask 255.255.0.0 nomodify notrap nopeer noquery
+  - restrict 172.16.0.0 mask 255.240.0.0 nomodify notrap nopeer noquery

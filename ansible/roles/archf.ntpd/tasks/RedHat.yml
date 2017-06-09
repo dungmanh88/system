@@ -1,0 +1,13 @@
+---
+
+- name: Install ntp packages
+  yum:
+    name: "{{ntpd_pkgs}}"
+    state: "{{ntpd_pkg_state}}"
+  tags: ntp
+
+- name: Uninstall chrony
+  yum:
+    name: chrony
+    state: absent
+  tags: ntp
