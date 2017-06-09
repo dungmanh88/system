@@ -1,3 +1,9 @@
+## Check ssh
+```
+ssh -vT git@<git-domain>
+less /var/opt/gitlab/.ssh/authorized_keys
+```
+
 ## Add - Commit - Push
 ```
 git add -A

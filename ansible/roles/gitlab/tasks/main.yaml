@@ -22,5 +22,12 @@
     validate: "/usr/sbin/sshd -t -f %s"
   when: has_allow_users|succeeded
 
+- name: Replace to port 22
+  replace:
+    dest: "{{ sshd_config }}"
+    regexp: 'Port\s+[0-9]+'
+    replace: 'Port 22'
+    validate: "/usr/sbin/sshd -t -f %s"
+
 - name: Show msg
   debug: msg="Access gitlab via url http://{{ ansible_host }} or http://{{ hostname }}"
