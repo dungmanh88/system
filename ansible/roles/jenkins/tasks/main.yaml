@@ -1,0 +1,10 @@
+- name: Copy script install jenkins
+  copy: src=install_jenkins.sh.j2 dest=/tmp/install_jenkins.sh owner=root group=root mode=0744
+
+- name: Run script install jenkins
+  shell: /tmp/install_jenkins.sh
+  args:
+    executable: /bin/bash
+
+- name: Show msg
+  debug: msg="Access jenkins via url http://{{ ansible_host }}:8080"

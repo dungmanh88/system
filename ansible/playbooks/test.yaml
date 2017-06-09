@@ -1,5 +1,6 @@
 - hosts: development_test
   roles:
+    - role: sshd
     - role: gitlab
 
 - hosts: staging_test
@@ -8,5 +9,6 @@
 
 - hosts: production_test
   roles:
-    - role: common
+#    - role: common
     - role: docker
+    - role: jenkins

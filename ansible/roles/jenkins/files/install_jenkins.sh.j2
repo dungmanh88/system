@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker pull jenkinsci/jenkins:lts && \
+
+if ! docker ps | grep -q myjenkins; then
+  docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /var/jenkins_home jenkinsci/jenkins:lts
+fi
