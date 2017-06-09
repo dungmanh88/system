@@ -1,0 +1,14 @@
+#!/bin/bash
+
+yum -y install curl policycoreutils openssh-server openssh-clients
+systemctl enable sshd
+systemctl start sshd
+yum -y install postfix
+systemctl enable postfix
+systemctl start postfix
+# sudo firewall-cmd --permanent --add-service=http
+# sudo systemctl reload firewalld
+curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash
+yum -y install gitlab-ce
+gitlab-ctl reconfigure
+gitlab-ctl restart

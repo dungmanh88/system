@@ -1,6 +1,6 @@
 - hosts: development_test
   roles:
-    - role: common
+    - role: gitlab
 
 - hosts: staging_test
   roles:

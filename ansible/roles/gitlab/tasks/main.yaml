@@ -1,0 +1,7 @@
+- name: Copy script setup gitlab
+  copy: src=setup_gitlab.sh.j2 dest=/tmp/setup_gitlab.sh owner=root group=root mode=0744
+
+- name: Run script setup gitlab
+  shell: /tmp/setup_gitlab.sh
+  args:
+    executable: /bin/bash
