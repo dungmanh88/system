@@ -1,0 +1,30 @@
+#!/bin/bash
+
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+yum -y remove docker \
+                  docker-common \
+                  container-selinux \
+                  docker-selinux \
+                  docker-engine
+
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+
+yum-config-manager --disable docker-ce-edge
+
+yum makecache fast
+
+yum -y install docker-ce
+
+
+#cat << EOF > /etc/docker/daemon.json
+# {
+#   "storage-driver": "devicemapper"
+# }
+#EOF
+
+systemctl start docker && systemctl enable docker && docker run hello-world

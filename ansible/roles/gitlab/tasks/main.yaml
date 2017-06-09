@@ -5,3 +5,6 @@
   shell: /tmp/setup_gitlab.sh
   args:
     executable: /bin/bash
+
+- name: Show msg
+  debug: msg="Access gitlab via url http://{{ ansible_host }} or http://{{ hostname }}"

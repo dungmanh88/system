@@ -1,0 +1,7 @@
+- name: Copy script install docker
+  copy: src=install_docker.sh.j2 dest=/tmp/install_docker.sh owner=root group=root mode=0744
+
+- name: Run script install docker
+  shell: /tmp/install_docker.sh
+  args:
+    executable: /bin/bash
