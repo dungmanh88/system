@@ -1,11 +1,10 @@
 - hosts: development_test
   roles:
     - role: sshd
-    - role: gitlab
 
 - hosts: staging_test
   roles:
-    - role: sshd
+    - role: common
     - role: gitlab
 
 - hosts: production_test

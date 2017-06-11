@@ -14,7 +14,7 @@ if route -n | grep -q UG; then
   echo "default gw is set"
 else
   route add default gw ${gw}
-fi  
+fi
 
 if grep -q ${deployer_user} /etc/passwd; then
   echo "user ${deployer_user} is exists"

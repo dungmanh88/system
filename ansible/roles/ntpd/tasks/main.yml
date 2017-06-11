@@ -6,6 +6,7 @@
   template: >
     src=ntpd_config.j2
     dest=/etc/ntp.conf
+    backup=yes
   notify: restart ntpd
   tags: configuration
 

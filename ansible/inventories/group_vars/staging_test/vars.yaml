@@ -4,6 +4,6 @@ dev_users:
     passwd: "{{ vault_dev2_passwd }}"
     full_name:  Dev1
     active: 1
-    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCb6RD44udUAnsqe4+0YTbQwj5G3H0YZoUyud3r2FyZHeg33VZANfKtUX+cBlr8GHyoCKSpZc04zhvQagh26S5T1Lnb8ioo0j3vPDU9zR4r3DrrntIJWRxobZgCkzBn7took6dNiqs1/rA2/Nfv2AxCNk12X+1EhxrvOVB1oyC5ZqbaG07jGUPok8hQwLn9i6cdKhZIRc/Felsxfw5FJH+fyHe6H1xU9HeF3u3TrPcUNCzwaHJei3AHk+O+cfNJJL7TP0sjQWgLNk4s7M2N55wTDv68TBTBT4Im8FidV6b+X2kZmjHx/rxMDR+vPUQ+SdqKGgvrFzJibpJInDRzyXkL dungnm@devops
+    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8Y+ypqsOVLYCeWeQq6pXzDx8F8kAMa1nq488G/a+z7gFTq5uRHA3VZu19cwciCIiu6Hk+ZFA7TEaVjNZcdfVBd/Z/4zI0AAPd23rJtI8Tld2FRkP//a9zhq+jq/1RwoCOFnGUO5HruUKEqYR7GteEtWDBCn8Bn2LdGtBndPwaowrfz+ThTxrNZblRv3OWvI7DCvdRDOvUhbjI7bE2kdW9ynSTSUN9hzFB0LUmis5ZoI+Z4MagqCJD+GzylUDAaaPv0wBMoAgv1dmocsY6EmjGdDkU2Zo7RC/dBPqnIDKDTfFXTm2PTIvn2Te/A9KPHet5gyOwVN97wF0NKm+D1hBt dungnm@devops
 
 dev_group: developers
