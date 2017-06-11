@@ -6,10 +6,9 @@
 - hosts: staging_test
   roles:
     - role: common
-    - role: gitlab
+    - role: docker
+    - role: jenkins
 
 - hosts: production_test
   roles:
-#    - role: common
-    - role: docker
-    - role: jenkins
+    - role: common

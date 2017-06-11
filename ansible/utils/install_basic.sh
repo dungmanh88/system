@@ -10,33 +10,36 @@ ssh_dir=/home/${deployer_user}/.ssh
 authorized_keys=${ssh_dir}/authorized_keys
 sshd_cnf=/etc/ssh/sshd_config
 
+# Set gw
 if route -n | grep -q UG; then
   echo "default gw is set"
 else
   route add default gw ${gw}
 fi
 
+# Create user
 if grep -q ${deployer_user} /etc/passwd; then
   echo "user ${deployer_user} is exists"
 else
   useradd ${deployer_user}
 fi
 
+# Create group
 if grep -q ${deployer_group} /etc/group; then
   echo "user ${deployer_group} is exists"
 else
   groupadd ${deployer_group}
 fi
 
+# Create sudoers
 cat << EOF > /etc/sudoers.d/${deployer_group}
 %${deployer_group} ALL=(ALL:ALL) ALL
 EOF
 
+# Add user into group
 usermod -aG ${deployer_group} ${deployer_user}
 
-passwd -l root \
-&& usermod -s /sbin/nologin root
-
+# Key based authentication
 mkdir -p ${ssh_dir} && chmod 700 ${ssh_dir} \
 && touch ${authorized_keys}
 
@@ -46,6 +49,10 @@ EOF
 
 chmod 600 ${authorized_keys} && chown -R ${deployer_user}:${deployer_user} ${ssh_dir}
 
+# Set passwd
+passwd ${deployer_user}
+
+# Secure sshd
 sed -i '/^#Port/s/#Port/Port/' ${sshd_cnf} && \
 sed -i '/^Port/s/22/1102/' ${sshd_cnf} && \
 sed -i '/^#Protocol/s/#Protocol/Protocol/' ${sshd_cnf} && \
@@ -56,26 +63,23 @@ sed -i '/^PermitEmptyPasswords/s/yes/no/' ${sshd_cnf} && \
 sed -i '/^#PasswordAuthentication/s/PasswordAuthentication/PasswordAuthentication/' ${sshd_cnf} && \
 sed -i '/^PasswordAuthentication/s/yes/no/' ${sshd_cnf}
 
-if grep -q "AllowUsers ${deployer_user}" ${sshd_cnf}; then
-  echo "Allowed user ${deployer_user} in ${sshd_cnf}"
+if grep -q "AllowGroups ${deployer_group}" ${sshd_cnf}; then
+  echo "Allowed groups ${deployer_group} in ${sshd_cnf}"
 else
-  echo "AllowUsers ${deployer_user}" >> ${sshd_cnf}
+  echo "AllowGroups ${deployer_group}" >> ${sshd_cnf}
 fi
 
+systemctl enable sshd && systemctl restart sshd
+
+# Disable selinux
 if sestatus | grep -q "disabled"; then
   echo "disabled selinux"
 else
   setenforce 0
 fi
 
-systemctl enable sshd && systemctl restart sshd
-
-
-# Remove x window package
-yum -y groupremove "X Window System"
-
-# Update
-yum update -y
+# Disable firewalld
+systemctl disable firewalld && systemctl stop firewalld
 
 # Lock down cronjob
 grep -q -F "ALL" /etc/cron.deny || echo "ALL" >>/etc/cron.deny
@@ -93,4 +97,12 @@ if [ ! -z "$(cat /etc/shadow | awk -F: '($2==""){print $1}')" ]; then
   cat /etc/shadow | awk -F: '($2==""){print $1}' | xargs userdel -r &> /dev/null
 fi
 
-passwd ${deployer_user}
+# Lock root
+passwd -l root \
+&& usermod -s /sbin/nologin root
+
+# Remove x window package
+yum -y groupremove "X Window System"
+
+# Update
+yum update -y
