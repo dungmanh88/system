@@ -6,21 +6,21 @@
   args:
     executable: /bin/bash
 
-- name: Has Allow user in sshd ?
-  shell: grep -q AllowUsers "{{ sshd_config }}"
-  register: has_allow_users
+- name: Has Allow group git in sshd ?
+  shell: grep -q AllowGroups "{{ sshd_config }}"
+  register: has_allow_groups
   # grep will exit with 1 when no results found.
   # This causes the task not to halt play.
   ignore_errors: true
 
-- name: AllowUsers git in sshd
+- name: AllowGroups git in sshd
   lineinfile:
     dest: "{{ sshd_config }}"
     state: present
     line: "AllowGroups {{ git_group }}"
     insertafter: EOF
     validate: "/usr/sbin/sshd -t -f %s"
-  when: has_allow_users|succeeded
+  when: has_allow_groups|succeeded
   notify: restart sshd
 
 - name: Replace to port 22
