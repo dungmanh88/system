@@ -28,3 +28,12 @@ yum -y install docker-ce
 #EOF
 
 systemctl start docker && systemctl enable docker && docker run hello-world
+
+# Check https://github.com/docker/compose/releases to get latest release
+dockerComposeVersion=1.13.0
+
+curl -L https://github.com/docker/compose/releases/download/${dockerComposeVersion}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
+&& chmod +x /usr/local/bin/docker-compose \
+&& if [ ! -L /usr/bin/docker-compose ] || [ ! -e /usr/bin/docker-compose ]; then
+  ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+fi
