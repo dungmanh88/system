@@ -1,0 +1,4 @@
+# runner_type: shared|specific
+runner_type: shared
+# executor: dood|dind|shell
+executor: dood

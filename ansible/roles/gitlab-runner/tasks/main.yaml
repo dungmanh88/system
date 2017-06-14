@@ -1,0 +1,19 @@
+- name: Copy script setup gitlab runner
+  copy: src=setup_gitlab_runner.sh.j2 dest=/tmp/setup_gitlab_runner.sh owner=root group=root mode=0744
+
+- name: Run script setup gitlab runner
+  shell: /tmp/setup_gitlab_runner.sh
+  args:
+    executable: /bin/bash
+
+- name: Copy script register shared runner
+  copy: src=register_shared_runner.sh.j2 dest=/tmp/register_shared_runner.sh owner=root group=root mode=0744
+
+vars_prompt:
+  - name: "registration_token"
+    prompt: "what is your REGISTRATION_TOKEN ?"
+
+- name: Registerd shared runner
+  shell: /tmp/register_shared_runner.sh
+  args:
+    executable: /bin/bash
