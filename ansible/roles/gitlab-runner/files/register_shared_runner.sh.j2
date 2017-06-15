@@ -2,12 +2,18 @@
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-REGISTRATION_TOKEN=
+GITLAB_URL=$1
+REGISTRATION_TOKEN=$2
+RUNNER_DESC=$3
+executor=$4
+
 # Register runner
-gitlab-ci-multi-runner register -n \
-  --url https://gitlab.com/ \
-  --registration-token ${REGISTRATION_TOKEN} \
-  --executor docker \
-  --description "My Docker Runner" \
-  --docker-image "docker:latest" \
-  --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+if [ ${executor} == "dood" ]; then
+  gitlab-ci-multi-runner register -n \
+    --url ${GITLAB_URL} \
+    --registration-token ${REGISTRATION_TOKEN} \
+    --executor docker \
+    --description ${RUNNER_DESC} \
+    --docker-image "docker:latest" \
+    --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+fi

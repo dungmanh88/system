@@ -5,7 +5,7 @@
 
 - hosts: staging_test
   roles:
-    - role: jenkins
+    - role: gitlab-runner
 
 - hosts: production_test
   roles:

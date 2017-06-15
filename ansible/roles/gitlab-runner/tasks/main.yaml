@@ -6,14 +6,10 @@
   args:
     executable: /bin/bash
 
-- name: Copy script register shared runner
-  copy: src=register_shared_runner.sh.j2 dest=/tmp/register_shared_runner.sh owner=root group=root mode=0744
+- include: shared_runner.yaml
+  when: runner_type == "shared"
+  tags: shared
 
-vars_prompt:
-  - name: "registration_token"
-    prompt: "what is your REGISTRATION_TOKEN ?"
-
-- name: Registerd shared runner
-  shell: /tmp/register_shared_runner.sh
-  args:
-    executable: /bin/bash
+- include: specific_runner.yaml
+  when: runner_type == "specific"
+  tags: specific
