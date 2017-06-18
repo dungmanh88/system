@@ -1,55 +1,27 @@
 {# for item in nginx_items #}
 server {
-    listen {{ item.listen }};
 
-{% if item.server_name is defined %}
-    server_name {{ item.server_name }};
+{% for k,v in item.iteritems() %}
+{% if k.find('location') == -1 %}
+{{ k }} {{ v }};
 {% endif %}
+{% endfor %}
 
-{% if ngx_role == "web" and item.root is defined %}
-    root {{ item.root }};
-{% endif %}
-{% if item.index is defined %}
-    index {{ item.index | default('index.html index.htm') }};
-{% endif %}
-{% if item.error_page is defined %}
-    error_page {{ item.error_page }};
-{% endif %}
-{% if item.access_log is defined %}
-    access_log {{ item.access_log }};
-{% endif %}
-{% if item.error_log is defined %}
-    error_log {{ item.error_log }} error;
-{% endif %}
-{% if item.client_max_body_size is defined %}
-    client_max_body_size {{ item.client_max_body_size }};
-{% endif %}
 
-    location / {
-{% if ngx_role == "proxy" or ngx_role == "proxy_cache" %}
-      proxy_pass http://{{ item.upstream.name }};
-      proxy_set_header        Host $host;
-      proxy_set_header        X-Real-IP $remote_addr;
-      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header        X-Forwarded-Proto $scheme;
-{% endif %}
-{% if ngx_role == "proxy_cache" %}
-      proxy_cache {{ item.cache_name }};
-      add_header X-Proxy-Cache $upstream_cache_status;
-      #  If the header includes the "Set-Cookie" field, such a response will not be cached.
-      proxy_ignore_headers Set-Cookie;
-      proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
-      proxy_cache_lock on;
-      proxy_cache_valid 200 302 10m;
-      proxy_cache_valid 301     1h;
-
-{% endif %}
-{% if item.index is defined %}
-      index index.html index.php;
-{% endif %}
+{% for k,v in item.iteritems() %}
+  {% if k.find('location') != -1 %}
+    location {{ v.name }} {
+    {% for x,y in v.iteritems() if x != 'name' %}
+      {% if type(y) == "<type 'list'>" %}
+        {% for i in y %}
+          {{ x }} {{ i }};
+        {% endfor %}
+      {% else %}
+        {{ x }} {{ y }};
+      {% endif %}
+    {% endfor %}
     }
-{% if ngx_role == "web" and item.locations is defined %}
-    {{ item.locations|indent(4) }}
-{% endif %}
+  {% endif %}
+{% endfor %}
 }
 {# endfor #}

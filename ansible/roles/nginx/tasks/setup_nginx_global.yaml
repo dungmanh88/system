@@ -1,0 +1,48 @@
+- name: Create group nginx
+  group:
+    name: "{{ nginx_group }}"
+    state: present
+
+- name: Create user nginx
+  user:
+    name: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    state: present
+    shell: /sbin/nologin
+    home: /dev/null
+    comment: "{{ nginx_full_name }}"
+
+#- name: Create pid
+#  file:
+#    path: /run/nginx
+#    owner: root
+#    group: root
+#    mode: 0660
+#    state: directory
+
+- name: Create log
+  file:
+    path: "{{ nginx_log_dir }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0660
+    state: directory
+
+- name: Create nginx service
+  template: src=nginx.systemd.j2 dest=/usr/lib/systemd/system/nginx.service backup=yes
+  when:
+    - ansible_distribution == "{{ distro_centos.name }}"
+    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+
+- name: Config nginx global
+  template: src=nginx.conf.j2 dest="{{ nginx_conf }}" backup=yes
+  notify: restart nginx
+
+- name: Create link to binary
+  file:
+    src: "{{ nginx_install_dir }}/sbin/nginx"
+    dest: /usr/sbin/nginx
+    state: link
+
+#- name: enable nginx
+#  service: name={{ nginx_service_name }} state=running enabled=yes daemond=reload

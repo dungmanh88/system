@@ -1,18 +1,15 @@
 user  {{ nginx_user }};
-worker_processes  {{ nginx_worker_processes }};
-
+{% for k,v in nginx_global_params.iteritems() %}
+        {{ k }}  {{ v }};
+{% endfor %}
 error_log  {{ nginx_error_log }};
-
 pid        {{ nginx_pid }};
 
-
 events {
-    worker_connections  {{ nginx_worker_connections }};
-    use epoll;
-    multi_accept {{ nginx_multi_accept }};
+{% for k,v in nginx_events_params.iteritems() %}
+        {{ k }}  {{ v }};
+{% endfor %}
 }
-
-worker_rlimit_nofile {{ nginx_worker_rlimit_nofile }};
 
 http {
     include       mime.types;
@@ -22,15 +19,10 @@ http {
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
     access_log  {{ nginx_access_log }}  main;
-    sendfile        on;
-    keepalive_timeout  65;
-    client_max_body_size {{ nginx_client_max_body_size }};
-{% if ngx_role == "proxy"  or ngx_role == "proxy_cache" %}
-    include {{ nginx_upstream|indent(4) }};
-{% endif %}
-{% if ngx_role == "proxy_cache" %}
-    include {{ nginx_proxy_cache_path|indent(4) }};
-{% endif %}
+
+    {% for k,v in nginx_http_params.iteritems() %}
+            {{ k }}  {{ v }};
+    {% endfor %}
     server {
       listen 80 default_server;
       location / {

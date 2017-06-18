@@ -1,0 +1,26 @@
+- name: Install dependencies
+  yum: name="{{ item }}"
+  with_items:
+    - pcre
+    - pcre-devel
+    - zlib
+    - zlib-devel
+    - openssl
+    - openssl-devel
+
+- name: Download nginx
+  get_url:
+    url: "{{ nginx_url }}"
+    dest: "/tmp/nginx-{{ nginx_version }}.tar.gz"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Unarchive nginx
+  unarchive:
+    src: "/tmp/nginx-{{ nginx_version }}.tar.gz"
+    dest: /tmp
+    remote_src: yes
+
+- name: Install nginx
+  shell: cd /tmp/nginx-{{ nginx_version }} && ./configure {{ nginx_compiling_params }} && make && make install

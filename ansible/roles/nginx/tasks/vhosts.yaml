@@ -23,22 +23,18 @@
     mode : 0750
     state: directory
   with_items: "{{ nginx_vhosts }}"
-  when: ngx_role == "web"
 
 - name: Ensure all are nginx:nginx
   command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ item.root }}
   with_items: "{{ nginx_vhosts }}"
-  when: ngx_role == "web"
 
 - name: Ensure dictories are 0755
   command: find {{ item.root }} -type d -exec chmod 0755 {} \;
   with_items: "{{ nginx_vhosts }}"
-  when: ngx_role == "web"
 
 - name: Ensure files are 0644
   command: find {{ item.root }} -type f -exec chmod 0644 {} \;
   with_items: "{{ nginx_vhosts }}"
-  when: ngx_role == "web"
 
 - name: Setup config for vhost
   template:
@@ -48,47 +44,4 @@
     group: "{{ nginx_group }}"
     mode: 0640
   with_items: "{{ nginx_vhosts }}"
-  tags: vhost_conf
-
-- name: Change user of php-fpm socket to nginx
-  lineinfile:
-    dest: /etc/php-fpm.d/www.conf
-    state: present
-    regexp: '^user = '
-    line: 'user = {{ nginx_user }}'
-  when:
-    - ngx_enable_php == 1
-
-- name: Change group of php-fpm socket to nginx
-  lineinfile:
-    dest: /etc/php-fpm.d/www.conf
-    state: present
-    regexp: '^group = '
-    line: 'group = {{ nginx_group }}'
-  when:
-    - ngx_enable_php == 1
-
-- name: Change listen owner of php-fpm socket to nginx
-  lineinfile:
-    dest: /etc/php-fpm.d/www.conf
-    state: present
-    regexp: '^listen.owner = '
-    line: 'listen.owner = {{ nginx_user }}'
-  when:
-    - ngx_enable_php == 1
-
-- name: Change listen group of php-fpm socket to nginx
-  lineinfile:
-    dest: /etc/php-fpm.d/www.conf
-    state: present
-    regexp: '^listen.group = '
-    line: 'listen.group = {{ nginx_group }}'
-  when:
-    - ngx_enable_php == 1
-
-- name: Restart and enable php-fpm
-  systemd: name=php-fpm.service enabled=yes daemon_reload=yes state=restarted
-  when:
-    - ngx_enable_php == 1
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+  notify: restart nginx

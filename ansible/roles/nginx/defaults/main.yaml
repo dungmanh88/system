@@ -1,89 +1,85 @@
 nginx_version: 1.11.8
 nginx_url: "https://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
-nginx_group: nginx
-nginx_user: nginx
-nginx_full_name: nginx user
-nginx_install_dir: /etc/nginx
 nginx_compiling_params: "--prefix={{ nginx_install_dir }} --user={{ nginx_user }} --group={{ nginx_group }} --without-http_autoindex_module --without-http_ssi_module --without-http_map_module --without-http_uwsgi_module --without-http_scgi_module --without-http_empty_gif_module --with-threads --with-file-aio --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_stub_status_module"
-nginx_pid: /run/nginx.pid
-nginx_log_dir: /var/log/nginx
-nginx_error_log: "{{ nginx_log_dir }}/error.log"
-nginx_access_log: "{{ nginx_log_dir }}/access.log"
-nginx_worker_processes: 1
-nginx_worker_connections: 25000
-nginx_worker_rlimit_nofile: 25000
-nginx_client_max_body_size: 8M
-nginx_multi_accept: "on"
+
+nginx_install_dir: /etc/nginx
 nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
 nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
+nginx_conf: "{{ nginx_install_dir }}/conf/nginx.conf"
 nginx_proxy_cache_path: "{{ nginx_install_dir }}/conf/proxy_cache_path.conf"
+nginx_log_dir: /var/log/nginx
 
-nginx_vhost_meta:
-  - service_name: hotel
-    name: "hotel.example.com"
-  - service_name: motel
-    name: "motel.example.com"
+nginx_pid: /run/nginx.pid
+nginx_error_log: "{{ nginx_log_dir }}/error.log"
+nginx_access_log: "{{ nginx_log_dir }}/access.log"
+
+nginx_global_params:
+  worker_rlimit_nofile: "4096"
+  worker_processes: "1"
+
+nginx_events_params:
+  worker_connections: "4096"
+  use: "epoll"
+  multi_accept: "on"
+
+nginx_http_params:
+  client_max_body_size: "8M"
+  multi_accept: "on"
+  sendfile: "on"
+  tcp_nopush: "on"
+  tcp_nodelay: "on"
+  keepalive_timeout: "65"
+
+nginx_vhosts_name:
+  - hotel.example.com
 
 nginx_vhosts:
-  - service_name: "{{ nginx_vhost_meta.0.service_name }}"
-    name: "{{ nginx_vhost_meta.0.name }}"
-    listen: 80
-    server_name: "hotel.example.com www.hotel.example.com"
+  - listen: 80
+    name: "{{ nginx_vhosts_name.0 }}"
+    server_name: "{{ nginx_vhosts_name.0 }} www.{{ nginx_vhosts_name.0 }}"
     index: "index.php index.html"
-    log_dir: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}"
-    access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/access.log"
-    error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.0.name }}/error.log"
-    root: "/data/www/{{ nginx_vhost_meta.0.name }}"
+    log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}"
+    access_log: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}/access.log"
+    error_log: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}/error.log"
+    root: "/data/www/{{ nginx_vhosts_name.0 }}"
     client_max_body_size: 20M
-    locations: |
-      location ~ \.php$ {
-        fastcgi_pass unix:{{ php_fpm_listen }};
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include {{ nginx_install_dir }}/conf/fastcgi_params;
+    location0: {
+        name: /,
+        proxy_pass: "http://{{ nginx_vhosts_name.0 }}",
+        proxy_set_header: [
+          "Host $host",
+          "X-Real-IP $remote_addr",
+          "X-Forwarded-For $proxy_add_x_forwarded_for",
+          "X-Forwarded-Proto $scheme"
+        ],
+        proxy_cache: "{{ nginx_vhosts_name.0 }}_cache",
+        add_header: "X-Proxy-Cache $upstream_cache_status",
+        #  If the header includes the "Set-Cookie" field, such a response will not be cached.
+        proxy_ignore_headers: "Set-Cookie",
+        proxy_cache_use_stale: "error timeout updating http_500 http_502 http_503 http_504",
+        proxy_cache_lock: "on",
+        proxy_cache_valid: [
+          "200 302 10m",
+          "301     1h"
+        ]
       }
-    upstream:
-      name: "{{ nginx_vhost_meta.0.service_name }}"
-      content: |
-        upstream {{ nginx_vhost_meta.0.service_name }} {
-          server 192.168.10.122:80;
-        }
-    cache_dir: "/data/nginx/cache/{{ nginx_vhost_meta.0.service_name }}"
-    cache_name: "{{ nginx_vhost_meta.0.service_name }}_cache"
-    proxy_cache_path: "/data/nginx/cache/{{ nginx_vhost_meta.0.service_name }} levels=1:2 keys_zone={{ nginx_vhost_meta.0.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
 
-  - service_name: "{{ nginx_vhost_meta.1.service_name }}"
-    name: "{{ nginx_vhost_meta.1.name }}"
-    listen: 80
-    server_name: "motel.example.com www.motel.example.com"
-    index: "index.php index.html"
-    log_dir: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}"
-    access_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/access.log"
-    error_log: "{{ nginx_log_dir }}/{{ nginx_vhost_meta.1.name }}/error.log"
-    root: "/data/www/{{ nginx_vhost_meta.1.name }}"
-    client_max_body_size: 20M
-    locations: |
-      location ~ \.php$ {
-        fastcgi_pass unix:{{ php_fpm_listen }};
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include {{ nginx_install_dir }}/conf/fastcgi_params;
+    location1: {
+        name: ~ \.php$,
+        fastcgi_pass: "unix:/var/run/php-fpm/php-fpm.sock",
+        fastcgi_index: "index.php",
+        fastcgi_param: "SCRIPT_FILENAME $document_root$fastcgi_script_name",
+        include: "{{ nginx_install_dir }}/conf/fastcgi_params"
       }
-    upstream:
-      name: "{{ nginx_vhost_meta.1.service_name }}"
-      content: |
-        upstream {{ nginx_vhost_meta.1.service_name }} {
-          server 192.168.10.122:80;
-        }
-    cache_dir: "/data/nginx/cache/{{ nginx_vhost_meta.1.service_name }}"
-    cache_name: "{{ nginx_vhost_meta.1.service_name }}_cache"
-    proxy_cache_path: "/data/nginx/cache/{{ nginx_vhost_meta.1.service_name }} levels=1:2 keys_zone={{ nginx_vhost_meta.1.service_name }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
+    upstream1: {
+        name: "{{ nginx_vhosts_name.0 }}",
+        server:  "192.168.10.122:80"
+      }
+    cache1: {
+        cache_dir: "/data/nginx/cache/{{ nginx_vhosts_name.0 }}",
+        cache_name: "{{ nginx_vhosts_name.0 }}_cache",
+        proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts_name.0 }} levels=1:2 keys_zone={{ nginx_vhosts_name.0 }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
+    }
 
-### Control param
-### ngx_enable_php: 0|1
-### If you enable php then you have to include php-fpm role in playbook
-ngx_enable_php: 0
-### ngx_role: web|proxy|proxy_cache
-ngx_role: web
 ### ngx_built: 0|1
-ngx_built: 0
+ngx_built: 1
