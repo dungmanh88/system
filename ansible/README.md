@@ -53,5 +53,5 @@ ansible-playbook --limit production_test -s playbooks/test.yaml
 9 - Debug
 ```
 ansible-playbook --limit development_test -s playbooks/test.yaml --step
-ansible-playbook --limit development_test -s playbooks/test.yaml --start-at-task "task name"
+ansible-playbook --limit development_test -s playbooks/test.yaml --start-at-task="task name"
 ```

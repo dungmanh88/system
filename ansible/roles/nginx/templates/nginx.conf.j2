@@ -1,33 +1,36 @@
 user  {{ nginx_user }};
 {% for k,v in nginx_global_params.iteritems() %}
-        {{ k }}  {{ v }};
+{{ k }}  {{ v }};
 {% endfor %}
 error_log  {{ nginx_error_log }};
 pid        {{ nginx_pid }};
 
 events {
 {% for k,v in nginx_events_params.iteritems() %}
-        {{ k }}  {{ v }};
+  {{ k }}  {{ v }};
 {% endfor %}
 }
 
 http {
-    include       mime.types;
-    default_type  application/octet-stream;
+  include       mime.types;
+  default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log  {{ nginx_access_log }}  main;
+  log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+  access_log  {{ nginx_access_log }}  main;
+  include {{ nginx_upstream }};
+  include {{ nginx_proxy_cache_path }};
 
-    {% for k,v in nginx_http_params.iteritems() %}
-            {{ k }}  {{ v }};
-    {% endfor %}
-    server {
-      listen 80 default_server;
-      location / {
-        deny all;
-      }
+{% for k,v in nginx_http_params.iteritems() %}
+  {{ k }}  {{ v }};
+{% endfor %}
+
+  server {
+    listen 80 default_server;
+    location / {
+      deny all;
     }
-    include {{ nginx_vhosts_dir }}/*.conf;
+  }
+  include {{ nginx_vhosts_dir }}/*.conf;
 }

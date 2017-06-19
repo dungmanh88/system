@@ -1,0 +1,9 @@
+{% for k,v in item.iteritems() %}
+{% if k.find('upstream') != -1 %}
+upstream {{ v.name }} {
+{% for s in v.server %}
+    server {{ s }};
+{% endfor %}
+}
+{% endif %}
+{% endfor %}

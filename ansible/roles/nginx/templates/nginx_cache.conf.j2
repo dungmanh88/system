@@ -1,0 +1,7 @@
+{% for k,v in item.iteritems() %}
+{% if k.find('cache') != -1 %}
+{% for x,y in v.iteritems() if x == "proxy_cache_path" %}
+proxy_cache_path {{ y }};
+{% endfor %}
+{% endif %}
+{% endfor %}

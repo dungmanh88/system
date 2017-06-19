@@ -24,7 +24,6 @@ nginx_events_params:
 
 nginx_http_params:
   client_max_body_size: "8M"
-  multi_accept: "on"
   sendfile: "on"
   tcp_nopush: "on"
   tcp_nodelay: "on"
@@ -63,7 +62,6 @@ nginx_vhosts:
           "301     1h"
         ]
       }
-
     location1: {
         name: ~ \.php$,
         fastcgi_pass: "unix:/var/run/php-fpm/php-fpm.sock",
@@ -71,15 +69,15 @@ nginx_vhosts:
         fastcgi_param: "SCRIPT_FILENAME $document_root$fastcgi_script_name",
         include: "{{ nginx_install_dir }}/conf/fastcgi_params"
       }
-    upstream1: {
+    upstream: {
         name: "{{ nginx_vhosts_name.0 }}",
-        server:  "192.168.10.122:80"
+        server:  ["192.168.10.122:80"]
       }
-    cache1: {
+    cache: {
         cache_dir: "/data/nginx/cache/{{ nginx_vhosts_name.0 }}",
         cache_name: "{{ nginx_vhosts_name.0 }}_cache",
         proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts_name.0 }} levels=1:2 keys_zone={{ nginx_vhosts_name.0 }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
     }
 
 ### ngx_built: 0|1
-ngx_built: 1
+ngx_built: 0

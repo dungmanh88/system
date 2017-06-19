@@ -1,27 +1,25 @@
-{# for item in nginx_items #}
 server {
 
 {% for k,v in item.iteritems() %}
-{% if k.find('location') == -1 %}
-{{ k }} {{ v }};
+{% if k.find('location') == -1 and k != "name" and k.find("cache") == -1 and k.find("upstream") == -1 and k != "log_dir" %}
+  {{ k }} {{ v }};
 {% endif %}
 {% endfor %}
 
-
 {% for k,v in item.iteritems() %}
-  {% if k.find('location') != -1 %}
-    location {{ v.name }} {
-    {% for x,y in v.iteritems() if x != 'name' %}
-      {% if type(y) == "<type 'list'>" %}
-        {% for i in y %}
-          {{ x }} {{ i }};
-        {% endfor %}
-      {% else %}
-        {{ x }} {{ y }};
-      {% endif %}
-    {% endfor %}
-    }
-  {% endif %}
+{% if k.find('location') != -1 %}
+  location {{ v.name }} {
+{% for x,y in v.iteritems() if x != 'name' %}
+{% if x == "proxy_set_header" or x == "proxy_cache_valid" %}
+{% for i in y %}
+      {{ x }} {{ i }};
+{% endfor %}
+{% else %}
+      {{ x }} {{ y }};
+{% endif %}
+{% endfor %}
+  }
+
+{% endif %}
 {% endfor %}
 }
-{# endfor #}
