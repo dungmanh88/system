@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Felix Peters
+  description: Installs Nginx as reverse proxy on Ubuntu
+
+  license: MIT
+
+  min_ansible_version: 1.9
+
+  platforms:
+    - name: Ubuntu
+      versions:
+      - xenial
+      - yakkety
+
+  galaxy_tags:
+    - nginx
+dependencies:
+  - geerlingguy.nginx

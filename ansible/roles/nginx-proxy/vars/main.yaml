@@ -1,0 +1,4 @@
+nginx_group: nginx
+nginx_user: nginx
+nginx_full_name: nginx user
+nginx_service_name: nginx

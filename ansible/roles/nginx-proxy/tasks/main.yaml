@@ -1,0 +1,17 @@
+- name: Build nginx
+  include: nginx_build.yaml
+  when: ngx_built == 1
+  tags: build
+
+- name: Setup nginx global
+  include: setup_nginx_global.yaml
+  tags: nginx_conf
+
+- name: Install nginx as proxy
+  include: nginx_upstream.yaml
+  tags: proxy
+
+- name: Install nginx as cache
+  include: nginx_cache.yaml
+  when: ngx_cache == 1
+  tags: cache

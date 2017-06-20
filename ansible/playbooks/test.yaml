@@ -9,4 +9,4 @@
 
 - hosts: production_test
   roles:
-    - role: common
+    - role: nginx-proxy

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  roles:
+    - role: ansible-role-nginx-proxy
+
+  tasks:
+    - name: Install netstat for testing
+      package: name=net-tools

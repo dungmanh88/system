@@ -1,0 +1,13 @@
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_max_temp_file_size {{ nginx_proxy_max_temp_file_size }};
+
+proxy_connect_timeout {{ nginx_proxy_connect_timeout}};
+proxy_send_timeout {{ nginx_proxy_send_timeout }};
+proxy_read_timeout {{ nginx_proxy_read_timeout }};
+
+proxy_buffer_size {{ nginx_proxy_buffer_size }};
+proxy_buffers {{ nginx_proxy_buffers }};
+proxy_busy_buffers_size {{ nginx_proxy_busy_buffers_size }};
+proxy_temp_file_write_size {{ nginx_proxy_temp_file_write_size }};

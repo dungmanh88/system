@@ -10,11 +10,3 @@
 - name: Install vhosts
   include: vhosts.yaml
   tags: vhost_conf
-
-- name: Install nginx as proxy
-  include: nginx_upstream.yaml
-  tags: proxy
-
-- name: Install nginx as cache
-  include: nginx_cache.yaml
-  tags: cache

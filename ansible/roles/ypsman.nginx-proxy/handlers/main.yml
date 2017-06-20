@@ -1,0 +1,4 @@
+---
+# handlers file for nginx-proxy
+- name: reload nginx daemon
+  command: systemctl reload nginx

@@ -1,0 +1,30 @@
+server {
+  listen {{ nginx_proxy_http_port }};
+    server_name {{ nginx_proxy_server_name }};
+    if ($host != "https://{{ nginx_proxy_server_name }}") {
+        return 301 https://{{ nginx_proxy_server_name }};
+    }
+    access_log {{ nginx_proxy_logdir }}/{{ nginx_proxy_server_name }}.access.log;
+}
+
+server {
+    listen {{ nginx_proxy_https_port }} ssl;
+    server_name {{ nginx_proxy_server_name }};
+    if ($host != "{{ nginx_proxy_server_name }}") {
+        return 301 https://{{ nginx_proxy_server_name }};
+    }
+
+    access_log {{ nginx_proxy_logdir }}/{{ nginx_proxy_server_name }}.access.log;
+    ssl_certificate      {{ nginx_proxy_ssl_cert }};
+    ssl_certificate_key  {{ nginx_proxy_ssl_key }};
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout {{ nginx_proxy_ssl_session_timeout }};
+    ssl_ciphers  "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA RC4 !EXPORT !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS";
+    ssl_prefer_server_ciphers on;
+
+    ssl_protocols {{ nginx_proxy_ssl_protocols }};
+    location {{ nginx_proxy_location }} {
+     	proxy_pass {{ nginx_proxy_pass }};
+      proxy_redirect default;
+    }
+}

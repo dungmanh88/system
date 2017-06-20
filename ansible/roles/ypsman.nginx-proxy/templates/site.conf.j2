@@ -1,0 +1,12 @@
+server {
+  listen {{ nginx_proxy_http_port }};
+    server_name {{ nginx_proxy_server_name }};
+    if ($host != "{{ nginx_proxy_server_name }}") {
+        return 301 {{ nginx_proxy_server_name }};
+    }
+    access_log {{ nginx_proxy_logdir }}/{{ nginx_proxy_server_name }}.access.log;
+    location {{ nginx_proxy_location }} {
+      proxy_pass {{ nginx_proxy_pass }};
+      proxy_redirect default;
+    }
+}

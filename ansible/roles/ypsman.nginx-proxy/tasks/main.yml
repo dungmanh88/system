@@ -1,0 +1,53 @@
+---
+# tasks file for nginx-proxy
+- name: Ensure nginx is Installed
+  apt: name=nginx state=present
+
+# Base Config for nginx
+- name: enable nginx Base Config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/nginx.conf
+  notify: reload nginx daemon
+
+- local_action: stat path=templates/{{ nginx_proxy_custom_index }}
+  become: False
+  register: nginx_sites_exist
+
+- name: setup Custom default Page
+  template:
+    src: "{{ nginx_proxy_custom_index }}"
+    dest: /var/www/html/index.html
+  notify: reload nginx daemon
+  when: nginx_sites_exist.stat.exists == true
+
+- name: Remove Default symlink
+  file:
+   path: "/etc/nginx/sites-enabled/default"
+   state: absent
+  notify: reload nginx daemon
+  when: nginx_proxy_disable_default == true
+
+# nginx site config
+- name: setup Site Config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/sites-available/{{ nginx_proxy_conf_name }}
+  notify: reload nginx daemon
+  when: nginx_proxy_ssl_proxy == false
+
+# nginx ssl site config
+- name: setup SSL Site Config
+  template:
+    src: site-ssl.conf.j2
+    dest: /etc/nginx/sites-available/{{ nginx_proxy_conf_name }}
+  notify: reload nginx daemon
+  when: nginx_proxy_ssl_proxy == true
+
+# Ensure symlink in sites-enabled exists
+- name: Ensure symlink in sites-enabled exists
+  file:
+    src: /etc/nginx/sites-available/{{ nginx_proxy_conf_name }}
+    dest: /etc/nginx/sites-enabled/{{ nginx_proxy_conf_name }}
+    state: link
+  notify: reload nginx daemon

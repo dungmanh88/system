@@ -1,0 +1,25 @@
+---
+# default for nginx-proxy site Config
+nginx_proxy_pass: http://localhost:8080
+nginx_proxy_server_name: "{{ ansible_hostname }}"
+nginx_proxy_conf_name: site.conf
+nginx_proxy_location: /
+nginx_proxy_disable_default: true
+nginx_proxy_ssl_proxy: false
+nginx_proxy_http_port: 80
+nginx_proxy_https_port: 443
+nginx_proxy_logdir: /var/log/nginx
+
+# defaults file for nginx-proxy
+nginx_proxy_max_temp_file_size: 0
+nginx_proxy_connect_timeout: 90
+nginx_proxy_send_timeout: 90
+nginx_proxy_read_timeout: 90
+nginx_proxy_buffer_size: 4k
+nginx_proxy_buffers: 8 32k
+nginx_proxy_busy_buffers_size: 64k
+nginx_proxy_temp_file_write_size: 64k
+
+# nginx SSL Config
+nginx_proxy_ssl_session_timeout:  5m
+nginx_proxy_ssl_protocols: TLSv1 TLSv1.1 TLSv1.2

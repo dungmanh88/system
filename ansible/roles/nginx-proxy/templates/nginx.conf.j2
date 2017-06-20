@@ -19,6 +19,8 @@ http {
                     '$status $body_bytes_sent "$http_referer" '
                     '"$http_user_agent" "$http_x_forwarded_for"';
   access_log  {{ nginx_access_log }}  main;
+  include {{ nginx_upstream }};
+  include {{ nginx_proxy_cache_path }};
 
 {% for k,v in nginx_http_params.iteritems() %}
   {{ k }}  {{ v }};

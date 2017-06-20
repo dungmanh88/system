@@ -4,8 +4,10 @@ nginx_compiling_params: "--prefix={{ nginx_install_dir }} --user={{ nginx_user }
 
 nginx_install_dir: /etc/nginx
 nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
-nginx_conf: "{{ nginx_install_dir }}/conf/nginx.conf"
 nginx_log_dir: /var/log/nginx
+nginx_conf: "{{ nginx_install_dir }}/conf/nginx.conf"
+nginx_proxy_cache_path: "{{ nginx_install_dir }}/conf/proxy_cache_path.conf"
+nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
 
 nginx_pid: /run/nginx.pid
 nginx_error_log: "{{ nginx_log_dir }}/error.log"
@@ -38,18 +40,41 @@ nginx_vhosts:
     log_dir: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}"
     access_log: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}/access.log"
     error_log: "{{ nginx_log_dir }}/{{ nginx_vhosts_name.0 }}/error.log"
-    root: "/data/www/{{ nginx_vhosts_name.0 }}"
     client_max_body_size: 20M
+
     location0: {
-        name: /
-      }
-    location1: {
-        name: ~ \.php$,
-        fastcgi_pass: "unix:/var/run/php-fpm/php-fpm.sock",
-        fastcgi_index: "index.php",
-        fastcgi_param: "SCRIPT_FILENAME $document_root$fastcgi_script_name",
-        include: "{{ nginx_install_dir }}/conf/fastcgi_params"
+        name: /,
+        proxy_pass: "http://{{ nginx_vhosts_name.0 }}",
+        proxy_set_header: [
+          "Host $host",
+          "X-Real-IP $remote_addr",
+          "X-Forwarded-For $proxy_add_x_forwarded_for",
+          "X-Forwarded-Proto $scheme"
+        ],
+        proxy_cache: "{{ nginx_vhosts_name.0 }}_cache",
+        add_header: "X-Proxy-Cache $upstream_cache_status",
+        #  If the header includes the "Set-Cookie" field, such a response will not be cached.
+        proxy_ignore_headers: "Set-Cookie",
+        proxy_cache_use_stale: "error timeout updating http_500 http_502 http_503 http_504",
+        proxy_cache_lock: "on",
+        proxy_cache_valid: [
+          "200 302 10m",
+          "301     1h"
+        ]
       }
 
+    upstream: {
+        name: "{{ nginx_vhosts_name.0 }}",
+        server:  ["103.53.170.70:80"]
+      }
+
+    cache: {
+        cache_dir: "/data/nginx/cache/{{ nginx_vhosts_name.0 }}",
+        cache_name: "{{ nginx_vhosts_name.0 }}_cache",
+        proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts_name.0 }} levels=1:2 keys_zone={{ nginx_vhosts_name.0 }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
+    }
+
 ### ngx_built: 0|1
-ngx_built: 0
+ngx_built: 1
+### ngx_cache: 0|1
+ngx_cache: 1

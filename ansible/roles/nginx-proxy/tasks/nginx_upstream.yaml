@@ -1,0 +1,45 @@
+- name: Setup config dir for vhost
+  file:
+    path: "{{ nginx_vhosts_dir }}"
+    owner: nginx
+    group: nginx
+    mode: 0750
+    state: directory
+
+- name: Setup log dir for vhost
+  file:
+    path: "{{ item.log_dir }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0750
+    state: directory
+  with_items: "{{ nginx_vhosts }}"
+
+- name: Setup config for vhost
+  template:
+    src: nginx.vhosts.conf.j2
+    dest: "{{ nginx_vhosts_dir }}/{{ item.name }}.conf"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0640
+  with_items: "{{ nginx_vhosts }}"
+  notify: restart nginx
+
+- name: Create file upstream.conf
+  file:
+    path: "{{ nginx_upstream }}"
+    mode: 0644
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    state: touch
+
+- name: Config upstream.conf
+  template:
+    src: nginx_upstream.conf.j2
+    dest: "{{ nginx_upstream }}"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    mode: 0644
+    backup: yes
+  with_items: "{{ nginx_vhosts }}"
+  notify: restart nginx
