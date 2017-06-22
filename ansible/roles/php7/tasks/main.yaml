@@ -1,0 +1,9 @@
+- name: Setup php
+  include: setup.yaml
+
+# Configure PHP.
+- name: Configure php
+  include: configure-php.yaml
+
+- name: Configure php-fpm
+  include: configure-php-fpm.yaml

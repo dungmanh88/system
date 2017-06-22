@@ -5,7 +5,8 @@
 
 - hosts: staging_test
   roles:
-    - role: nginx
+#    - role: nginx
+    - role: php7
 
 - hosts: production_test
   roles:

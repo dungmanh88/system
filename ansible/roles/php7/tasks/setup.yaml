@@ -1,0 +1,3 @@
+- name: Install php packages
+  yum: name="{{ item }}" update_cache=yes state=present enablerepo="{{ php_enablerepo }}"
+  with_items: "{{ php_packages }}"

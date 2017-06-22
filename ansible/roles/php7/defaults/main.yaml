@@ -1,0 +1,53 @@
+### php_version: php71|php72
+php_version: php71
+
+php_enablerepo: "remi-{{ php_version }},remi"
+php_packages:
+  - php
+  - php-cli
+  - php-common
+  - php-devel
+  - php-dom
+  - php-gd
+  - php-intl
+  - php-json
+  - php-ldap
+  - php-mbstring
+  - php-mcrypt
+  - php-mysql
+  - php-bcmath
+  - php-memcached
+  - php-redis
+  - php-mysqlnd
+  - php-opcache
+  - php-pdo
+  - php-pear
+  - php-pecl-xdebug
+  - php-pgsql
+  - php-xml
+  - php-xmlrpc
+  - php-xsl
+  - php-fpm
+  - php-zip
+  - php-soap
+  - php-pecl-igbinary
+  - php-snmp
+  - php-msgpack
+  - php-process
+  - php-imap
+#    - php-pecl-apcu
+php_webserver_daemon: "nginx"
+
+php_date_timezone: "Asia/Tokyo"
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
+php_display_errors: "Off"
+php_display_startup_errors: "Off"
+
+php_fpm_unix_listen: /var/run/php-fpm/php-fpm.sock
+php_fpm_tcp_listen: 127.0.0.1:9000
+### php_fpm_listen is php_fpm_unix_listen or php_fpm_tcp_listen
+php_fpm_listen: "{{ php_fpm_unix_listen }}"
+php_fpm_listen_allowed_clients: "127.0.0.1"
+php_fpm_listen_owner: nginx
+php_fpm_listen_group: nginx
+php_fpm_listen_mode: "0660"
