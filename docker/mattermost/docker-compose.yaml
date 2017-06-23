@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    hostname: mysql.mattermost.swat
+    container_name: mysql_mattermost_swat
+    volumes:
+      - /var/lib/mysql
+      - /var/log/mysql
+      - /etc/my.cnf
+    environment:
+      - MYSQL_USER=mmuser
+      - MYSQL_PASSWORD=mmuser_password
+      - MYSQL_DB=mattermost
+    networks:
+      - swat-net
+
+  app:
+    image: mattermost-test
+    hostname: app.mattermost.swat
+    container_name: app_mattermost_swat
+    volumes:
+      - ./mm-data:/opt/mattermost/data
+    environment:
+      - MM_USERNAME=mmuser
+      - MM_PASSWORD=mmuser_password
+      - MM_DBNAME=mattermost
+    depends_on:
+     - db
+    networks:
+      - swat-net
+
+  web:
+    image: nginx
+    hostname: nginx.mattermost.swat
+    container_name: nginx_mattermost_swat
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+     - /etc/nginx
+     - /var/log/nginx
+    depends_on:
+     - app
+    networks:
+      - swat-net
+
+networks:
+  swat-net:

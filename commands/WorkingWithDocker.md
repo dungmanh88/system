@@ -7,6 +7,11 @@ docker exec -it <container_name> <cmd>
 <cmd> := sh|bash
 ```
 
+# Build image
+```
+docker build -t test .
+```
+
 # Manage container
 ```
 docker ps | grep nginx | awk '{ print $1 }' | xargs docker rm -f
