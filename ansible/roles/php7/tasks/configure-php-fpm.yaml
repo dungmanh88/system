@@ -12,6 +12,15 @@
     mode: 0755
   when: php_fpm_pool_conf_path_dir_stat.stat.islnk is not defined
 
+- name: Ensure the default php-fpm config exists.
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ php_fpm_conf_path }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart php-fpm
+
 - name: Ensure the default pool exists.
   template:
     src: www.conf.j2
@@ -20,6 +29,12 @@
     group: root
     mode: 0644
   notify: restart php-fpm
+
+- name: Add apache to www-data group
+  user:
+    name: "{{ php_fpm_pool_user }}"
+    groups: "{{ www_data_group }}"
+    append: yes
 
 - name: Ensure php-fpm is started and enabled at boot (if configured).
   service:

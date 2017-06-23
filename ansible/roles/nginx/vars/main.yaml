@@ -1,4 +1,7 @@
 nginx_group: nginx
 nginx_user: nginx
+www_data_group: www-data
+www_data_user: www-data
 nginx_full_name: nginx user
+www_data_full_name: www-data user
 nginx_service_name: nginx

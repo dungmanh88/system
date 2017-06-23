@@ -11,5 +11,5 @@
   tags: configuration
 
 - name: enable ntpd
-  service: name={{ ntpd_service_name }} state=running enabled=yes
+  service: name={{ ntpd_service_name }} state=started enabled=yes
   tags: service

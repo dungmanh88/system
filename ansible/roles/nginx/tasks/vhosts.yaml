@@ -18,14 +18,14 @@
 - name: Setup root dir for vhost
   file:
     path: "{{ item.root }}"
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_group }}"
+    owner: "{{ www_data_user }}"
+    group: "{{ www_data_group }}"
     mode : 0750
     state: directory
   with_items: "{{ nginx_vhosts }}"
 
-- name: Ensure all are nginx:nginx
-  command: chown -R {{ nginx_user }}:{{ nginx_group }} {{ item.root }}
+- name: Ensure all are www-data:www-data
+  command: chown -R {{ www_data_user }}:{{ www_data_group }} {{ item.root }}
   with_items: "{{ nginx_vhosts }}"
 
 - name: Ensure dictories are 0755

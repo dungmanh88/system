@@ -12,5 +12,5 @@
   tags: configuration
 
 - name: enable sshd
-  service: name={{ sshd_service_name }} state=running enabled=yes
+  service: name={{ sshd_service_name }} state=started enabled=yes
   tags: service

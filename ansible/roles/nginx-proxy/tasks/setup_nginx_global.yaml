@@ -44,5 +44,5 @@
     dest: /usr/sbin/nginx
     state: link
 
-#- name: enable nginx
-#  service: name={{ nginx_service_name }} state=running enabled=yes daemond=reload
+- name: enable nginx
+  service: name={{ nginx_service_name }} state=started enabled=yes

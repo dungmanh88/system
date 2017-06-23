@@ -37,6 +37,8 @@ php_packages:
   - php-imap
 #    - php-pecl-apcu
 php_webserver_daemon: "nginx"
+www_data_group: "www-data"
+php_webserver_owner_group: "nginx"
 
 php_date_timezone: "Asia/Tokyo"
 php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
@@ -48,6 +50,6 @@ php_fpm_tcp_listen: 127.0.0.1:9000
 ### php_fpm_listen is php_fpm_unix_listen or php_fpm_tcp_listen
 php_fpm_listen: "{{ php_fpm_unix_listen }}"
 php_fpm_listen_allowed_clients: "127.0.0.1"
-php_fpm_listen_owner: nginx
-php_fpm_listen_group: nginx
+php_fpm_listen_owner: "{{ php_webserver_owner_group }}"
+php_fpm_listen_group: "{{ php_webserver_owner_group }}"
 php_fpm_listen_mode: "0660"

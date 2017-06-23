@@ -3,6 +3,11 @@
     name: "{{ nginx_group }}"
     state: present
 
+- name: Create group www-data
+  group:
+    name: "{{ www_data_group }}"
+    state: present
+
 - name: Create user nginx
   user:
     name: "{{ nginx_user }}"
@@ -11,6 +16,21 @@
     shell: /sbin/nologin
     home: /dev/null
     comment: "{{ nginx_full_name }}"
+
+- name: Create user www-data
+  user:
+    name: "{{ www_data_user }}"
+    group: "{{ www_data_group }}"
+    state: present
+    shell: /sbin/nologin
+    home: /dev/null
+    comment: "{{ www_data_full_name }}"
+
+- name: Add user nginx into www-data group
+  user:
+    name: "{{ nginx_user }}"
+    groups: "{{ www_data_group }}"
+    append: yes
 
 #- name: Create pid
 #  file:
@@ -44,5 +64,5 @@
     dest: /usr/sbin/nginx
     state: link
 
-#- name: enable nginx
-#  service: name={{ nginx_service_name }} state=running enabled=yes daemond=reload
+- name: enable nginx
+  service: name={{ nginx_service_name }} state=started enabled=yes
