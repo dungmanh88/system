@@ -8,8 +8,9 @@ services:
     volumes:
       - /var/lib/mysql
       - /var/log/mysql
-      - /etc/my.cnf
+      - ./db/my.cnf.d:/etc/mysql/conf.d:ro  ### custom mysql config
     environment:
+      - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=mmuser
       - MYSQL_PASSWORD=mmuser_password
       - MYSQL_DB=mattermost
@@ -21,7 +22,7 @@ services:
     hostname: app.mattermost.swat
     container_name: app_mattermost_swat
     volumes:
-      - ./mm-data:/opt/mattermost/data
+      - ./app/data:/opt/mattermost/data
     environment:
       - MM_USERNAME=mmuser
       - MM_PASSWORD=mmuser_password
@@ -40,7 +41,9 @@ services:
      - "443:443"
     volumes:
      - /etc/nginx
+     - /etc/nginx/conf.d
      - /var/log/nginx
+     ### No need webroot because of proxy role
     depends_on:
      - app
     networks:
