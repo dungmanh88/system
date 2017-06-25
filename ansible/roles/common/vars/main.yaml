@@ -33,6 +33,7 @@ packages:
    - ioping
    - iptraf
    - vim
+   - nano
    - ntp
    - nethogs
    - lshw
@@ -53,3 +54,5 @@ packages:
    - openssh-server
    - openssh-clients
    - yum-utils
+   - whois
+   - nc

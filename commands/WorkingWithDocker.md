@@ -49,3 +49,12 @@ docker volume ls
 ```
 docker volume rm $(docker volume ls -f dangling=true -q)
 ```
+
+# Docker compose
+```
+docker-compose up
+docker-compose build
+docker-compose rm
+docker-compose build --no-cache ### force if file copy is changed
+docker-compose up -d --force-recreate ### force recreate container
+```

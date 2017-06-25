@@ -8,37 +8,45 @@ services:
     volumes:
       - /var/lib/mysql
       - /var/log/mysql
-      - ./db/my.cnf.d:/etc/mysql/conf.d:ro  ### custom mysql config
+      - ./db/mysql.conf.d:/etc/mysql/mysql.conf.d:ro  ### custom mysql config
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=mmuser
       - MYSQL_PASSWORD=mmuser_password
-      - MYSQL_DB=mattermost
+      - MYSQL_DATABASE=mattermost
     networks:
       - swat-net
 
   app:
-    image: mattermost-test
+    build:
+      context: app
+      dockerfile: Dockerfile
     hostname: app.mattermost.swat
     container_name: app_mattermost_swat
     volumes:
-      - ./app/data:/opt/mattermost/data
+      - ./app/code/data:/opt/mattermost/data
     environment:
       - MM_USERNAME=mmuser
       - MM_PASSWORD=mmuser_password
       - MM_DBNAME=mattermost
+      - MM_SITE_URL=mm.swat.example.com
     depends_on:
      - db
     networks:
       - swat-net
 
   web:
-    image: nginx
+#    image: nginx
+    build:
+      context: web
+      dockerfile: Dockerfile
     hostname: nginx.mattermost.swat
     container_name: nginx_mattermost_swat
     ports:
      - "80:80"
      - "443:443"
+    environment:
+      - SERVER_NAME=mm.swat.example.com
     volumes:
      - /etc/nginx
      - /etc/nginx/conf.d
@@ -47,7 +55,7 @@ services:
     depends_on:
      - app
     networks:
-      - swat-net
+     - swat-net
 
 networks:
   swat-net:
