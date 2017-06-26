@@ -3,7 +3,7 @@
 
 - name: Enter gitlab url
   pause:
-    prompt: "Enter gitlab url: "
+    prompt: "Enter gitlab url (e.g. https://gitlab.com): "
   register: gitlab_url
 
 - debug:
@@ -11,7 +11,7 @@
 
 - name: Enter registration token
   pause:
-    prompt: "Please go to http://{{ gitlab_url.user_input }}/admin/runners and get token"
+    prompt: "Please go to {{ gitlab_url.user_input }}/admin/runners and get token"
   register: reg_token
 
 - debug:
@@ -19,13 +19,21 @@
 
 - name: Enter runner description
   pause:
-    prompt: "Enter runner description: "
+    prompt: "Enter runner description (e.g. Name of runner): "
   register: runner_desc
 
 - debug:
     msg: "Your runner description: {{ runner_desc.user_input }}"
 
+- name: Enter tag list
+  pause:
+    prompt: "Enter tag list (tag to match which runner that a .gitlab-ci.yml choose): "
+  register: tag_list
+
+- debug:
+    msg: "Your tag list: {{ tag_list.user_input }}"
+
 - name: Registerd shared runner
-  shell: "/tmp/register_shared_runner.sh {{ gitlab_url.user_input }} {{ reg_token.user_input }} {{ runner_desc.user_input }} {{ executor }}"
+  shell: "/tmp/register_shared_runner.sh {{ gitlab_url.user_input }} {{ reg_token.user_input }} {{ runner_desc.user_input }} {{ tag_list.user_input }} {{ executor }}"
   args:
     executable: /bin/bash

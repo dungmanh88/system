@@ -3,8 +3,12 @@
 host=$1
 port=$2
 dockerComposeVersion=1.14.0
+remote_dir=/webapp/mattermost
 
-ssh ${host} -p ${port} mkdir -p /webapp/mattermost
+# get private key
+cp -pr .ssh /root/
+
+ssh ${host} -p ${port} mkdir -p ${remote_dir}/mm-data
 
 rsync -avzP -e "ssh -p ${port}" docker-compose.yaml ${host}:/webapp/mattermost
 
@@ -14,6 +18,6 @@ ssh ${host} -p ${port} <<EOF
     curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     export PATH=$PATH:/usr/local/bin
-    cd /webapp/mattermost
+    cd ${remote_dir}
     docker-compose up
 EOF

@@ -5,8 +5,9 @@
 
 - hosts: staging_test
   roles:
-    - role: nginx
-    - role: php7
+#    - role: nginx
+#    - role: php7
+    - role: gitlab-runner
 
 - hosts: production_test
   roles:
