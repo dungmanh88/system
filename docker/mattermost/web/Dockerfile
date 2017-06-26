@@ -11,7 +11,6 @@ EXPOSE 80
 EXPOSE 443
 VOLUME /etc/nginx
 VOLUME /etc/nginx/conf.d
-VOLUME /var/log/nginx
 WORKDIR /etc/nginx
 
 CMD ["nginx", "-g", "daemon off;"]

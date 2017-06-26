@@ -25,13 +25,14 @@ services:
     container_name: app_mattermost_swat
     volumes:
       - ./app/code/data:/opt/mattermost/data
+      - /opt/mattermost/bin
     environment:
       - MM_USERNAME=mmuser
       - MM_PASSWORD=mmuser_password
       - MM_DBNAME=mattermost
       - MM_SITE_URL=mm.swat.example.com
     depends_on:
-     - db
+      - db
     networks:
       - swat-net
 
@@ -50,7 +51,6 @@ services:
     volumes:
      - /etc/nginx
      - /etc/nginx/conf.d
-     - /var/log/nginx
      ### No need webroot because of proxy role
     depends_on:
      - app

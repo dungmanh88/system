@@ -20,6 +20,7 @@ ENTRYPOINT ["/docker-entry.sh"]
 
 EXPOSE 8065
 VOLUME /opt/mattermost/data
+VOLUME /opt/mattermost/bin/
 WORKDIR /opt/mattermost/bin
 USER mattermost
 CMD ["platform"]
