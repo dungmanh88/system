@@ -18,13 +18,11 @@ services:
       - swat-net
 
   app:
-    build:
-      context: app
-      dockerfile: Dockerfile
+    image: 103.53.170.69:5000/mattermost_app
     hostname: app.mattermost.swat
     container_name: app_mattermost_swat
     volumes:
-      - ./app/code/data:/opt/mattermost/data
+      - ./app/mm-data:/opt/mattermost/data
       - /opt/mattermost/bin
     environment:
       - MM_USERNAME=mmuser
@@ -37,10 +35,7 @@ services:
       - swat-net
 
   web:
-#    image: nginx
-    build:
-      context: web
-      dockerfile: Dockerfile
+    image: 103.53.170.69:5000/mattermost_web
     hostname: nginx.mattermost.swat
     container_name: nginx_mattermost_swat
     ports:

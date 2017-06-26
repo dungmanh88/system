@@ -1,0 +1,55 @@
+# use docker image - docker in docker
+image docker:latest
+
+before_script:
+  - docker info
+  - apk update
+
+after_script:
+  - pip uninstall -y docker-compose
+  - apk del py-pip rsync
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  script:
+    # download docker compose then build
+    - apk add py-pip
+    - pip install docker-compose
+    - docker-compose --version
+    - docker-compose build
+    # push image to registry
+    - docker tag mattermost_app 103.53.170.69:5000/mattermost_app
+    - docker tag mattermost_web 103.53.170.69:5000/mattermost_web
+    - docker push 103.53.170.69:5000/mattermost_app
+    - docker push 103.53.170.69:5000/mattermost_web
+  stage: build
+  tags:
+    - swat-demo
+  only:
+    - swat-demo
+
+# test with docker compose
+test:
+  script:
+    - docker-compose up
+  stage: test
+  tags:
+    - swat-demo
+  only:
+    - swat-demo
+
+# deploy to remote server via ssh
+deploy:
+  script:
+    - apk add rsync
+    - chmod +x deploy.sh
+    - ./deploy.sh deployer@103.53.171.121 1102
+  stage: deploy
+  tags:
+    - swat-demo
+  only:
+    - swat-demo
