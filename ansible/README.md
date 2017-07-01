@@ -12,13 +12,13 @@ ansible_become_pass: "{{ vault_ansible_ssh_pass }}"
 hostname must distinct.
 ```
 [development_test]
-test1 ansible_host=103.53.170.69 hostname=test1
+test1 ansible_host=xx.xx.xx.xx hostname=test1
 
 [staging_test]
-test2 ansible_host=103.53.170.70 hostname=test2
+test2 ansible_host=yy.yy.yy.yy hostname=test2
 
 [production_test]
-test3 ansible_host=103.53.171.121 hostname=test3
+test3 ansible_host=zz.zz.zz.zz hostname=test3
 ```
 
 5 - Create group, set vars.yaml and/or vault.yaml
