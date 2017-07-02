@@ -31,6 +31,11 @@ git status
 git config --list
 git config user.name "name"
 git config user.email "email"
+git remote add origin http://IP/path/to/repository.git
+or change
+git remote set-url origin https://github.com/USERNAME/REPOSITORY.git
+If you use ssh then origin is ssh
+You must have declare key to push
 ```
 
 ## Diff
