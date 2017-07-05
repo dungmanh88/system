@@ -58,10 +58,24 @@ git remote -v
 git branch -v
 ```
 
-## Checkout and add - commit - push to branch
+## Create new branch and select branch
 ```
 git checkout -b branch_name
 git checkout branch_name
+```
+
+## Create branch base on other branch
+```
+git checkout other-branch -b new-branch
+```
+
+## Delete a local branch
+```
+git branch -D branch_name
+```
+
+## add - commit - push to branch
+```
 git add .
 git commit -m "msg"
 git push remote_name branch_name
