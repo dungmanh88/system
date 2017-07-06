@@ -40,6 +40,7 @@ You must have declare key to push
 
 ## Diff
 ```
+changed but not staged
 git diff <file>
 ```
 
@@ -51,6 +52,7 @@ git log
 ## View remote URL
 ```
 git remote -v
+git remote show origin/upstream/<repo-name>
 ```
 
 ## View branches
@@ -69,6 +71,11 @@ git checkout branch_name
 git checkout other-branch -b new-branch
 ```
 
+## Revert local
+```
+git checkout -- /path/to/file
+```
+
 ## Delete a local branch
 ```
 git branch -D branch_name
@@ -76,7 +83,7 @@ git branch -D branch_name
 
 ## add - commit - push to branch
 ```
-git add .
-git commit -m "msg"
-git push remote_name branch_name
+git add . ## add to staging (index)
+git commit -m "msg" ## add to local repo
+git push remote_name branch_name ## add to remote repo
 ```
