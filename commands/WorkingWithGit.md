@@ -47,6 +47,8 @@ git diff <file>
 ## View log
 ```
 git log
+git log -p -2
+git log --oneline --decorate --graph --all
 ```
 
 ## View remote URL
@@ -68,7 +70,7 @@ git checkout branch_name
 
 ## Create branch base on other branch
 ```
-git checkout other-branch -b new-branch
+git checkout -b other-branch new-branch
 ```
 
 ## Revert local
@@ -78,7 +80,8 @@ git checkout -- /path/to/file
 
 ## Delete a local branch
 ```
-git branch -D branch_name
+git branch -D branch_name ### equal git branch -d --force branch_name
+git branch -d branch_name
 ```
 
 ## add - commit - push to branch
