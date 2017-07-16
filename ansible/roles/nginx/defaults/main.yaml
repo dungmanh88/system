@@ -29,7 +29,7 @@ nginx_http_params:
   keepalive_timeout: "65"
 
 nginx_vhosts_name:
-  - hotel.example.com
+  - myalbum.com.vn
 
 nginx_vhosts:
   - listen: 80

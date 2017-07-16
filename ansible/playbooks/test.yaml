@@ -11,6 +11,6 @@
 
 - hosts: production_test
   roles:
-#    - role: mysql56
-    - role: nginx
-    - role: php7
+    - role: mysql56
+#    - role: nginx
+#    - role: php7

@@ -1,6 +1,7 @@
 mysql_pkgs:
   - mysql-community-server
-  
+  - mysql-community-devel
+
 mysql_service: mysqld
 
 mysql_conf_dir: "/etc/"
