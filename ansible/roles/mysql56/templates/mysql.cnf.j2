@@ -1,0 +1,22 @@
+[mysqld]
+sql_mode={{ mysql_sql_mode }}
+
+innodb_buffer_pool_size={{ mysql_innodb_buffer_pool_size }}
+innodb_buffer_pool_instances={{ mysql_innodb_buffer_pool_instances }}
+innodb_log_buffer_size={{ mysql_innodb_log_buffer_size }}
+
+max_allowed_packet={{ mysql_max_allowed_packet }}
+table_open_cache={{ mysql_table_open_cache }}
+
+thread_cache_size={{ mysql_thread_cache_size }}
+max_connections={{ mysql_max_connections }}
+
+tmp_table_size={{ mysql_tmp_table_size }}
+max_heap_table_size={{ mysql_max_heap_table_size }}
+
+log_queries_not_using_indexes={{ mysql_log_queries_not_using_indexes }}
+log_warnings={{ mysql_log_warnings }}
+long_query_time={{ mysql_long_query_time }}
+
+innodb_log_files_in_group={{ mysql_innodb_log_files_in_group }}
+innodb_log_file_size={{ mysql_innodb_log_file_size }}

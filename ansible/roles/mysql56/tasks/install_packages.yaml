@@ -1,0 +1,13 @@
+- name: Install repo
+  copy:
+    src: mysql56.repo
+    dest: /etc/yum.repos.d/mysql56.repo
+
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mysql_pkgs }}"
+
+- name: Install MySQL-python
+  pip: name=MySQL-python

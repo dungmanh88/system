@@ -1,0 +1,33 @@
+---
+- name: Add the OS specific variables
+  include_vars: "{{ ansible_os_family }}{{ ansible_distribution_major_version }}.yml"
+
+- name: Install mysql packages
+  include: install_packages.yaml
+
+- name: Copy the my.cnf file
+  template: src=my.cnf.{{ ansible_os_family }}.j2 dest={{ mysql_conf_dir }}/my.cnf
+  notify:
+   - restart mysql
+
+- name: Create the directory /etc/mysql/conf.d
+  file: path=/etc/mysql/conf.d state=directory
+  notify:
+   - restart mysql
+
+- name: Deploy mysql config to conf.d
+  template: src=mysql.cnf.j2 dest=/etc/mysql/conf.d/mysql.cnf
+  notify:
+    - restart mysql
+
+- name: Start the mysql services
+  service: name={{ mysql_service }} state=started enabled=yes
+
+- name: Run mysql_secure_installation
+  include: mysql_secure.yaml
+
+- name: Run mysql_user_db
+  include: mysql_user_db.yaml
+
+- name: Run mysql_replication
+  include: mysql_replication.yaml
