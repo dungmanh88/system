@@ -5,6 +5,7 @@ nginx_compiling_params: "--prefix={{ nginx_install_dir }} --user={{ nginx_user }
 nginx_install_dir: /etc/nginx
 nginx_vhosts_dir: "{{ nginx_install_dir }}/conf.d"
 nginx_log_dir: /var/log/nginx
+nginx_cache_dir: /cache/nginx
 nginx_conf: "{{ nginx_install_dir }}/conf/nginx.conf"
 nginx_proxy_cache_path: "{{ nginx_install_dir }}/conf/proxy_cache_path.conf"
 nginx_upstream: "{{ nginx_install_dir }}/conf/upstream.conf"
@@ -69,9 +70,9 @@ nginx_vhosts:
       }
 
     cache: {
-        cache_dir: "/data/nginx/cache/{{ nginx_vhosts_name.0 }}",
+        cache_dir: "{{ nginx_cache_dir }}/{{ nginx_vhosts_name.0 }}",
         cache_name: "{{ nginx_vhosts_name.0 }}_cache",
-        proxy_cache_path: "/data/nginx/cache/{{ nginx_vhosts_name.0 }} levels=1:2 keys_zone={{ nginx_vhosts_name.0 }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
+        proxy_cache_path: "{{ nginx_cache_dir }}/{{ nginx_vhosts_name.0 }} levels=1:2 keys_zone={{ nginx_vhosts_name.0 }}_cache:10m max_size=1g inactive=60m use_temp_path=off"
     }
 
 ### ngx_built: 0|1

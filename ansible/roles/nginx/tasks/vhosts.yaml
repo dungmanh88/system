@@ -24,6 +24,9 @@
     state: directory
   with_items: "{{ nginx_vhosts }}"
 
+- name: Ensure base doc root is www-data:www-data
+  command: chown -R {{ www_data_user }}:{{ www_data_group }} {{ nginx_base_doc_root }}
+
 - name: Ensure all are www-data:www-data
   command: chown -R {{ www_data_user }}:{{ www_data_group }} {{ item.root }}
   with_items: "{{ nginx_vhosts }}"
