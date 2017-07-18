@@ -1,6 +1,6 @@
 - name: Create the replication users
   mysql_user: name={{ item.name }}  host="{{ item.host | default("%") }}" password={{ item.pass|default("foobar") }}
-                priv=*.*:"REPLICATION SLAVE" state=present
+                priv={{ item.priv|default("*.*:REPLICATION SLAVE") }} state=present
   with_items:
     - "{{ mysql_repl_user }}"
   when: mysql_repl_role == 'master'

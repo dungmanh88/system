@@ -12,10 +12,12 @@ mysql_users:
   - name: benz
     pass: "{{ vault_mysql_user_passwd }}"
     priv: "*.*:ALL"
+    host: "%"
 
 mysql_repl_user:
   - name: repl
     pass: "{{ vault_mysql_repl_passwd }}"
+    priv: "*.*:REPLICATION SLAVE"
 
 mysql_repl_role: master
 mysql_db_id: 7
