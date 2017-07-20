@@ -1,0 +1,7 @@
+resgistry_dir: /docker-registry
+web_dir: "{{ resgistry_dir }}/nginx"
+htpasswd_file: "{{ web_dir }}/registry.password"
+data_dir: "{{ resgistry_dir }}/data"
+auth_users:
+  - name: admin
+    passwd: "{{ vault_admin_passwd }}"
