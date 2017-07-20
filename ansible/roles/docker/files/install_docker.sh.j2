@@ -2,38 +2,43 @@
 
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-yum -y remove docker \
-                  docker-common \
-                  container-selinux \
-                  docker-selinux \
-                  docker-engine
 
-yum install -y yum-utils device-mapper-persistent-data lvm2
+if [ ! "$(which docker)" ]; then
 
-yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo
+  # yum -y remove docker \
+  #                   docker-common \
+  #                   container-selinux \
+  #                   docker-selinux \
+  #                   docker-engine
 
-yum-config-manager --disable docker-ce-edge
+  yum install -y yum-utils device-mapper-persistent-data lvm2
 
-yum makecache fast
+  yum-config-manager \
+      --add-repo \
+      https://download.docker.com/linux/centos/docker-ce.repo
 
-yum -y install docker-ce
+  yum-config-manager --disable docker-ce-edge
 
+  yum makecache fast
 
-#cat << EOF > /etc/docker/daemon.json
-# {
-#   "storage-driver": "devicemapper"
-# }
-#EOF
+  yum -y install docker-ce
 
-systemctl start docker && systemctl enable docker && docker run hello-world
+  #cat << EOF > /etc/docker/daemon.json
+  # {
+  #   "storage-driver": "devicemapper"
+  # }
+  #EOF
 
-# Check https://github.com/docker/compose/releases to get latest release
-dockerComposeVersion=1.13.0
+  systemctl start docker && systemctl enable docker && docker run hello-world
+fi
 
-curl -L https://github.com/docker/compose/releases/download/${dockerComposeVersion}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
-&& chmod +x /usr/local/bin/docker-compose \
-&& if [ ! -L /usr/bin/docker-compose ] || [ ! -e /usr/bin/docker-compose ]; then
-  ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+if [ ! "$(which docker-compose)" ]; then
+  # Check https://github.com/docker/compose/releases to get latest release
+  dockerComposeVersion=1.13.0
+
+  curl -L https://github.com/docker/compose/releases/download/${dockerComposeVersion}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
+  && chmod +x /usr/local/bin/docker-compose \
+  && if [ ! -L /usr/bin/docker-compose ] || [ ! -e /usr/bin/docker-compose ]; then
+    ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+  fi
 fi

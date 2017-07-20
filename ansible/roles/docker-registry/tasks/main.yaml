@@ -1,22 +1,13 @@
-- name: Add the OS specific variables
-  include_vars: "{{ ansible_os_family }}.yaml"
-
 - include_vars: vault/main.yaml
   tags: include
-
-- name: Install packages
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ dependent_pkgs }}"
-  when: ansible_os_family == 'RedHat'
 
 - name: Create docker-registry directory
   file: path="{{ item }}" state=directory owner=root group=root mode=0755
   with_items:
     - "{{ resgistry_dir }}"
-    - "{{ web_dir }}"
     - "{{ data_dir }}"
+    - "{{ auth_dir }}"
+    - "{{ cert_dir }}"
 
 - name: Copy docker-compose.yaml into docker-registry directory
   copy:
@@ -26,21 +17,36 @@
     group: root
     mode: 0644
 
-- name: Copy resgistry.conf into docker-registry directory
+### For SSL
+- name: Copy script gencert.sh
   copy:
-    src: nginx_registry.conf
-    dest: "{{ web_dir }}/registry.conf"
+    src: gencert.sh
+    dest: "{{ cert_dir }}/gencert.sh"
     owner: root
     group: root
-    mode: 0644
+    mode: 0500
 
-- name: Create registry password
-  file: path="{{ htpasswd_file }}" state=touch owner=root group=root mode=0644
-
-- name: Create admin htpasswd
-  command: "htpasswd -b {{ htpasswd_file }} {{ item.name }} {{ item.passwd }}"
+- name: Gen cert
+  command: "./gencert.sh {{ server_name }}"
   args:
-    chdir: "{{ web_dir }}"
+    chdir: "{{ cert_dir }}"
+
+- name: DEBUG
+  debug: msg="Copy the domain.crt file to /etc/docker/certs.d/{{ server_name }}:5000/ca.crt on every Docker host. You do not need to restart Docker."
+###
+
+- name: Copy script reg_htpasswd.sh
+  copy:
+    src: reg_htpasswd.sh
+    dest: "{{ auth_dir }}/reg_htpasswd.sh"
+    owner: root
+    group: root
+    mode: 0500
+
+- name: Create htpasswd
+  command: "./reg_htpasswd.sh {{ item.name }} {{ item.passwd }} htpasswd"
+  args:
+    chdir: "{{ auth_dir }}"
   with_items: "{{ auth_users }}"
 
 - name: docker-compose up
@@ -49,3 +55,9 @@
     - docker-compose stop
     - docker-compose rm -f
     - docker-compose up -d
+
+- name: DEBUG
+  debug: msg="curl https://{{ server_name }}:5000"
+
+- name: DEBUG
+  debug: msg="docker login {{ server_name }}:5000 using username and passwd in htpasswd"

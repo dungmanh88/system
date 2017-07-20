@@ -1,7 +1,9 @@
 resgistry_dir: /docker-registry
-web_dir: "{{ resgistry_dir }}/nginx"
-htpasswd_file: "{{ web_dir }}/registry.password"
+cert_dir: "{{ resgistry_dir }}/certs"
+auth_dir: "{{ resgistry_dir }}/auth"
+htpasswd_file: "{{ auth_dir }}/htpasswd"
 data_dir: "{{ resgistry_dir }}/data"
 auth_users:
   - name: admin
     passwd: "{{ vault_admin_passwd }}"
+server_name: registry.example.com

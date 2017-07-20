@@ -1,16 +1,15 @@
-nginx:
-  image: "nginx:1.9"
-  ports:
-    - 5043:443
-  links:
-    - registry:registry
-  volumes:
-    - ./nginx/:/etc/nginx/conf.d
 registry:
+  restart: always
   image: registry:2
   ports:
     - 5000:5000
   environment:
-    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+    REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+    REGISTRY_AUTH: htpasswd
+    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
   volumes:
-    - ./data:/data
+    - ./data:/var/lib/registry
+    - ./certs:/certs
+    - ./auth:/auth
