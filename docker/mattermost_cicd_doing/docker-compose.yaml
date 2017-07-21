@@ -14,11 +14,9 @@ services:
       - MYSQL_USER=mmuser
       - MYSQL_PASSWORD=mmuser_password
       - MYSQL_DATABASE=mattermost
-    networks:
-      - swat-net
 
   app:
-    image: 103.53.170.69:5000/mattermost_app
+    image: registry.localhost:5000/mattermost_app
     hostname: app.mattermost.swat
     container_name: app_mattermost_swat
     volumes:
@@ -31,11 +29,9 @@ services:
       - MM_SITE_URL=mm.swat.example.com
     depends_on:
       - db
-    networks:
-      - swat-net
 
   web:
-    image: 103.53.170.69:5000/mattermost_web
+    image: registry.localhost:5000/mattermost_web
     hostname: nginx.mattermost.swat
     container_name: nginx_mattermost_swat
     ports:
@@ -49,8 +45,3 @@ services:
      ### No need webroot because of proxy role
     depends_on:
      - app
-    networks:
-     - swat-net
-
-networks:
-  swat-net:

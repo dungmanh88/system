@@ -15,10 +15,10 @@ build:
     - docker build -t mattermost_app app/
     - docker build -t mattermost_web web/
     # push image to registry
-    - docker tag mattermost_app 103.53.170.69:5000/mattermost_app
-    - docker tag mattermost_web 103.53.170.69:5000/mattermost_web
-    - docker push 103.53.170.69:5000/mattermost_app
-    - docker push 103.53.170.69:5000/mattermost_web
+    - docker tag mattermost_app registry.localhost:5000/mattermost_app
+    - docker tag mattermost_web registry.localhost:5000/mattermost_web
+    - docker push registry.localhost:5000/mattermost_app
+    - docker push registry.localhost:5000/mattermost_web
   stage: build
   tags:
     - swat-demo
@@ -33,7 +33,7 @@ deploy:
     - apk add openssh-client
     - chmod +x deploy.sh
   script:
-    - ./deploy.sh deployer@103.53.170.70 1102
+    - ./deploy.sh deployer@server.localhost 1102
   after_script:
     - apk del rsync
     - apk del openssh-client
