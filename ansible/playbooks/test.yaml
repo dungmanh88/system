@@ -11,7 +11,7 @@
 
 - hosts: production_test
   roles:
-    - role: docker-registry
+#    - role: docker-registry
 #    - role: mysql56
 #    - role: nginx
-#    - role: php7
+    - role: php7
