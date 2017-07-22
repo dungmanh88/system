@@ -44,7 +44,7 @@ mkdir -p ${ssh_dir} && chmod 700 ${ssh_dir} \
 && touch ${authorized_keys}
 
 cat << EOF > ${authorized_keys}
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJwk58yR0iuSLERzk3EOPvRe9TQ40lt05fzYzOqPwThc9ibAFsysNe+lqQBtXmXXic35FZBQ8MOSEF+/XhMeiSs7tGOUsnRbJYdlr2mqiXAoqgJQzHkRa6rLvNpKulZF5URqW/mB8Ojw6PLZgBJ3YxCcacAgiBkhsNgSBwJoP4bcuhRQQ3tUYyqXbg39dtm6r7xP1rLAnuOizcQvGfuHY/Z27sDBk/l9p8t0HMYRkpDZZeZ37vFShuJp2tJ+rGJvNEfYjnYp/ezEye8AzF6Qh9dX2rH1i05pm9/8cLj1EOdkVoiI6XS4+z5yJ/M56HB0nyfzft/PSFTiO0fLW9xYs7 ansible@devops
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4TsLZgY3pMe7yRUPfDV32It5VD+/Sb0HM2SqexWswUOjtKQMVYVhsmTEYvSsBl1CPc+15WeNLfCMxd6pvZhWKDQnb1FOJtYiIPxNBFWunk2M3rM23s/4CzKnUdJoJqZM4l2XliB5G+95lcT3sw6Ar/KeZNeGpMiqmf0V2YavBe22TAG0Lx1XagRLB+2byV2OAGFdVWjdWYZ/GEzt2bc7+imRSTXnn6TNqX0JqTey5FjSbhiFHJkkxqhxHbbKSjIEL/+OjBBgyDQKkhsZmnyY+vrkamr+1tIaGVRE9TA+Md9keqoVSN6z4IOYm7EDV0qUSbrfPCNpGq7tnyGeNfcYN ansible@devops
 EOF
 
 chmod 600 ${authorized_keys} && chown -R ${deployer_user}:${deployer_user} ${ssh_dir}
