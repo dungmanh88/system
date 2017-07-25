@@ -1,0 +1,5 @@
+/etc/httpd/conf.d/ssl.conf
+/etc/httpd/modules
+/etc/httpd/conf.modules.d/00-ssl.conf
+/etc/httpd/conf.d/ssl.conf
+/etc/httpd/modules/mod_ssl.so
