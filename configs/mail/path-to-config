@@ -1,0 +1,6 @@
+/var/log/maillog
+/etc/postfix/main.cf
+/etc/postfix/master.cf
+/etc/dovecot/conf.d/10-master.conf
+/etc/dovecot/conf.d/10-auth.conf
+$HOME/Maildir

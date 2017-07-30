@@ -1,0 +1,5 @@
+Maildir structure
+cur new tmp
+
+cur: recevied mail
+new: sending mail until mail is sent

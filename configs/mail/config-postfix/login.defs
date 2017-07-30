@@ -1,0 +1,9 @@
+/etc/login.defs
+```
+...
+#QMAIL_DIR      Maildir
+#MAIL_DIR       /var/spool/mail
+#MAIL_FILE      .mail
+MAIL_FILE       Maildir/
+...
+```

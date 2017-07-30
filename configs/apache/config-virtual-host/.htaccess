@@ -1,5 +1,8 @@
+/data/www/ninja/.htaccess
+```
 AuthType Basic
 AuthName "Restricted web page"
 AuthBasicProvider file
 AuthUserFile "/etc/httpd/conf/.htpasswd"
 Require valid-user
+```

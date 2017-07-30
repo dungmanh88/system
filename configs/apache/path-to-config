@@ -3,3 +3,5 @@
 /etc/httpd/conf.modules.d/00-ssl.conf
 /etc/httpd/conf.d/ssl.conf
 /etc/httpd/modules/mod_ssl.so
+/etc/httpd/conf.d/vhost.conf
+/data/www/ninja/.htaccess

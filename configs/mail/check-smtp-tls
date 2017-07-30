@@ -1,0 +1,3 @@
+openssl s_client -connect localhost:smtp -starttls smtp
+or
+openssl s_client -connect mail.lab.com:smtp -starttls smtp
