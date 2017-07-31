@@ -90,3 +90,16 @@ git add . ## add to staging (index)
 git commit -m "msg" ## add to local repo
 git push remote_name branch_name ## add to remote repo
 ```
+
+## Merge
+```
+git checkout dev
+git pull
+git checkout master
+git pull
+git merge dev
+If you get conflict, you have to resolve it locally, then
+git add .
+git commit -m "msg"
+git push origin master
+```
