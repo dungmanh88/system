@@ -1,0 +1,2 @@
+groupadd -g 9999 vmail
+useradd -u 9999 -g vmail -s /usr/bin/nologin -d /home/vmail -m vmail

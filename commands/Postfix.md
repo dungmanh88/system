@@ -1,0 +1,2 @@
+postfix reload
+postconf -m

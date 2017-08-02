@@ -24,7 +24,7 @@ CREATE DATABASE postfix;
 
 # Config postfixadmin
 
-postfix/config.local.php
+postfixadmin/config.local.php
 ```
 <?php
 $CONF['database_type'] = 'mysqli';
@@ -33,6 +33,9 @@ $CONF['database_password'] = 'postfix';
 $CONF['database_name'] = 'postfix';
 
 $CONF['configured'] = true;
+
+$CONF['domain_path'] = 'YES';
+$CONF['domain_in_mailbox'] = 'NO';
 ?>
 ```
 
@@ -71,9 +74,29 @@ server {
 mkdir -p /var/log/nginx/postfixadmin.lab.com
 mkdir -p /data/www/html/postfixadmin
 
+systemctl restart nginx
+systemctl restart php-fpm
+
 # Create admin user
 ```
 http://postfixadmin.lab.com/setup.php
 admin/genpass
-doing
 ```
+NOTICE:
+```
+If you want to use the password you entered as setup password, edit config.inc.php or config.local.php and set
+$CONF['setup_password'] = '28603e3cac94fa19c59d38b7adfa3b1f:5381c6fb4346f97c7abeac605b45ccac4d4b6962';
+```
+Add
+```
+$CONF['setup_password'] = '28603e3cac94fa19c59d38b7adfa3b1f:5381c6fb4346f97c7abeac605b45ccac4d4b6962';
+```
+into postfixadmin/config.local.php
+
+email admin must be a real email in domain lab.com
+
+# Test admin account
+```
+http://postfixadmin.lab.com/login.php
+```
+adam@lab.com + admin password (not setup password)
