@@ -1,0 +1,4 @@
+groupadd -g 9999 vmail
+mkdir -p /var/vmail/mail
+useradd -u 9999 -g vmail -d /var/vmail -s /sbin/nologin -c "Virtual Mail User" vmail
+chown -R vmail:vmail /var/vmail

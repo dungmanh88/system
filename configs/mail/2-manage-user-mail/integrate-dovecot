@@ -1,0 +1,171 @@
+yum -y install dovecot-mysql
+
+/etc/dovecot/dovecot.conf
+```
+!include conf.d/*.conf
+```
+
+/etc/dovecot/conf.d/auth-sql.conf.ext
+```
+passdb {
+  driver = sql
+  # Path for SQL configuration file, see example-config/dovecot-sql.conf.ext
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+
+userdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+```
+
+/etc/dovecot/dovecot.conf
+```
+...
+# Protocols we want to be serving.
+#protocols = imap pop3 lmtp
+protocols = imap pop3
+...
+```
+
+/etc/dovecot/conf.d/10-auth.conf
+```
+#!include auth-system.conf.ext
+!include auth-sql.conf.ext
+auth_mechanisms = plain login
+disable_plaintext_auth = no
+```
+
+/etc/dovecot/conf.d/10-master.conf
+```
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0666
+    user = postfix
+    group = postfix
+  }
+  user = dovecot
+}
+
+service auth-worker {
+  user = vmail
+}
+```
+
+/etc/dovecot/conf.d/10-mail.conf
+```
+mail_location = maildir:/var/vmail/mail/%d/%n
+namespace inbox {
+  inbox = yes
+}
+mail_uid = 9999
+mail_gid = 9999
+mail_privileged_group = vmail
+first_valid_uid = 9999
+last_valid_uid = 9999
+mbox_write_locks = fcntl
+```
+
+/etc/dovecot/conf.d/10-ssl.conf
+Keep it as default
+```
+ssl = required
+ssl_cert = </etc/pki/dovecot/certs/dovecot.pem
+ssl_key = </etc/pki/dovecot/private/dovecot.pem
+```
+
+/etc/dovecot/dovecot-sql.conf.ext
+```
+connect = host=localhost dbname=postfix user=postfix password=postfix
+# Use either
+driver = mysql
+# Or
+# driver = pgsql
+
+# Default password scheme - change to match your Postfixadmin setting.
+# depends on your $CONF['encrypt'] setting:
+# md5crypt  -> MD5-CRYPT
+# md5       -> PLAIN-MD5
+# cleartext -> PLAIN
+default_pass_scheme = MD5-CRYPT
+
+# Query to retrieve password. user can be used to retrieve username in other
+# formats also.
+
+password_query = SELECT username AS user,password FROM mailbox WHERE username = '%u' AND active='1'
+
+# Query to retrieve user information, note uid matches dovecot.conf AND Postfix virtual_uid_maps parameter.
+user_query = SELECT maildir, 9999 AS uid, 9999 AS gid FROM mailbox WHERE username = '%u' AND active='1'
+
+
+# MYSQL :
+user_query = SELECT CONCAT('/var/vmail/mail/', maildir) AS home, 9999 AS uid, 9999 AS gid, CONCAT('*:bytes=', quota) AS quota_rule FROM mailbox WHERE username = '%u' AND active='1'
+# PostgreSQL : (no Quota though) :
+# user_query = SELECT '/var/vmail/mail/' || maildir AS home, 9999 as uid, 9999 as gid FROM mailbox WHERE username = '%u' AND active = '1'
+```
+
+[root@mail dovecot]# chown -R vmail:dovecot /etc/dovecot
+[root@mail dovecot]# chmod -R o-rwx /etc/dovecot
+
+systemctl restart dovecot
+
+dovecot -n should look like this:
+```
+dovecot -n
+# 2.2.10: /etc/dovecot/dovecot.conf
+# OS: Linux 3.10.0-327.el7.x86_64 x86_64 CentOS Linux release 7.2.1511 (Core)  xfs
+auth_debug = yes
+auth_debug_passwords = yes
+auth_mechanisms = plain login
+disable_plaintext_auth = no
+first_valid_uid = 9999
+last_valid_uid = 9999
+mail_gid = 9999
+mail_location = maildir:/var/vmail/mail/%d/%n
+mail_privileged_group = vmail
+mail_uid = 9999
+mbox_write_locks = fcntl
+namespace inbox {
+ inbox = yes
+ location =
+ mailbox Drafts {
+   special_use = \Drafts
+ }
+ mailbox Junk {
+   special_use = \Junk
+ }
+ mailbox Sent {
+   special_use = \Sent
+ }
+ mailbox "Sent Messages" {
+   special_use = \Sent
+ }
+ mailbox Trash {
+   special_use = \Trash
+ }
+ prefix =
+}
+passdb {
+ args = /etc/dovecot/dovecot-sql.conf.ext
+ driver = sql
+}
+protocols = imap pop3
+service auth-worker {
+ user = vmail
+}
+service auth {
+ unix_listener /var/spool/postfix/private/auth {
+   group = postfix
+   mode = 0666
+   user = postfix
+ }
+ user = dovecot
+}
+ssl = required
+ssl_cert = </etc/pki/dovecot/certs/dovecot.pem
+ssl_key = </etc/pki/dovecot/private/dovecot.pem
+userdb {
+ args = /etc/dovecot/dovecot-sql.conf.ext
+ driver = sql
+}
+```

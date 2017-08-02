@@ -1,8 +1,18 @@
+https://www.rosehosting.com/blog/setup-and-configure-a-mail-server-with-postfixadmin/
+https://github.com/postfixadmin/postfixadmin/tree/master/DOCUMENTS
+https://wiki.archlinux.org/index.php/Virtual_user_mail_system#Dovecot
+https://wiki.dovecot.org/BasicConfiguration
+https://www.howtoforge.com/community/threads/proper-postfix-and-dovecot-configuration-after-installing-ispconfig.63289/
+https://serverfault.com/questions/334850/dovecot-auth-fatal-unknown-database-driver-pgsql
+
+
+Inherit from send-receive-mail-LAN, customize from send-receive-mail-LAN/GUIDE.md
+
 # Install
 ```
 yum -y install epel-release \
 mysql mariadb-server
-systemctl start mariadb
+systemctl start mariadb && \
 systemctl enable mariadb
 
 yum -y install nginx php php-fpm php-mysql php-mbstring php-imap
@@ -36,6 +46,9 @@ $CONF['configured'] = true;
 
 $CONF['domain_path'] = 'YES';
 $CONF['domain_in_mailbox'] = 'NO';
+
+$CONF['used_quotas'] = 'YES';
+$CONF['quota'] = 'YES';
 ?>
 ```
 
@@ -49,7 +62,6 @@ chmod o+rwx templates_c/
 # Config web
 /etc/nginx/conf.d/postfixadmin.conf
 ```
-/etc/nginx/conf.d/vhost.conf
 server {
 
   index index.php index.html;
@@ -71,32 +83,33 @@ server {
   }
 }
 ```
-mkdir -p /var/log/nginx/postfixadmin.lab.com
+mkdir -p /var/log/nginx/postfixadmin.lab.com && \
 mkdir -p /data/www/html/postfixadmin
 
-systemctl restart nginx
+systemctl restart nginx && \
 systemctl restart php-fpm
 
 # Create admin user
 ```
 http://postfixadmin.lab.com/setup.php
-admin/genpass
+Create setup password
 ```
 NOTICE:
 ```
 If you want to use the password you entered as setup password, edit config.inc.php or config.local.php and set
-$CONF['setup_password'] = '28603e3cac94fa19c59d38b7adfa3b1f:5381c6fb4346f97c7abeac605b45ccac4d4b6962';
+$CONF['setup_password'] = 'xyz...';
 ```
 Add
 ```
-$CONF['setup_password'] = '28603e3cac94fa19c59d38b7adfa3b1f:5381c6fb4346f97c7abeac605b45ccac4d4b6962';
+$CONF['setup_password'] = 'xyz...';
 ```
 into postfixadmin/config.local.php
 
 email admin must be a real email in domain lab.com
+password login admin (such as adam@lab.com) of postfixadmin may be different than password of account adam on mail server.
 
 # Test admin account
 ```
 http://postfixadmin.lab.com/login.php
 ```
-adam@lab.com + admin password (not setup password)
+adam@lab.com + password (not setup password)
