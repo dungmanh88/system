@@ -1,7 +1,0 @@
-yum -y install epel-release \
-mysql mariadb-server nginx php php-fpm php-mysql \
-php-mbstring php-imap
-wget https://sourceforge.net/projects/postfixadmin/files/latest/download?source=files
-mv download?source=files postfixadmin-3.1.tar.gz
-tar xvzf postfixadmin-3.1.tar.gz
-mv postfixadmin-3.1 postfixadmin

@@ -1,8 +1,0 @@
-# Support SASL for Dovecot
-/etc/postfix/main.cf
-```
-...
-smtpd_sasl_type = dovecot
-smtpd_sasl_path = private/auth
-smtpd_sasl_auth_enable = yes
-```

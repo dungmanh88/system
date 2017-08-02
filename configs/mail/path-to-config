@@ -1,4 +1,5 @@
 /var/log/maillog
+/var/log/secure
 /etc/postfix/main.cf
 /etc/postfix/master.cf
 /etc/dovecot/conf.d/10-master.conf
