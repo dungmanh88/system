@@ -5,3 +5,4 @@
 /etc/dovecot/conf.d/10-master.conf
 /etc/dovecot/conf.d/10-auth.conf
 $HOME/Maildir
+/var/spool/postfix: queue directory
