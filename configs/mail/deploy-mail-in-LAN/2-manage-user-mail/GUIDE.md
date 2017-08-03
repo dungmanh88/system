@@ -105,11 +105,11 @@ $CONF['setup_password'] = 'xyz...';
 ```
 into postfixadmin/config.local.php
 
-email admin must be a real email in domain lab.com
-password login admin (such as adam@lab.com) of postfixadmin may be different than password of account adam on mail server.
+email admin must be a email in domain lab.com
+admin (such as admin@lab.com) - this account is a isolated account for postfixadmin management (not email account)
 
 # Test admin account
 ```
 http://postfixadmin.lab.com/login.php
 ```
-adam@lab.com + password (not setup password)
+admin@lab.com + password (not setup password)
