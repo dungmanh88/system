@@ -6,3 +6,6 @@
 /etc/dovecot/conf.d/10-auth.conf
 $HOME/Maildir
 /var/spool/postfix: queue directory
+/var/spool/mail/user: default mailbox
+/var/mail/user: other mailbox
+/home/user/Maildir: other mailbox

@@ -8,6 +8,8 @@ https://serverfault.com/questions/334850/dovecot-auth-fatal-unknown-database-dri
 
 Inherit from send-receive-mail-LAN, customize from send-receive-mail-LAN/GUIDE.md
 
+NOTE: using lookup table type is proxy:mysql
+
 # Install
 ```
 yum -y install epel-release \

@@ -1,8 +1,15 @@
 # postfix reload
 postfix reload
 
-# get module
+# what database type that postfix support
 postconf -m
 
 # get sasl support
 postconf -a
+
+# get mail version
+postconf mail_version
+
+# convert to hash file
+postmap filename
+filename -> filename.db
