@@ -37,12 +37,13 @@ cd rubygems-2.6.12
 Install rake and bundler
 /usr/local/rvm/rubies/ruby-2.3.3/bin/gem install rake bundler
 
-ln -s /usr/local/rvm/bin/rvm /usr/bin/rvm
-ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/ruby /usr/bin/ruby        
-ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/gem /usr/bin/gem
-ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/bundle /usr/bin/bundle
-ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/rake /usr/bin/rake
-ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/ruby_executable_hooks /usr/bin/ruby_executable_hooks
+/etc/profile.d/ruby.sh
+```
+export PATH=$PATH:/usr/local/rvm/rubies/ruby-2.3.3/bin/
+```
+source /etc/profile.d/ruby.sh
+
+By default, rvm will install /etc/profile.d/rvm.sh
 
 Install huginn dependencies
 cd huginn
