@@ -187,4 +187,27 @@ From: joe@abc.com
 
 hello joe em
 .
+
+Add more:
+```
+/etc/dovecot/dovecot.conf
+```
+...
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+  mode = 0660
+  user = postfix
+  group = postfix                 
+ }
+}
+```
+
+/etc/postfix/main.cf
+```
+...
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous - not sure
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination - not sure
 ```
