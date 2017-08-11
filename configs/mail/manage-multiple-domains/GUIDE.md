@@ -35,9 +35,12 @@ joe@xyz.vn xyz.vn/joe/
 john@tele.scope tele.scope/john
 ```
 
-convert to hash file:
+You must convert to hash file: (really hash:/etc/postfix/vmaps.txt means postfix will read from /etc/postfix/vmaps.txt.db)
+
 postmap /etc/postfix/vmaps.txt
 -> output /etc/postfix/vmaps.txt.db
+postmap /etc/postfix/valias.txt
+-> output /etc/postfix/valias.txt.db
 
 create mailbox
 ```
@@ -107,9 +110,13 @@ userdb {
 openssl passwd -1 -salt abc 123
 $1$abc$98/EDagBiz63dxD3fhRFk1
 
+openssl passwd -1 -salt salt 123
+$1$salt$bD2zrbw4E9L9ylz6WgvhW1
+
 /etc/dovecot/users
 ```
 joe@abc.com:$1$abc$98/EDagBiz63dxD3fhRFk1:1000:1000::/var/spool/vmail/abc.com/
+joe@xyz.vn:$1$salt$bD2zrbw4E9L9ylz6WgvhW1:1000:1000::/var/spool/vmail/xyz.vn/
 ```
 login as joe@abc.com/123 but then dovecot use user 1000:1000 (virtual:virtual) to
 access mailbox
@@ -126,3 +133,58 @@ user joe@abc.com
 +OK
 pass 123
 +OK Logged in.
+
+Config DNS resolv abc.com and xyz.vn to same server
+
+Try send mail from joe@abc.com to joe@xyz.vn via telnet
+```
+telnet localhost 25
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
+220 mail.lab.global.com ESMTP Postfix
+helo abc.com
+250 mail.lab.global.com
+mail from: joe@abc.com
+250 2.1.0 Ok
+rcpt to: joe@xyz.vn
+250 2.1.5 Ok
+data
+354 End data with <CR><LF>.<CR><LF>
+subject: hello
+hello joe em
+.
+250 2.0.0 Ok: queued as 2697F189750
+```
+
+Try read mailbox of joe@xyz.vn via telnet
+```
+telnet localhost 110
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
++OK Dovecot ready.
+user joe@xyz.vn
++OK
+pass 123
++OK Logged in.
+list
++OK 1 messages:
+1 404
+.
+retr 1
++OK 404 octets
+Return-Path: <joe@abc.com>
+X-Original-To: joe@xyz.vn
+Delivered-To: joe@xyz.vn
+Received: from abc.com (localhost [IPv6:::1])
+	by mail.lab.global.com (Postfix) with SMTP id 2697F189750
+	for <joe@xyz.vn>; Fri, 11 Aug 2017 15:55:07 +0700 (ICT)
+subject: hello
+Message-Id: <20170811085515.2697F189750@mail.lab.global.com>
+Date: Fri, 11 Aug 2017 15:55:07 +0700 (ICT)
+From: joe@abc.com
+
+hello joe em
+.
+```
