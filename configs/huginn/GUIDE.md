@@ -45,17 +45,6 @@ source /etc/profile.d/ruby.sh
 
 By default, rvm will install /etc/profile.d/rvm.sh
 
-Problems:
-```
-rvm -v
-Warning! PATH is not properly set up, '/usr/local/rvm/gems/ruby-2.3.3/bin' is not at first place.
-         Usually this is caused by shell initialization files. Search for 'PATH=...' entries.
-         You can also re-add RVM to your profile by running: 'rvm get stable --auto-dotfiles'.
-         To fix it temporarily in this shell session run: 'rvm use ruby-2.3.3'.
-         To ignore this error add rvm_silence_path_mismatch_check_flag=1 to your ~/.rvmrc file.
-rvm 1.29.2 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io/]
-```
-
 Other options: use ln
 ```
 ln -s /usr/local/rvm/rubies/ruby-2.3.3/bin/ruby /usr/bin/ruby

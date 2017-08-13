@@ -58,8 +58,3 @@ or
 ```
 /etc/init.d/clamav-freshclam restart
 ```
-
-Problems:
-WARNING: Your ClamAV installation is OUTDATED!
-WARNING: Local version: 0.98.7 Recommended version: 0.99.2
-DON'T PANIC! Read http://www.clamav.net/support/faq
