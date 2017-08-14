@@ -10,10 +10,9 @@ disable selinux
 ```
 yum --enablerepo=centosplus install postfix -y
 systemctl enable postfix
+systemctl restart postfix
 yum install net-tools telnet mailx -y
 ```
-
-systemctl restart postfix
 
 # Config hostname
 ```
@@ -108,4 +107,26 @@ adam@mail.lab.com wrote:
 done
 .
 EOT
+```
+
+You can send mail to google mail if you want.
+But your mail will go into spam.
+```
+telnet localhost 25
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+220 test3.localdomain ESMTP Postfix
+helo case1.lab.com
+250 test3.localdomain
+mail from: test@lab.com
+250 2.1.0 Ok
+rcpt to: hidden@gmail.com
+250 2.1.5 Ok
+data
+354 End data with <CR><LF>.<CR><LF>
+subject: this is a mail demo
+this is just a demo
+.
+250 2.0.0 Ok: queued as D2453100DABA5
 ```
