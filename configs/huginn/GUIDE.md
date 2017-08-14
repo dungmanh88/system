@@ -74,3 +74,16 @@ Start
 foreman start & (run in tmux)
 
 http://<IP-SERVER>:3000
+
+If you want to run via  proxy
+```
+server {
+    listen 80;
+    server_name huginn.example.com;
+    location / {
+        auth_basic "Restricted Content";
+        auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+        proxy_pass http://127.0.0.1:3000;
+    }
+}
+```

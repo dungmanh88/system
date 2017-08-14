@@ -1,3 +1,6 @@
+yum -y install dovecot
+systemctl enable dovecot
+
 passwd adam
 passwd brian
 
@@ -40,4 +43,32 @@ b select inbox
 b OK [READ-WRITE] Select completed (0.000 secs).
 c logout
 * BYE Logging out
+```
+
+# check external
+*Impossible to connect via POP3, IMAP. You must use secure version POP3S, IMAPS*
+```
+telnet mail.lab.com 110
+Trying 192.168.88.105...
+Connected to mail.lab.com.
+Escape character is '^]'.
++OK Dovecot ready.
+user adam
+-ERR [AUTH] Plaintext authentication disallowed on non-secure (SSL/TLS) connections.
+```
+```
+openssl s_client -connect mail.lab.com:995
+...
+---
++OK Dovecot ready.
+user adam
++OK
+pass 12345678
++OK Logged in.
+```
+
+Or use STARTTLS on POP3/IMAP
+```
+openssl s_client  -connect mail.lab.com:110 -starttls pop3
+openssl s_client  -connect mail.lab.com:143 -starttls imap
 ```
