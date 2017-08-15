@@ -7,7 +7,8 @@ mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
 mynetworks_style = subnet
 # not relay for any domain
 relay_domains =
-# restrictions relay for sasl
+# by default:
+# smtpd_relay_restrictions = permit_mynetworks,permit_sasl_authenticated,defer_unauth_destination
 smtpd_relay_restrictions = permit_sasl_authenticated,defer_unauth_destination
 ```
 
