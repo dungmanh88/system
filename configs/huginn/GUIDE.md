@@ -75,7 +75,7 @@ foreman start & (run in tmux)
 
 http://<IP-SERVER>:3000
 
-If you want to run via  proxy
+<!-- If you want to run via  proxy
 ```
 server {
     listen 80;
@@ -86,4 +86,4 @@ server {
         proxy_pass http://127.0.0.1:3000;
     }
 }
-```
+``` -->
