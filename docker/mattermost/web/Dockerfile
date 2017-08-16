@@ -1,5 +1,4 @@
 FROM nginx
-LABEL maintainer "dungnm@mm.swat.example.com"
 
 COPY nginx.conf /etc/nginx/
 COPY nginx.conf.d/default.conf /etc/nginx/conf.d

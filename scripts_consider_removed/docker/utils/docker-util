@@ -1,4 +1,3 @@
 FROM alpine
-MAINTAINER dungnm
 RUN apk add --no-cache 	mysql-client curl wget atop drill nano
 CMD ["top"]

@@ -1,5 +1,5 @@
 FROM centos:7
-LABEL maintainer "dungnm@mm.swat.example.com"
+
 ENV PATH /opt/mattermost/bin:$PATH
 
 # need mattermost after make packages in here to copy

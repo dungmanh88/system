@@ -1,5 +1,4 @@
 FROM golang
-LABEL maintainer "dungnm@mm.swat.example.com"
 ENV PATH /opt/mattermost/bin:$PATH
 
 RUN apt-get -y update && apt-get -y install netcat jq libpng-dev build-essential zip \
