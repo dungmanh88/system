@@ -116,11 +116,14 @@ server {
   }
 }
 ```
+
+```
 mkdir -p /var/log/nginx/postfixadmin.lab.com && \
 mkdir -p /data/www/html/postfixadmin
 
 systemctl restart nginx && \
 systemctl restart php-fpm
+```
 
 # Create admin user
 ```
@@ -302,9 +305,11 @@ smtps     inet  n       -       n       -       -       smtpd
   -o smtpd_sasl_auth_enable=yes
 ```
 
+```
 openssl req -new -x509 -days 3650 -nodes -out /etc/pki/tls/certs/postfix.pem -keyout /etc/pki/tls/private/postfix.key
 openssl dhparam -out /etc/pki/tls/private/postfix.dh.param.tmp 1024
 mv /etc/pki/tls/private/postfix.dh.param.tmp  /etc/pki/tls/private/postfix.dh.param
+```
 
 # Config dovecot
 
@@ -420,8 +425,10 @@ user_query = SELECT CONCAT('/var/vmail/mail/', maildir) AS home, 9999 AS uid, 99
 # user_query = SELECT '/var/vmail/mail/' || maildir AS home, 9999 as uid, 9999 as gid FROM mailbox WHERE username = '%u' AND active = '1'
 ```
 
+```
 chown -R vmail:dovecot /etc/dovecot
 chmod -R o-rwx /etc/dovecot
+```
 
 ```
 dovecot -n
