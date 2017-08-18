@@ -5,10 +5,10 @@
 ...
 #myhostname = host.domain.tld
 #myhostname = virtual.domain.tld
-myhostname = mail.lab.com
+myhostname = mail.lab.local
 ...
 #mydomain = domain.tld
-mydomain = lab.com
+mydomain = lab.local
 ...
 #myorigin = $myhostname
 myorigin = $mydomain

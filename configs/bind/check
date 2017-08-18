@@ -1,2 +1,2 @@
 named-checkconf
-named-checkzone lab.com /var/named/lab.com
+named-checkzone lab.local /var/named/lab.local

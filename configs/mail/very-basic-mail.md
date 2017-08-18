@@ -16,7 +16,7 @@ yum install net-tools telnet mailx -y
 
 # Config hostname
 ```
-hostnamectl set-hostname mail.lab.com
+hostnamectl set-hostname mail.lab.local
 ```
 
 # Config postfix
@@ -83,25 +83,25 @@ su - brian
 mailx
 & 8
 Message  8:
-From adam@mail.lab.com Sun Jul 30 08:48:16 2017
-Return-Path: <adam@mail.lab.com>
+From adam@mail.lab.local Sun Jul 30 08:48:16 2017
+Return-Path: <adam@mail.lab.local>
 X-Original-To: brian
-Delivered-To: brian@mail.lab.com
+Delivered-To: brian@mail.lab.local
 Date: Sun, 30 Jul 2017 08:48:16 +0000
-To: brian@mail.lab.com
+To: brian@mail.lab.local
 Subject: test again
 User-Agent: Heirloom mailx 12.5 7/5/10
 Content-Type: text/plain; charset=us-ascii
-From: adam@mail.lab.com
+From: adam@mail.lab.local
 Status: R
 
 hello i am testing mail local again
 
 & r
-To: adam@mail.lab.com brian@mail.lab.com
+To: adam@mail.lab.local brian@mail.lab.local
 Subject: Re: test again
 
-adam@mail.lab.com wrote:
+adam@mail.lab.local wrote:
 
 > hello i am testing mail local again
 done
@@ -117,9 +117,9 @@ Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
 220 test3.localdomain ESMTP Postfix
-helo case1.lab.com
+helo case1.lab.local
 250 test3.localdomain
-mail from: test@lab.com
+mail from: test@lab.local
 250 2.1.0 Ok
 rcpt to: hidden@gmail.com
 250 2.1.5 Ok

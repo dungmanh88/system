@@ -1,12 +1,12 @@
 servers=[
   {
-    :hostname => "mail1.lab.com",
+    :hostname => "mail1.lab.local",
     :box => "bento/centos-7.2",
     :ram => 512,
     :cpu => 1
   },
   {
-    :hostname => "mail2.lab.com",
+    :hostname => "mail2.lab.local",
     :box => "bento/centos-7.2",
     :ram => 512,
     :cpu => 1
@@ -27,6 +27,6 @@ Vagrant.configure(2) do |config|
 end
 
 ```
-vagrant ssh mail1.lab.com
-vagrant ssh mail2.lab.com
+vagrant ssh mail1.lab.local
+vagrant ssh mail2.lab.local
 ```

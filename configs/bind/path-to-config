@@ -1,2 +1,2 @@
 /etc/named.conf
-/var/named/lab.com
+/var/named/lab.local

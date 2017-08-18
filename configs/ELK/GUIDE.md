@@ -61,7 +61,7 @@ include /etc/nginx/conf.d/*.conf;
 server {
     listen 80;
 
-    server_name kibana.lab.com;
+    server_name kibana.lab.local;
 
     auth_basic "Restricted Access";
     auth_basic_user_file /etc/nginx/htpasswd.users;
@@ -96,7 +96,7 @@ yum install -y logstash
 Gen cert
 ```
 cd /etc/pki/tls
-openssl req -subj '/CN=elk.lab.com/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout private/logstash-forwarder.key -out certs/logstash-forwarder.crt
+openssl req -subj '/CN=elk.lab.local/' -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout private/logstash-forwarder.key -out certs/logstash-forwarder.crt
 ```
 
 TBC

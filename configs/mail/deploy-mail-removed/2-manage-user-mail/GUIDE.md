@@ -67,10 +67,10 @@ chmod o+rwx templates_c/
 server {
 
   index index.php index.html;
-  server_name postfixadmin.lab.com www.postfixadmin.lab.com;
-  error_log /var/log/nginx/postfixadmin.lab.com/error.log;
+  server_name postfixadmin.lab.local www.postfixadmin.lab.local;
+  error_log /var/log/nginx/postfixadmin.lab.local/error.log;
   client_max_body_size 20M;
-  access_log /var/log/nginx/postfixadmin.lab.com/access.log;
+  access_log /var/log/nginx/postfixadmin.lab.local/access.log;
   root /data/www/html/postfixadmin;
   listen 80;
 
@@ -85,7 +85,7 @@ server {
   }
 }
 ```
-mkdir -p /var/log/nginx/postfixadmin.lab.com && \
+mkdir -p /var/log/nginx/postfixadmin.lab.local && \
 mkdir -p /data/www/html/postfixadmin
 
 systemctl restart nginx && \
@@ -93,7 +93,7 @@ systemctl restart php-fpm
 
 # Create admin user
 ```
-http://postfixadmin.lab.com/setup.php
+http://postfixadmin.lab.local/setup.php
 Create setup password
 ```
 NOTICE:
@@ -107,11 +107,11 @@ $CONF['setup_password'] = 'xyz...';
 ```
 into postfixadmin/config.local.php
 
-email admin must be a email in domain lab.com
-admin (such as admin@lab.com) - this account is a isolated account for postfixadmin management (not email account)
+email admin must be a email in domain lab.local
+admin (such as admin@lab.local) - this account is a isolated account for postfixadmin management (not email account)
 
 # Test admin account
 ```
-http://postfixadmin.lab.com/login.php
+http://postfixadmin.lab.local/login.php
 ```
-admin@lab.com + password (not setup password)
+admin@lab.local + password (not setup password)

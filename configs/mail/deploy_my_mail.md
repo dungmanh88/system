@@ -20,11 +20,11 @@ disable selinux
 # Install
 ```
 yum --enablerepo=centosplus install postfix -y
-systemctl enable postfix
+systemctl enable postfix && \
 systemctl restart postfix
-yum install net-tools telnet mailx -y
+yum install net-tools telnet wget mailx -y
 yum -y install dovecot dovecot-mysql
-systemctl enable dovecot
+systemctl enable dovecot && \
 systemctl restart dovecot
 ```
 
@@ -39,13 +39,15 @@ systemctl enable nginx && \
 systemctl start php-fpm && \
 systemctl enable php-fpm
 
+cd /tmp
+wget https://downloads.sourceforge.net/project/postfixadmin/postfixadmin/postfixadmin-3.1/postfixadmin-3.1.tar.gz
 tar xvzf postfixadmin-3.1.tar.gz
 mv postfixadmin-3.1 postfixadmin
 ```
 
 # Config hostname
 ```
-hostnamectl set-hostname mail.lab.com
+hostnamectl set-hostname mail.lab.local
 ```
 
 # Config virtual user
@@ -98,10 +100,10 @@ chmod o+rwx templates_c/
 server {
 
   index index.php index.html;
-  server_name postfixadmin.lab.com www.postfixadmin.lab.com;
-  error_log /var/log/nginx/postfixadmin.lab.com/error.log;
+  server_name postfixadmin.lab.local www.postfixadmin.lab.local;
+  error_log /var/log/nginx/postfixadmin.lab.local/error.log;
   client_max_body_size 20M;
-  access_log /var/log/nginx/postfixadmin.lab.com/access.log;
+  access_log /var/log/nginx/postfixadmin.lab.local/access.log;
   root /data/www/html/postfixadmin;
   listen 80;
 
@@ -118,8 +120,11 @@ server {
 ```
 
 ```
-mkdir -p /var/log/nginx/postfixadmin.lab.com && \
-mkdir -p /data/www/html/postfixadmin
+mkdir -p /var/log/nginx/postfixadmin.lab.local && \
+mkdir -p /data/www/html/
+mv /tmp/postfixadmin /data/www/html/
+chown vmail:vmail -R /data/www/html/postfixadmin
+
 
 systemctl restart nginx && \
 systemctl restart php-fpm
@@ -127,7 +132,7 @@ systemctl restart php-fpm
 
 # Create admin user
 ```
-http://postfixadmin.lab.com/setup.php
+http://postfixadmin.lab.local/setup.php
 Create setup password
 ```
 NOTICE:
@@ -141,9 +146,10 @@ $CONF['setup_password'] = 'xyz...';
 ```
 into postfixadmin/config.local.php
 
-email admin must be a email in domain lab.com
-admin (such as admin@lab.com) - this account is a isolated account for postfixadmin management (not email account)
+email admin must be a email in domain lab.local
+admin (such as admin@lab.local) - this account is a isolated account for postfixadmin management (not email account)
 
+After creating one admin account, you should remove file setup.php or rename to setup.php.orig
 
 # Config postfix
 /etc/postfix/main.cf
@@ -154,8 +160,8 @@ daemon_directory = /usr/libexec/postfix
 data_directory = /var/lib/postfix
 
 mail_owner = postfix
-myhostname = mail.lab.com
-mydomain = lab.com
+myhostname = mail.lab.local
+mydomain = lab.local
 myorigin = $mydomain
 inet_interfaces = all
 inet_protocols = ipv4
@@ -489,3 +495,99 @@ userdb {
   driver = sql
 }
 ```
+
+systemctl restart dovecot && \
+systemctl restart postfix
+
+# Test
+Add lab.local domain into postfixadmin.lab.local
+Add some virtual mailbox via postfixadmin.lab.local such as dungnm, bot (passwd abc@123)
+
+```
+echo -ne "\000dungnm@lab.local\000abc@123" | openssl base64
+<something>
+echo -ne "\000bot@lab.local\000abc@123" | openssl base64
+<something1>
+```
+
+openssl s_client -connect localhost:smtp -starttls smtp
+or
+openssl s_client -connect mail.lab.local:smtp -starttls smtp
+```
+ehlo lab.local
+auth plain <something>
+235 2.7.0 Authentication successful
+mail from: dungnm@lab.local
+250 2.1.0 Ok
+rcpt to: <hidden>@gmail.com
+454 4.7.1 <<hidden>@gmail.com>: Relay access denied
+rcpt to: bot@lab.local
+250 2.1.5 Ok
+data
+354 End data with <CR><LF>.<CR><LF>
+subject: hello bot
+hello bot, this is mail demo
+.
+250 2.0.0 Ok: queued as 541476E52E
+```
+**Send between accounts in same mail server, you don't need DNS**
+
+telnet localhost 25 (if you don't use TLS/SSL)
+```
+ehlo lab.local
+AUTH PLAIN <something>
+...
+```
+openssl s_client  -connect localhost:110 -starttls pop3
+or
+openssl s_client  -connect mail.lab.local:110 -starttls pop3
+```
++OK Dovecot ready.
+auth plain <something1>
++OK Logged in.
+list
++OK 1 messages:
+1 423
+.
+retr 1
++OK 423 octets
+...
+Date: Fri, 18 Aug 2017 09:35:46 +0700 (ICT)
+From: dungnm@lab.local
+
+hello bot, this is mail demo
+```
+telnet localhost 110 (if you don't use TLS/SSL)
+```
+user bot@lab.local
+pass abc@123
+...
+```
+
+openssl s_client  -connect localhost:143 -starttls imap
+```
+a login bot@lab.local abc@123
+b select inbox
+* FLAGS (\Answered \Flagged \Deleted \Seen \Draft)
+* OK [PERMANENTFLAGS (\Answered \Flagged \Deleted \Seen \Draft \*)] Flags permitted.
+* 1 EXISTS
+* 0 RECENT
+* OK [UIDVALIDITY 1503024394] UIDs valid
+* OK [UIDNEXT 2] Predicted next UID
+b OK [READ-WRITE] Select completed (0.000 secs).
+
+```
+or
+openssl s_client  -connect mail.lab.local:143 -starttls imap
+telnet localhost 143 (if you don't use TLS/SSL)
+```
+a login bot@lab.local abc@123
+b select inbox
+c logout
+```
+
+Add more virtual domain lab.vip
+Try to send/receive between account belong different domain - done
+**Send between accounts in same mail server belong different domain that mail service manage, you don't need DNS**
+
+Config my mail server using my dns via /etc/resolv.conf

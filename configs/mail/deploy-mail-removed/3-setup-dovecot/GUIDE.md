@@ -48,16 +48,16 @@ c logout
 # check external
 *Impossible to connect via POP3, IMAP. You must use secure version POP3S, IMAPS*
 ```
-telnet mail.lab.com 110
+telnet mail.lab.local 110
 Trying 192.168.88.105...
-Connected to mail.lab.com.
+Connected to mail.lab.local.
 Escape character is '^]'.
 +OK Dovecot ready.
 user adam
 -ERR [AUTH] Plaintext authentication disallowed on non-secure (SSL/TLS) connections.
 ```
 ```
-openssl s_client -connect mail.lab.com:995
+openssl s_client -connect mail.lab.local:995
 ...
 ---
 +OK Dovecot ready.
@@ -69,6 +69,6 @@ pass 12345678
 
 Or use STARTTLS on POP3/IMAP
 ```
-openssl s_client  -connect mail.lab.com:110 -starttls pop3
-openssl s_client  -connect mail.lab.com:143 -starttls imap
+openssl s_client  -connect mail.lab.local:110 -starttls pop3
+openssl s_client  -connect mail.lab.local:143 -starttls imap
 ```

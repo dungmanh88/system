@@ -81,10 +81,10 @@ ssl_key = </etc/pki/dovecot/private/dovecot.pem
 
 openssl s_client -connect localhost:smtp -starttls smtp
 or
-openssl s_client -connect mail.lab.com:smtp -starttls smtp
+openssl s_client -connect mail.lab.local:smtp -starttls smtp
 
 ```
-openssl s_client -connect mail.lab.com:995
+openssl s_client -connect mail.lab.local:995
 ...
 ---
 +OK Dovecot ready.
@@ -96,6 +96,6 @@ pass 12345678
 
 Or use STARTTLS on POP3/IMAP
 ```
-openssl s_client  -connect mail.lab.com:110 -starttls pop3
-openssl s_client  -connect mail.lab.com:143 -starttls imap
+openssl s_client  -connect mail.lab.local:110 -starttls pop3
+openssl s_client  -connect mail.lab.local:143 -starttls imap
 ```

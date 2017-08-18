@@ -41,12 +41,12 @@ change passwd to abc@1234
 echo -ne "\000adam\000abc@1234" | openssl base64
 AGFkYW0AYWJjQDEyMzQ=
 
-openssl s_client -connect mail.lab.com:smtp -starttls smtp
+openssl s_client -connect mail.lab.local:smtp -starttls smtp
 ```
 ...
 250 DSN
-ehlo lab.com
-250-mail.lab.com
+ehlo lab.local
+250-mail.lab.local
 250-PIPELINING
 250-SIZE 10240000
 250-VRFY

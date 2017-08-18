@@ -59,9 +59,9 @@ zone "." IN {
         file "named.ca";
 };
 
-zone "lab.com" IN {
+zone "lab.local" IN {
         type master;
-        file "lab.com";
+        file "lab.local";
 };
 
 include "/etc/named.rfc1912.zones";
@@ -71,19 +71,19 @@ include "/etc/named.root.key";
 systemctl restart named
 
 # Config zone
-/var/named/lab.com
+/var/named/lab.local
 ```
 $TTL 2d
-$ORIGIN lab.com.
-@       IN      SOA     ns1.lab.com. admin.lab.com. (
+$ORIGIN lab.local.
+@       IN      SOA     ns1.lab.local. admin.lab.local. (
                               2017022702         ; Serial
              604800     ; Refresh
               86400     ; Retry
             2419200     ; Expire
              604800 )   ; Negative Cache TTL
 
-@ IN NS ns1.lab.com.
-@ IN MX 0 mail.lab.com.
+@ IN NS ns1.lab.local.
+@ IN MX 0 mail.lab.local.
 
 ns1 IN A xx.xx.xx.xx
 mail IN A yy.yy.yy.yy
