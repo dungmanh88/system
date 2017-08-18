@@ -171,7 +171,7 @@ mydestination = $myhostname, localhost.$mydomain, localhost
 unknown_local_recipient_reject_code = 550
 
 mynetworks_style = subnet
-relay_domains =
+relay_domains = <domain list separate by comma>
 
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
@@ -222,7 +222,7 @@ virtual_alias_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
 
 smtpd_client_restrictions = permit_sasl_authenticated, reject
-smtpd_relay_restrictions = defer_unauth_destination
+smtpd_relay_restrictions = permit_auth_destination, defer_unauth_destination
 
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth

@@ -4,6 +4,9 @@ postfix reload
 # what database type that postfix support
 postconf -m
 
+# View all
+postconf -n
+
 # get sasl support
 postconf -a
 
