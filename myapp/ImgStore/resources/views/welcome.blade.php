@@ -63,6 +63,7 @@
                 margin-bottom: 30px;
             }
         </style>
+        <link rel="stylesheet" href="<?php echo asset('css/mycss.css');?>" type="text/css">
     </head>
     <body>
         <div class="flex-center position-ref full-height">
@@ -78,10 +79,9 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
+                <div class="title m-b-md highlight">
                     Laravel
                 </div>
-
                 <div class="links">
                     <a href="https://laravel.com/docs">Documentation</a>
                     <a href="https://laracasts.com">Laracasts</a>
