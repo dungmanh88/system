@@ -31,10 +31,12 @@ Route::get('/', function () {
   // $painting->year = 2014;
   // $painting->save();
   // return view('welcome');
-  $painting = Painting::find(1);
-  $painting->title = "Do it right now!!!";
-  $painting->save();
-  return $painting->title;
+  // $painting = Painting::find(1);
+  // $painting->title = "Do it right now!!!";
+  // $painting->save();
+  // return $painting->title;
+  $theLandmarks = array('St. Marks', 'Central Park', 'Times square');
+  return view('welcome', array('theLocation' => 'NYC', 'theWeather' => 'stormy', 'theLandmarks' => $theLandmarks));
 });
 Route::get('about', function () {
     return 'About content goes here';

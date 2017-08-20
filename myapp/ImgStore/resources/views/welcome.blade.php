@@ -63,7 +63,8 @@
                 margin-bottom: 30px;
             }
         </style>
-        <link rel="stylesheet" href="<?php echo asset('css/mycss.css');?>" type="text/css">
+        <!-- <link rel="stylesheet" href="<?php echo asset('css/mycss.css'); ?>" type="text/css"> -->
+        <link rel="stylesheet" href="{{ URL::asset('css/mycss.css') }}" type="text/css">
     </head>
     <body>
         <div class="flex-center position-ref full-height">
@@ -80,8 +81,24 @@
 
             <div class="content">
                 <div class="title m-b-md highlight">
-                    Laravel
+                    Laravel - Blade has arrived in {{ $theLocation }} on {{ date('M d, Y') }}
                 </div>
+                @if($theWeather == 'sunny')
+                  <p>It is {{ $theWeather }} day</p>
+                @elseif($theWeather == 'stormy')
+                  <p>Bring your umbrella</p>
+                @else
+                  <p>No forecast available</p>
+                @endif
+
+                <p>Don't miss:</p>
+                <ul style='text-align: left'>
+                  @foreach($theLandmarks as $landmark)
+                    @unless($landmark == 'Times square')
+                    <li>{{ $landmark }}</li>
+                    @endunless
+                  @endforeach
+                </ul>
                 <div class="links">
                     <a href="https://laravel.com/docs">Documentation</a>
                     <a href="https://laracasts.com">Laracasts</a>
