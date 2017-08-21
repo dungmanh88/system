@@ -1,0 +1,8 @@
+vagrant ssh hostname
+sudo su -
+passwd vagrant
+set ip public, netmask, gw for vagrant box
+restart network
+change nat network to bridge network
+ssh vagrant@public_ip
+enter passwd of vagrant

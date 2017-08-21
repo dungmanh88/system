@@ -83,10 +83,19 @@ $ORIGIN lab.local.
              604800 )   ; Negative Cache TTL
 
 @ IN NS ns1.lab.local.
-@ IN MX 0 mail.lab.local.
+@ IN MX 10 aspmx.l.lab.local.
+@ IN MX 20 alt1.aspmx.l.lab.local.
+mail IN CNAME  smtp
+
+smtp IN A xx.xx.xx.xx
+smtp IN A yy.yy.yy.yy
 
 ns1 IN A xx.xx.xx.xx
-mail IN A yy.yy.yy.yy
+
+aspmx.l IN A xx.xx.xx.xx
+alt1.aspmx.l IN A yy.yy.yy.yy
+
+postfixadmin IN A xx.xx.xx.xx
 ```
 
 systemctl restart named

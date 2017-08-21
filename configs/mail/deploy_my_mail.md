@@ -19,6 +19,9 @@ disable selinux
 
 # Install
 ```
+yum -y install ntp
+systemctl enable ntpd && \
+systemctl restart ntpd
 yum --enablerepo=centosplus install postfix -y
 systemctl enable postfix && \
 systemctl restart postfix
@@ -29,8 +32,9 @@ systemctl restart dovecot
 ```
 
 ```
-yum -y install epel-release \
-mysql mariadb-server nginx php php-fpm php-mysql php-mbstring php-imap
+yum -y install epel-release
+
+yum -y install mysql mariadb-server nginx php php-fpm php-mysql php-mbstring php-imap
 
 systemctl start mariadb && \
 systemctl enable mariadb && \
@@ -596,3 +600,11 @@ Try to send/receive between account belong different domain - done
 **Send between accounts in same mail server belong different domain that mail service manage, you don't need DNS**
 
 Config my mail server using my dns via /etc/resolv.conf
+
+# High availibility
+- You just install more MTA
+- Setup vmail account
+- Setup SASL implementation + mail_location
+- Metadata db is shared
+- Data mailbox is shared
+- Cert is re-use

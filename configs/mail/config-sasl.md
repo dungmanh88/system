@@ -3,8 +3,53 @@ https://serverfault.com/questions/691795/how-to-force-postfix-smtp-to-use-auth-s
 /etc/dovecot/conf.d/10-auth.conf
 ```
 ...
+disable_plaintext_auth = no
 auth_mechanisms = plain login
+#!include auth-system.conf.ext
+!include auth-sql.conf.ext
 ...
+```
+
+/etc/dovecot/conf.d/auth-sql.conf.ext
+```
+passdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+userdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+```
+
+/etc/dovecot/dovecot-sql.conf.ext
+```
+connect = host=localhost dbname=mail user=postfix password=postfix
+# Use either
+driver = mysql
+# Or
+# driver = pgsql
+
+# Default password scheme - change to match your Postfixadmin setting.
+# depends on your $CONF['encrypt'] setting:
+# md5crypt  -> MD5-CRYPT
+# md5       -> PLAIN-MD5
+# cleartext -> PLAIN
+default_pass_scheme = MD5-CRYPT
+
+# Query to retrieve password. user can be used to retrieve username in other
+# formats also.
+
+password_query = SELECT username AS user,password FROM mailbox WHERE username = '%u' AND active='1'
+
+# Query to retrieve user information, note uid matches dovecot.conf AND Postfix virtual_uid_maps parameter.
+user_query = SELECT maildir, 9999 AS uid, 9999 AS gid FROM mailbox WHERE username = '%u' AND active='1'
+
+
+# MYSQL :
+user_query = SELECT CONCAT('/var/vmail/mail/', maildir) AS home, 9999 AS uid, 9999 AS gid, CONCAT('*:bytes=', quota) AS quota_rule FROM mailbox WHERE username = '%u' AND active='1'
+# PostgreSQL : (no Quota though) :
+# user_query = SELECT '/var/vmail/mail/' || maildir AS home, 9999 as uid, 9999 as gid FROM mailbox WHERE username = '%u' AND active = '1'
 ```
 
 /etc/dovecot/conf.d/10-master.conf
