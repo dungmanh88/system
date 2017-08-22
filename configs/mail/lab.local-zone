@@ -1,0 +1,25 @@
+$TTL 2d
+$ORIGIN lab.local.
+@       IN      SOA     ns1.lab.local. admin.lab.local. (
+                              2017022702         ; Serial
+             604800     ; Refresh
+              86400     ; Retry
+            2419200     ; Expire
+             604800 )   ; Negative Cache TTL
+
+@ IN NS ns1.lab.local.
+@ IN MX 30 aspmx.l.lab.local.
+@ IN MX 20 alt1.aspmx.l.lab.local.
+
+@ IN TXT "lab local space lab"
+@ IN TXT "v=spf1 a mx ~all"
+
+mail IN A xx.xx.xx.xx
+mail IN A yy.yy.yy.yy
+
+ns1 IN A xx.xx.xx.xx
+
+aspmx.l IN A xx.xx.xx.xx
+alt1.aspmx.l IN A yy.yy.yy.yy
+
+postfixadmin IN A xx.xx.xx.xx

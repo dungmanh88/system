@@ -663,6 +663,7 @@ amavisfeed unix    -       -       n        -      2     lmtp
     -o smtpd_client_connection_rate_limit=0
     -o receive_override_options=no_header_body_checks,no_unknown_recipient_checks,no_milters
     -o local_header_rewrite_clients=
+    -o smtpd_tls_security_level=none
 ```
 
 /etc/freshclam.conf
@@ -673,15 +674,178 @@ Comment Example line
 freshclam
 sa-update -D
 
-systemctl enable amavisd-new
-systemctl restart amavisd-new
-telnet localhost 10024
-telnet localhost 10025 (dedicated smtpd)
-systemctl enable spamassassin
-systecmtl restart spamassassin
-
 /etc/postfix/main.cf
 ```
 ...
 content_filter=amavisfeed:[127.0.0.1]:10024
 ```
+
+systemctl enable amavisd && \
+systemctl restart amavisd && \
+systemctl enable spamassassin && \
+systemctl restart spamassassin && \
+systemctl restart postfix
+
+Test amavisd
+```
+telnet localhost 10024
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
+220 [::1] ESMTP amavisd-new service ready
+EHLO localhost
+250-[::1]
+250-VRFY
+250-PIPELINING
+250-SIZE
+250-ENHANCEDSTATUSCODES
+250-8BITMIME
+250-SMTPUTF8
+250-DSN
+250 XFORWARD NAME ADDR PORT PROTO HELO IDENT SOURCE
+quit
+221 2.0.0 [::1] amavisd-new closing transmission channel
+Connection closed by foreign host.
+```
+
+Test the dedicated Postfix smtpd-daemon
+```
+telnet 127.0.0.1 10025
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+220 mail.nal.local ESMTP Postfix
+EHLO localhost
+250-mail.nal.local
+250-PIPELINING
+250-SIZE 10240000
+250-VRFY
+250-ETRN
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-8BITMIME
+250 DSN
+quit
+221 2.0.0 Bye
+Connection closed by foreign host.
+```
+
+Test the new transport chain
+```
+telnet localhost 10024
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
+220 [::1] ESMTP amavisd-new service ready
+HELO localhost
+250 [::1]
+MAIL FROM: <>
+250 2.1.0 Sender <> OK
+RCPT TO: <postmaster>
+250 2.1.5 Recipient <postmaster> OK
+DATA
+354 End data with <CR><LF>.<CR><LF>
+this is a simple message
+.
+250 2.7.0 Ok, discarded, id=20465-02 - spam
+```
+Aug 22 02:40:07 mail amavis[20465]: (20465-02) Blocked SPAM {DiscardedOpenRelay,Quarantined}, [::1] <> -> <postmaster>, mail_id: Ng_ZTwmXVXKx, Hits: 7.853, size: 28, 38657 ms
+
+cd /usr/share/doc/amavisd-new-2.11.0/test-messages/
+perl -pe 's/./chr(ord($&)^255)/sge' <sample.tar.gz.compl | zcat | tar xvf -
+$ sendmail -i your-address@example.com <sample-virus-simple.txt
+$ sendmail -i your-address@example.com <sample-virus-nested.txt
+$ sendmail -i your-address@example.com <sample-nonspam.txt
+$ sendmail -i your-address@example.com <sample-spam-GTUBE-junk.txt
+$ sendmail -i your-address@example.com <sample-spam-GTUBE-nojunk.txt
+$ sendmail -i your-address@example.com <sample-spam.txt   # old sample
+$ sendmail -i your-address@example.com <sample-42-mail-bomb.txt
+$ sendmail -i your-address@example.com <sample-badh.txt
+
+https://easyengine.io/tutorials/mail/server/testing/antivirus/
+wget https://secure.eicar.org/eicar.com.txt
+sendmail -i dungnm@nal.local < eicar.com.txt
+# Deploy SPF
+https://www.linode.com/docs/email/postfix/configure-spf-and-dkim-in-postfix-on-debian-8
+Config named lab.local-zone
+yum -y install pypolicyd-spf
+useradd -d /dev/null -s /sbin/nologin -c "policyd spf" policyd-spf
+/etc/python-policyd-spf/policyd-spf.conf
+```
+#  For a fully commented sample config file see policyd-spf.conf.commented
+
+debugLevel = 1
+defaultSeedOnly = 1
+
+Mail_From_reject = Fail
+HELO_reject = SPF_Not_Pass
+
+PermError_reject = True
+TempError_Defer = True
+
+skip_addresses = 127.0.0.0/8,::ffff:127.0.0.0/104,::1
+```
+/etc/postfix/master.cf
+```
+policyd-spf  unix  -       n       n       -       0       spawn
+    user=policyd-spf argv=/usr/libexec/postfix/policyd-spf
+```
+
+/etc/postfix/main.cf
+```
+smtpd_recipient_restrictions =
+        reject_unauth_destination,
+        check_policy_service unix:postgrey/socket,
+        check_policy_service unix:private/policyd-spf,  ### add new
+        permit
+
+policyd-spf_time_limit = 3600
+```
+systemctl restart postfix
+# Deploy DKIM
+```
+yum install opendkim
+```
+
+/etc/opendkim.conf
+```
+# This is a basic configuration that can easily be adapted to suit a standard
+# installation. For more advanced options, see opendkim.conf(5) and/or
+# /usr/share/doc/opendkim/examples/opendkim.conf.sample.
+
+# Log to syslog
+Syslog			yes
+# Required to use local socket with MTAs that access the socket as a non-
+# privileged user (e.g. Postfix)
+UMask			002
+# OpenDKIM user
+# Remember to add user postfix to group opendkim
+UserID			opendkim
+
+# Map domains in From addresses to keys used to sign messages
+KeyTable		/etc/opendkim/key.table
+SigningTable		refile:/etc/opendkim/signing.table
+
+# Hosts to ignore when verifying signatures
+ExternalIgnoreList	/etc/opendkim/trusted.hosts
+InternalHosts		/etc/opendkim/trusted.hosts
+
+# Commonly-used options; the commented-out versions show the defaults.
+Canonicalization	relaxed/simple
+Mode			sv
+SubDomains		no
+#ADSPAction		continue
+AutoRestart		yes
+AutoRestartRate		10/1M
+Background		yes
+DNSTimeout		5
+SignatureAlgorithm	rsa-sha256
+
+# Always oversign From (sign using actual From and a null From to prevent
+# malicious signatures header fields (From and/or others) between the signer
+# and the verifier.  From is oversigned by default in the Debian pacakge
+# because it is often the identity key used by reputation systems and thus
+# somewhat security sensitive.
+OversignHeaders		From
+```
+TBC
