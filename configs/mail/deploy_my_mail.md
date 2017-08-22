@@ -602,9 +602,86 @@ Try to send/receive between account belong different domain - done
 Config my mail server using my dns via /etc/resolv.conf
 
 # High availibility
-- You just install more MTA
+- Setup more MTA
 - Setup vmail account
-- Setup SASL implementation + mail_location
+- Setup more dovecot
 - Metadata db is shared
 - Data mailbox is shared
 - Cert is re-use
+
+# Deploy greylisting
+```
+yum -y install postgrey
+systemctl enable postgrey
+systemctl start postgrey
+```
+/etc/postfix/main.cf
+```
+smtpd_recipient_restrictions =
+#        permit_mynetworks,
+        reject_unauth_destination,
+        check_policy_service unix:postgrey/socket,
+        permit
+```
+/etc/sysconfig/postgrey
+```
+POSTGREY_OPTS="--delay=60"
+```
+systemctl restart postfix
+
+# Deploy spamassasin + clamav + amavisd-new
+```
+yum -y install spamassassin spamass-milter spamass-milter-postfix && \
+yum -y install clamav clamav-milter clamav-lib clamav-scanner clamav-scanner-systemd clamav-server clamav-server-systemd clamav-filesystem clamav-update clamav-milter-systemd clamav-data && \
+yum -y install amavisd-new
+```
+https://www.ijs.si/software/amavisd/README.postfix.html
+/etc/postfix/master.cf
+```
+...
+amavisfeed unix    -       -       n        -      2     lmtp
+    -o lmtp_data_done_timeout=1200
+    -o lmtp_send_xforward_command=yes
+    -o disable_dns_lookups=yes
+    -o max_use=20
+
+127.0.0.1:10025 inet n    -       n       -       -     smtpd
+    -o content_filter=
+    -o smtpd_delay_reject=no
+    -o smtpd_client_restrictions=permit_mynetworks,reject
+    -o smtpd_helo_restrictions=
+    -o smtpd_sender_restrictions=
+    -o smtpd_recipient_restrictions=permit_mynetworks,reject
+    -o smtpd_data_restrictions=reject_unauth_pipelining
+    -o smtpd_end_of_data_restrictions=
+    -o smtpd_restriction_classes=
+    -o mynetworks=127.0.0.0/8
+    -o smtpd_error_sleep_time=0
+    -o smtpd_soft_error_limit=1001
+    -o smtpd_hard_error_limit=1000
+    -o smtpd_client_connection_count_limit=0
+    -o smtpd_client_connection_rate_limit=0
+    -o receive_override_options=no_header_body_checks,no_unknown_recipient_checks,no_milters
+    -o local_header_rewrite_clients=
+```
+
+/etc/freshclam.conf
+Comment Example line
+
+/etc/sysconfig/fresclam
+
+freshclam
+sa-update -D
+
+systemctl enable amavisd-new
+systemctl restart amavisd-new
+telnet localhost 10024
+telnet localhost 10025 (dedicated smtpd)
+systemctl enable spamassassin
+systecmtl restart spamassassin
+
+/etc/postfix/main.cf
+```
+...
+content_filter=amavisfeed:[127.0.0.1]:10024
+```
