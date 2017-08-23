@@ -1,0 +1,50 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.define "proxy" do |proxy|
+    proxy.vm.hostname = 'proxy'
+    proxy.vm.box = "bento/centos-7.3"
+    proxy.vm.network "forwarded_port", guest: 80, host: 8080
+    proxy.vm.network :private_network, ip: "192.168.56.100"
+    proxy.vm.synced_folder "proxy_ws/", "/data"
+    proxy.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+
+  config.vm.define "web1" do |web1|
+    web1.vm.hostname = 'web1'
+    web1.vm.box = "bento/centos-7.3"
+
+    web1.vm.network :private_network, ip: "192.168.56.101"
+    web1.vm.synced_folder "web1_ws/", "/srv/website"
+    web1.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+
+  config.vm.define "web2" do |web2|
+    web2.vm.hostname = 'web2'
+    web2.vm.box = "bento/centos-7.3"
+
+    web2.vm.network :private_network, ip: "192.168.56.102"
+    web2.vm.synced_folder "web2_ws/", "/srv/website"
+    web2.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+
+  config.vm.define "db" do |db|
+    db.vm.hostname = 'db'
+    db.vm.box = "bento/centos-7.3"
+
+    db.vm.network :private_network, ip: "192.168.56.103"
+    db.vm.synced_folder "db_ws/", "/data/"
+    db.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 512]
+      v.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+  end
+end
