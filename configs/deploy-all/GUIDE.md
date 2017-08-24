@@ -11,15 +11,15 @@ App
 DB_CONNECTION=mysql
 DB_HOST=192.168.56.103
 DB_PORT=3306
-DB_DATABASE=nissan
-DB_USERNAME=nissan
-DB_PASSWORD=nissan
+DB_DATABASE=mycode
+DB_USERNAME=mycode
+DB_PASSWORD=mycode
 ```
 Put source code into web1_ws and web2_ws
-cp -r nissan_user_portal/* web1_ws/
-cp -r nissan_user_portal/* web2_ws/
-cp nissan_user_portal/.env web1_ws/
-cp nissan_user_portal/.env web2_ws/
+cp -r mycode_user_portal/* web1_ws/
+cp -r mycode_user_portal/* web2_ws/
+cp mycode_user_portal/.env web1_ws/
+cp mycode_user_portal/.env web2_ws/
 cd web1,2_ws/public
 rm -rf storage/
 ln -s ../storage/app/public/ storage
@@ -214,8 +214,8 @@ systemctl start mariadb
 systemctl enable mariadb
 mysql_secure_installation root/abc123
 mysql -u root -p
-create database nissan;
-grant all privileges on `nissan`.* to 'nissan'@'192.168.56.%' identified by 'nissan';
+create database mycode;
+grant all privileges on `mycode`.* to 'mycode'@'192.168.56.%' identified by 'mycode';
 
 config 127.0.0.1 workshop.lab.local
 
