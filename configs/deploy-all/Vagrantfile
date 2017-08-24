@@ -17,7 +17,8 @@ Vagrant.configure("2") do |config|
     web1.vm.box = "bento/centos-7.3"
 
     web1.vm.network :private_network, ip: "192.168.56.101"
-    web1.vm.synced_folder "web1_ws/", "/srv/website"
+#    web1.vm.network "forwarded_port", guest: 80, host: 9999
+    web1.vm.synced_folder "web1_ws/", "/data"
     web1.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]
@@ -29,7 +30,7 @@ Vagrant.configure("2") do |config|
     web2.vm.box = "bento/centos-7.3"
 
     web2.vm.network :private_network, ip: "192.168.56.102"
-    web2.vm.synced_folder "web2_ws/", "/srv/website"
+    web2.vm.synced_folder "web2_ws/", "/data"
     web2.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]
