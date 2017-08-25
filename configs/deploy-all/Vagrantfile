@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
     proxy.vm.box = "bento/centos-7.3"
     proxy.vm.network "forwarded_port", guest: 80, host: 8080
     proxy.vm.network :private_network, ip: "192.168.56.100"
-    proxy.vm.synced_folder "proxy_ws/", "/data"
+    proxy.vm.provision "shell", path:"install/proxy-package.sh"
     proxy.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]
@@ -17,8 +17,9 @@ Vagrant.configure("2") do |config|
     web1.vm.box = "bento/centos-7.3"
 
     web1.vm.network :private_network, ip: "192.168.56.101"
-#    web1.vm.network "forwarded_port", guest: 80, host: 9999
-    web1.vm.synced_folder "web1_ws/", "/data"
+    web1.vm.network "forwarded_port", guest: 80, host: 9999
+    web1.vm.provision "shell", path:"install/web-package.sh"
+    web1.vm.synced_folder "src/", "/data"
     web1.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]
@@ -30,7 +31,8 @@ Vagrant.configure("2") do |config|
     web2.vm.box = "bento/centos-7.3"
 
     web2.vm.network :private_network, ip: "192.168.56.102"
-    web2.vm.synced_folder "web2_ws/", "/data"
+    web2.vm.provision "shell", path:"install/web-package.sh"
+    web2.vm.synced_folder "src/", "/data"
     web2.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]
@@ -42,7 +44,7 @@ Vagrant.configure("2") do |config|
     db.vm.box = "bento/centos-7.3"
 
     db.vm.network :private_network, ip: "192.168.56.103"
-    db.vm.synced_folder "db_ws/", "/data/"
+    db.vm.provision "shell", path:"install/db-package.sh"
     db.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--memory", 512]
       v.customize ["modifyvm", :id, "--cpus", "1"]

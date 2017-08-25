@@ -1,34 +1,30 @@
 ```
 vagrant up
+vagrant reload --provision
 vagrant ssh web1
 vagrant ssh web2
 vagrant ssh db
 vagarnt ssh proxy
 ```
-App
-.env
-```
-DB_CONNECTION=mysql
-DB_HOST=192.168.56.103
-DB_PORT=3306
-DB_DATABASE=mycode
-DB_USERNAME=mycode
-DB_PASSWORD=mycode
-```
-Put source code into web1_ws and web2_ws
-cp -r mycode_user_portal/* web1_ws/
-cp -r mycode_user_portal/* web2_ws/
-cp mycode_user_portal/.env web1_ws/
-cp mycode_user_portal/.env web2_ws/
-cd web1,2_ws/public
-rm -rf storage/
-ln -s ../storage/app/public/ storage
+#App
+#.env
+
+#DB_CONNECTION=mysql
+#DB_HOST=192.168.56.103
+#DB_PORT=3306
+#DB_DATABASE=mycode
+#DB_USERNAME=mycode
+#DB_PASSWORD=mycode
+
+#cd src/public
+#rm -rf storage/
+#ln -s ../storage/app/public/ storage
 
 PROXY: 192.168.56.100 - cache
-yum -y install epel-release
-yum -y install nginx httpd-tools
-systemctl start nginx
-systemctl enable nginx
+#yum -y install epel-release
+#yum -y install nginx
+#systemctl start nginx
+#systemctl enable nginx
 
 /etc/nginx/conf.d/web.conf
 ```
@@ -73,16 +69,16 @@ chown -R nginx:nginx /cache/
 
 
 WEB1: 192.168.56.101 - web
-yum -y install epel-release
-cd /tmp
-wget https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-rpm -vih remi-release-7.rpm
-yum -y install --enablerepo=remi-php71,remi php php-fpm php-mysql php-mbstring php-xml
-yum -y install nginx httpd-tools mysql
-systemctl start nginx
-systemctl start php-fpm
-systemctl enable nginx
-systemctl enable php-fpm
+#yum -y install epel-release
+#cd /tmp
+#wget https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+#rpm -vih remi-release-7.rpm
+#yum -y install --enablerepo=remi-php71,remi php php-fpm php-mysql php-mbstring php-xml
+#yum -y install nginx mysql
+#systemctl start nginx
+#systemctl start php-fpm
+#systemctl enable nginx
+#systemctl enable php-fpm
 
 /etc/nginx/conf.d/web.conf
 ```
@@ -142,16 +138,16 @@ php artisan migrate
 
 
 WEB2: 192.168.56.102 - web
-yum -y install epel-release
-cd /tmp
-wget https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-rpm -vih remi-release-7.rpm
-yum -y install --enablerepo=remi-php71,remi php php-fpm php-mysql php-mbstring php-xml
-yum -y install nginx httpd-tools mysql
-systemctl start nginx
-systemctl start php-fpm
-systemctl enable nginx
-systemctl enable php-fpm
+#yum -y install epel-release
+#cd /tmp
+#wget https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+#rpm -vih remi-release-7.rpm
+#yum -y install --enablerepo=remi-php71,remi php php-fpm php-mysql php-mbstring php-xml
+#yum -y install nginx mysql
+#systemctl start nginx
+#systemctl start php-fpm
+#systemctl enable nginx
+#systemctl enable php-fpm
 
 /etc/nginx/conf.d/web.conf
 ```
@@ -208,10 +204,10 @@ php artisan optimize && \
 php artisan migrate
 
 DB: 192.168.56.103 - db
-yum -y install epel-release
-yum -y install mysql mariadb-server
-systemctl start mariadb
-systemctl enable mariadb
+#yum -y install epel-release
+#yum -y install mysql mariadb-server
+#systemctl start mariadb
+#systemctl enable mariadb
 mysql_secure_installation root/abc123
 mysql -u root -p
 create database mycode;
