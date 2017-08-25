@@ -23,6 +23,11 @@ Update package in VM
 vagrant reload --provision
 ```
 
+Update box
+```
+vagrant box update
+```
+
 SSH to VM
 ```
 vagrant ssh
