@@ -17,6 +17,12 @@ exportfs -v
 
 # Client
 yum -y install nfs-utils nfs-utils-lib
+
+service rpcbind start
+chkconfig rpcbind on
+service nfs start
+chkconfig nfs on
+
 showmount -e xx.xx.xx.xx
 Export list for xx.xx.xx.xx:
 /var/vmail/mail *

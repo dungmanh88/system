@@ -714,9 +714,9 @@ telnet 127.0.0.1 10025
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
 Escape character is '^]'.
-220 mail.nal.local ESMTP Postfix
+220 mail.lab.local ESMTP Postfix
 EHLO localhost
-250-mail.nal.local
+250-mail.lab.local
 250-PIPELINING
 250-SIZE 10240000
 250-VRFY
@@ -764,7 +764,7 @@ $ sendmail -i your-address@example.com <sample-badh.txt
 
 https://easyengine.io/tutorials/mail/server/testing/antivirus/
 wget https://secure.eicar.org/eicar.com.txt
-sendmail -i dungnm@nal.local < eicar.com.txt
+sendmail -i dungnm@lab.local < eicar.com.txt
 # Deploy SPF
 https://www.linode.com/docs/email/postfix/configure-spf-and-dkim-in-postfix-on-debian-8
 Config named lab.local-zone
@@ -803,49 +803,67 @@ policyd-spf_time_limit = 3600
 ```
 systemctl restart postfix
 # Deploy DKIM
+https://www.rosehosting.com/blog/how-to-install-and-integrate-opendkim-with-postfix-on-a-centos-6-vps/
 ```
 yum install opendkim
 ```
 
+mv /etc/opendkim.conf /etc/opendkim.conf.orig
 /etc/opendkim.conf
 ```
-# This is a basic configuration that can easily be adapted to suit a standard
-# installation. For more advanced options, see opendkim.conf(5) and/or
-# /usr/share/doc/opendkim/examples/opendkim.conf.sample.
-
-# Log to syslog
-Syslog			yes
-# Required to use local socket with MTAs that access the socket as a non-
-# privileged user (e.g. Postfix)
-UMask			002
-# OpenDKIM user
-# Remember to add user postfix to group opendkim
-UserID			opendkim
-
-# Map domains in From addresses to keys used to sign messages
-KeyTable		/etc/opendkim/key.table
-SigningTable		refile:/etc/opendkim/signing.table
-
-# Hosts to ignore when verifying signatures
-ExternalIgnoreList	/etc/opendkim/trusted.hosts
-InternalHosts		/etc/opendkim/trusted.hosts
-
-# Commonly-used options; the commented-out versions show the defaults.
-Canonicalization	relaxed/simple
-Mode			sv
-SubDomains		no
-#ADSPAction		continue
-AutoRestart		yes
-AutoRestartRate		10/1M
-Background		yes
-DNSTimeout		5
-SignatureAlgorithm	rsa-sha256
-
-# Always oversign From (sign using actual From and a null From to prevent
-# malicious signatures header fields (From and/or others) between the signer
-# and the verifier.  From is oversigned by default in the Debian pacakge
-# because it is often the identity key used by reputation systems and thus
-# somewhat security sensitive.
-OversignHeaders		From
+AutoRestart             Yes
+AutoRestartRate         10/1h
+LogWhy                  Yes
+Syslog                  Yes
+SyslogSuccess           Yes
+Mode                    sv
+Canonicalization        relaxed/simple
+ExternalIgnoreList      refile:/etc/opendkim/trusted.hosts
+InternalHosts           refile:/etc/opendkim/trusted.hosts
+KeyTable                refile:/etc/opendkim/key.table
+SigningTable            refile:/etc/opendkim/signing.table
+SignatureAlgorithm      rsa-sha256
+Socket                  inet:8891@localhost
+PidFile                 /var/run/opendkim/opendkim.pid
+UMask                   022
+UserID                  opendkim:opendkim
+TemporaryDirectory      /var/tmp
 ```
-TBC
+
+mkdir -p /etc/opendkim/keys/lab.local
+opendkim-genkey -D /etc/opendkim/keys/lab.local/ -d lab.local -s default
+chown -R opendkim: /etc/opendkim/keys/lab.local/
+mv /etc/opendkim/keys/lab.local/default.private /etc/opendkim/keys/lab.local/default
+
+/etc/opendkim/signing.table
+```
+*@lab.local default._domainkey.lab.local
+```
+/etc/opendkim/key.table
+```
+default._domainkey.lab.local lab.local:default:/etc/opendkim/keys/lab.local/default
+```
+/etc/opendkim/trusted.hosts
+```
+127.0.0.1
+```
+
+systemctl restart opendkim
+systemctl enable opendkim
+
+/etc/postfix/main.cf
+```
+smtpd_milters           = inet:127.0.0.1:8891
+non_smtpd_milters       = $smtpd_milters
+milter_default_action   = accept
+milter_protocol         = 2
+```
+
+systemctl restart postfix
+
+configure dns
+```
+default._domainkey      IN      TXT     ( "v=DKIM1; k=rsa; "
+          "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDV5EbzBMBmHrgj48xrczO+qsad/NYOgUH9cCiBvEAhaha1trqf/cPkgEWmpq/94WOnPmE+utWr/VCB8+KXi5fZ05qDWO8ESRDUqa8rE7z8vwOTmk9S/OjtVQY3g5JTfWRlrAxv/BzbPHQ+G2qbPi3lPHxVMPPxZvKKiAQhFyhvQIDAQAB" )  ; ----- DKIM key default for lab.local
+```
+systemctl restart named

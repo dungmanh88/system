@@ -34,6 +34,11 @@ cat /etc/group | grep groupname
 usermod -G "" username
 ```
 
+## Remove user from group
+```
+gpasswd -d user group
+```
+
 # User management
 ## Check user
 ```
