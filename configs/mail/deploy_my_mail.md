@@ -312,12 +312,12 @@ smtps     inet  n       -       n       -       -       smtpd
   -o syslog_name=postfix/smtps
   -o smtpd_tls_wrappermode=yes
   -o smtpd_sasl_auth_enable=yes
-#  -o smtpd_reject_unlisted_recipient=no
+  -o smtpd_reject_unlisted_recipient=no
 #  -o smtpd_client_restrictions=$mua_client_restrictions
 #  -o smtpd_helo_restrictions=$mua_helo_restrictions
 #  -o smtpd_sender_restrictions=$mua_sender_restrictions
   -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
-#  -o milter_macro_daemon_name=ORIGINATING
+  -o milter_macro_daemon_name=ORIGINATING
 ```
 
 ```
@@ -670,6 +670,26 @@ amavisfeed unix    -       -       n        -      2     lmtp
 Comment Example line
 
 /etc/sysconfig/fresclam
+```
+## When changing the periodicity of freshclam runs in the crontab,
+## this value must be adjusted also. Its value is the timespan between
+## two subsequent freshclam runs in minutes. E.g. for the default
+##
+## | 0 */3 * * *  ...
+##
+## crontab line, the value is 180 (minutes).
+# FRESHCLAM_MOD=
+
+## A predefined value for the delay in seconds. By default, the value is
+## calculated by the 'hostid' program. This predefined value guarantees
+## constant timespans of 3 hours between two subsequent freshclam runs.
+##
+## This option accepts two special values:
+## 'disabled-warn'  ...  disables the automatic freshclam update and
+##                         gives out a warning
+## 'disabled'       ...  disables the automatic freshclam silently
+# FRESHCLAM_DELAY=
+```
 
 freshclam
 sa-update -D
@@ -754,17 +774,19 @@ Aug 22 02:40:07 mail amavis[20465]: (20465-02) Blocked SPAM {DiscardedOpenRelay,
 cd /usr/share/doc/amavisd-new-2.11.0/test-messages/
 perl -pe 's/./chr(ord($&)^255)/sge' <sample.tar.gz.compl | zcat | tar xvf -
 $ sendmail -i your-address@example.com <sample-virus-simple.txt
-$ sendmail -i your-address@example.com <sample-virus-nested.txt
-$ sendmail -i your-address@example.com <sample-nonspam.txt
+$ sendmail -i your-address@example.com <sample-executable.txt (PASS)
+$ sendmail -i your-address@example.com <sample-virus-nested.txt (PASS)
+$ sendmail -i your-address@example.com <sample-nonspam.txt (PASS)
 $ sendmail -i your-address@example.com <sample-spam-GTUBE-junk.txt
 $ sendmail -i your-address@example.com <sample-spam-GTUBE-nojunk.txt
-$ sendmail -i your-address@example.com <sample-spam.txt   # old sample
+$ sendmail -i your-address@example.com <sample-spam.txt   # old sample (PASS)
 $ sendmail -i your-address@example.com <sample-42-mail-bomb.txt
 $ sendmail -i your-address@example.com <sample-badh.txt
 
 https://easyengine.io/tutorials/mail/server/testing/antivirus/
 wget https://secure.eicar.org/eicar.com.txt
 sendmail -i dungnm@lab.local < eicar.com.txt
+
 # Deploy SPF
 https://www.linode.com/docs/email/postfix/configure-spf-and-dkim-in-postfix-on-debian-8
 Config named lab.local-zone
