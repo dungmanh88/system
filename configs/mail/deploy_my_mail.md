@@ -827,18 +827,17 @@ systemctl restart postfix
 # Deploy DKIM
 https://www.rosehosting.com/blog/how-to-install-and-integrate-opendkim-with-postfix-on-a-centos-6-vps/
 ```
-yum install opendkim
+yum -y install opendkim
 ```
 
 mv /etc/opendkim.conf /etc/opendkim.conf.orig
 /etc/opendkim.conf
 ```
-AutoRestart             Yes
-AutoRestartRate         10/1h
 LogWhy                  Yes
 Syslog                  Yes
 SyslogSuccess           Yes
 Mode                    sv
+Domain                  lab.local
 Canonicalization        relaxed/simple
 ExternalIgnoreList      refile:/etc/opendkim/trusted.hosts
 InternalHosts           refile:/etc/opendkim/trusted.hosts
@@ -850,6 +849,10 @@ PidFile                 /var/run/opendkim/opendkim.pid
 UMask                   022
 UserID                  opendkim:opendkim
 TemporaryDirectory      /var/tmp
+On-BadSignature         reject
+On-SignatureError       reject
+RequiredHeaders         Yes
+On-KeyNotFound          reject
 ```
 
 mkdir -p /etc/opendkim/keys/lab.local
@@ -870,17 +873,18 @@ default._domainkey.lab.local lab.local:default:/etc/opendkim/keys/lab.local/defa
 127.0.0.1
 ```
 
-systemctl restart opendkim
-systemctl enable opendkim
-
-/etc/postfix/main.cf
+/etc/postfix/main.cf - before content_filter
+after the smtpd_recipient_restrictions entry
 ```
 smtpd_milters           = inet:127.0.0.1:8891
 non_smtpd_milters       = $smtpd_milters
 milter_default_action   = accept
-milter_protocol         = 2
+#milter_protocol         = 2
+milter_protocol         = 6
 ```
 
+systemctl restart opendkim && \
+systemctl enable opendkim && \
 systemctl restart postfix
 
 configure dns
