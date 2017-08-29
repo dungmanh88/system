@@ -68,3 +68,8 @@ mysql> flush privileges;
 mysql> alter user 'root'@'localhost' identified by 'abc123';
 mysql> flush privileges;
 ```
+
+# Alter something
+```
+ALTER TABLE users MODIFY COLUMN remember_token VARCHAR(100) NULL;
+```

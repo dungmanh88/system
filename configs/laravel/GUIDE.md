@@ -16,7 +16,7 @@ mv composer.phar /usr/local/bin/composer
 # Install mcrypt
 https://stackoverflow.com/questions/16830405/laravel-requires-the-mcrypt-php-extension
 ```
-yum install php-mcrypt
+yum install -y php-mcrypt php-mbstring php-xml
 ```
 
 # Install laravel
@@ -24,9 +24,22 @@ https://laravel.com/docs/5.4/installation
 ```
 Do not run Composer as root/super user! See https://getcomposer.org/root for details
 
+If you do not have existing project
+```
 composer create-project laravel/laravel ImgStore --prefer-dist
-
+```
 You get done when you get Application key
+
+If you have a existing project
+```
+cd ImgStore/
+composer install
+cp .env.example .env
+rm -f .gitignore
+php artisan key:generate
+php artisan config:clear
+php artisan migrate
+```
 
 cd ImgStore/
 php artisan serve

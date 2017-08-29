@@ -780,7 +780,7 @@ $ sendmail -i your-address@example.com <sample-nonspam.txt (PASS)
 $ sendmail -i your-address@example.com <sample-spam-GTUBE-junk.txt
 $ sendmail -i your-address@example.com <sample-spam-GTUBE-nojunk.txt
 $ sendmail -i your-address@example.com <sample-spam.txt   # old sample (PASS)
-$ sendmail -i your-address@example.com <sample-42-mail-bomb.txt
+$ sendmail -i your-address@example.com <sample-42-mail-bomb.txt (PASS)
 $ sendmail -i your-address@example.com <sample-badh.txt
 
 https://easyengine.io/tutorials/mail/server/testing/antivirus/
