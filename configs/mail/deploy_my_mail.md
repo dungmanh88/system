@@ -175,6 +175,7 @@ mydestination = $myhostname, localhost.$mydomain, localhost
 unknown_local_recipient_reject_code = 550
 
 mynetworks_style = subnet
+mynetworks_style = host
 relay_domains = <domain list separate by comma>
 
 alias_maps = hash:/etc/aliases
@@ -225,12 +226,27 @@ virtual_alias_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf,
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
 
-smtpd_relay_restrictions = permit_auth_destination, defer_unauth_destination
+
+smtpd_relay_restrictions = reject_unauth_destination
+#                       permit_sasl_authenticated, reject
+#smtpd_recipient_restrictions =
+#    check_client_access hash:/etc/postfix/client_access,
+#    check_sender_access hash:/etc/postfix/access,
+#    reject
+smtpd_recipient_restrictions = reject_unauth_destination, check_recipient_access hash:/etc/postfix/access-inbound,
+       permit_sasl_authenticated,
+       reject
 
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 smtpd_sasl_auth_enable = yes
 ```
+
+/etc/postfix/access-inbound
+```
+lab.local               OK
+```
+postmap /etc/postfix/access-inbound
 
 mkdir -p /etc/postfix/sql
 
@@ -617,11 +633,10 @@ systemctl start postgrey
 ```
 /etc/postfix/main.cf
 ```
-smtpd_recipient_restrictions =
-#        permit_mynetworks,
-        reject_unauth_destination,
-        check_policy_service unix:postgrey/socket,
-        permit
+smtpd_recipient_restrictions = reject_unauth_destination, check_recipient_access hash:/etc/postfix/access-inbound,
+        permit_sasl_authenticated,
+        check_policy_service unix:postgrey/socket,  ### add new
+        reject
 ```
 /etc/sysconfig/postgrey
 ```
@@ -815,11 +830,11 @@ policyd-spf  unix  -       n       n       -       0       spawn
 
 /etc/postfix/main.cf
 ```
-smtpd_recipient_restrictions =
-        reject_unauth_destination,
+smtpd_recipient_restrictions = reject_unauth_destination, check_recipient_access hash:/etc/postfix/access-inbound,
+        permit_sasl_authenticated,
         check_policy_service unix:postgrey/socket,
-        check_policy_service unix:private/policyd-spf,  ### add new
-        permit
+        check_policy_service unix:private/policyd-spf, ### add new
+        reject
 
 policyd-spf_time_limit = 3600
 ```
@@ -893,3 +908,47 @@ default._domainkey      IN      TXT     ( "v=DKIM1; k=rsa; "
           "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDV5EbzBMBmHrgj48xrczO+qsad/NYOgUH9cCiBvEAhaha1trqf/cPkgEWmpq/94WOnPmE+utWr/VCB8+KXi5fZ05qDWO8ESRDUqa8rE7z8vwOTmk9S/OjtVQY3g5JTfWRlrAxv/BzbPHQ+G2qbPi3lPHxVMPPxZvKKiAQhFyhvQIDAQAB" )  ; ----- DKIM key default for lab.local
 ```
 systemctl restart named
+
+
+### Final rules in /etc/postfix/main.cf
+```
+myhostname = mail.lab.local
+mydomain = lab.local
+myorigin = $mydomain
+
+inet_interfaces = all
+inet_protocols = ipv4
+
+mydestination = $myhostname, localhost.$mydomain, localhost
+
+mynetworks_style = subnet
+mynetworks_style = host
+
+relay_domains = lab.dev
+smtpd_relay_restrictions = reject_unauth_destination
+
+#                       permit_sasl_authenticated, reject
+#smtpd_recipient_restrictions =
+#    check_client_access hash:/etc/postfix/client_access,
+#    check_sender_access hash:/etc/postfix/access,
+#    reject
+
+smtpd_recipient_restrictions = reject_unauth_destination, check_recipient_access hash:/etc/postfix/access-inbound,
+        permit_sasl_authenticated,
+        check_policy_service unix:postgrey/socket,
+        check_policy_service unix:private/policyd-spf,
+        reject
+
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_auth_enable = yes
+
+smtpd_milters           = inet:127.0.0.1:8891
+non_smtpd_milters       = $smtpd_milters
+milter_default_action   = accept
+milter_protocol         = 6
+
+
+content_filter=amavisfeed:[127.0.0.1]:10024
+policyd-spf_time_limit = 3600
+```

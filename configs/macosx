@@ -1,0 +1,5 @@
+copy file from mac to windows server using microsoft remote desktop
+create an account > compmgmt.msc > create user with privileges: Users + Remote Desktop User
+
+https://apple.stackexchange.com/questions/7949/how-can-i-copy-files-from-my-mac-to-pc-via-microsoft-remote-desktop
+Add folder redirection for sharing.
