@@ -20,6 +20,29 @@ Route::get('/register', function(){
     return view('register');
 });
 
+Route::get('/login', function(){
+    return view('login');
+});
+
+Route::post('/login', function(){
+    $credentials = Input::only('username', 'password');
+    if(Auth::attempt($credentials)) {
+      return Redirect::intended('/');
+    }
+    return Redirect::to('login');
+});
+
+Route::get('/logout', function(){
+    Auth::logout();
+    return view('logout');
+});
+
+Route::get('spotlight', array(
+  'before' => 'auth.basic',
+  function(){
+    return view('spotlight');
+}));
+
 Route::post('/register', function(){
   $user = new User;
   $user->email = Input::get('email');
