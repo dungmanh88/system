@@ -1,0 +1,56 @@
+https://docs.sonarqube.org/display/PLUG/Usage+of+JaCoCo+with+Java+Plugin
+https://github.com/SonarSource/sonar-examples/tree/master/projects/languages/java/code-coverage/ut/ut-maven-jacoco
+
+
+settings.xml
+```
+<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+```
+
+.gitlab-ci.yml
+```
+..
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pcoverage-per-test
+- mvn sonar:sonar -P <profile-id>
+..
+```
+
+pom.xml
+```
+..
+<!-- BEGIN: Specific to mapping unit tests and covered code -->
+  <profiles>
+    <profile>
+      <id>coverage-per-test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <!-- Minimal supported version is 2.4 -->
+            <version>2.13</version>
+            <configuration>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>org.sonar.java.jacoco.JUnitListener</value>
+                </property>
+              </properties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.sonarsource.java</groupId>
+          <artifactId>sonar-jacoco-listeners</artifactId>
+          <version>3.8</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+  <!-- END: Specific to mapping unit tests and covered code -->
+..
+```

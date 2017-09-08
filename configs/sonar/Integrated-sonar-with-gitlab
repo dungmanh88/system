@@ -1,0 +1,125 @@
+# On Sonar
+https://gitlab.talanlabs.com/gabriel-allaigre/sonar-gitlab-plugin
+```
+wget https://github.com/gabrie-allaigre/sonar-gitlab-plugin/releases/download/2.1.0/sonar-gitlab-plugin-2.1.0.jar
+cp sonar-gitlab-plugin-2.1.0.jar /opt/sonar/extensions/plugins/
+/opt/sonar/bin/linux-x86-64/sonar.sh restart
+```
+
+# On shell runner
+## Install mvn
+https://tecadmin.net/install-apache-maven-on-centos/
+jdk-8u144-linux-x64.rpm
+```
+rpm -iv jdk-8u144-linux-x64.rpm
+jre:
+/usr/java/jdk1.8.0_144/jre/bin/
+jdk:
+/usr/java/jdk1.8.0_144/bin
+```
+/etc/profile.d/java.sh
+```
+export JAVA_HOME=/usr/java/jdk1.8.0_144
+```
+```
+source /etc/profile.d/java.sh
+```
+```
+wget http://www-eu.apache.org/dist/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz
+tar xvzf apache-maven-3.5.0-bin.tar.gz
+mv apache-maven-3.5.0 /opt/maven
+```
+/etc/profile.d/maven.sh
+```
+export MAVEN_HOME=/opt/maven
+export PATH=${MAVEN_HOME}/bin:${PATH}
+```
+```
+source /etc/profile.d/maven.sh
+```
+
+## Check java and mvn
+```
+java -version
+mvn -version
+```
+
+## Config maven using sonar
+https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Maven
+https://github.com/skhatri/grunt-sonar-runner/issues/15
+http://maven.apache.org/guides/introduction/introduction-to-profiles.html
+https://docs.sonarqube.org/display/SONAR/Analysis+Parameters
+
+$MAVEN_HOME/conf/settings.xml
+```
+<settings>
+    <pluginGroups>
+        <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+    </pluginGroups>
+    <profiles>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Optional URL to server. Default value is http://localhost:9000 -->
+                <sonar.host.url>
+                  http://sonar-server:9000
+                </sonar.host.url>
+          <sonar.login>admin</sonar.login>
+          <sonar.password>admin</sonar.password>
+          <sonar.sources>src/java</sonar.sources>
+            </properties>
+        </profile>
+     </profiles>
+</settings>
+```
+
+# On gitlab
+https://docs.sonarqube.org/display/PLUG/SonarJava
+https://github.com/SonarSource/sonar-examples/blob/master/projects/languages/java/maven/java-maven-simple/pom.xml
+https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Maven
+
+pom.xml
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonarqube</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+  <name>test</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.language>java</sonar.language>
+  </properties>
+</project>
+```
+.gitlab-ci.yml
+```
+stages:
+  - test
+  - deploy
+
+test_smell_code:
+  stage: test
+  script:
+    - echo "Run test smell code"
+    - mvn sonar:sonar
+  only:
+    - staging
+  tags:
+    - build
+
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Run ansible script"
+  environment:
+    name: staging
+  only:
+    - staging
+  tags:
+    - build
+```
