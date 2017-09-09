@@ -62,9 +62,9 @@ Residential Script > Configure residential script
 Trunking script (when you have PBX)
 Load balancer script (simple load balancer)
 ```
->  Add ENABLE_TCP, USE_DBUSRLOC, USE_ALIASES, USE_DIALOG > q > Generate residential script
+>  Add *ENABLE_TCP, USE_DBUSRLOC*, USE_ALIASES, USE_DIALOG > q > Generate residential script
 ```
-Try to Generate loadbalancer script with ENABLE_TCP
+Try to Generate loadbalancer script with *ENABLE_TCP*
 
 script gen to /usr/local/opensips/etc/opensips
 ```
@@ -74,11 +74,9 @@ mv opensips_residential_2017-9-9_23:41:7.cfg opensips_residential.cfg
 
 vi opensips_residential.cfg
 ```
-log_level=6
 log_facility=LOG_LOCAL1
 
 listen=udp:<lb-ip>:5060   # CUSTOMIZE ME
-listen=tcp:<lb-ip>:5060
 mpath="/usr/local//lib64/opensips/modules/" # FOCUS to make sure set correctly
 
 
@@ -152,14 +150,51 @@ chkconfig opensips on
 
 insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>", "ch=fs://:ClueCon@<fs-ip>");
 
+```
+listen=udp:<opensips-ip>:5060
+listen=tcp:<opensips-ip>:5060
 
-/etc/freeswitch/autoload_configs/switch.conf.xml
+loadmodule "load_balancer.so"
+modparam("load_balancer", "db_url","mysql://opensips:opensipsrw@localhost/opensips")
+modparam("load_balancer", "initial_freeswitch_load", 15)
+modparam("load_balancer", "fetch_freeswitch_stats", 1)
+
+loadmodule "freeswitch.so"
+
+if ($rU==NULL) {
+        # request with no Username in RURI
+        sl_send_reply("484","Address Incomplete");
+        exit;
+}
+
+# count as load also the calls orgininated by lb destinations
+if (lb_is_destination("$si","$sp") ) {
+	# inbound call from destination
+	lb_count_call("$si","$sp","-1","conference");
+} else {
+	# outbound call to destinations
+	if ( !load_balance("1","conference") ) {
+		send_reply("503","unavailable");
+		exit();
+	}
+	# dst URI points to the new destination
+	xlog("sending call to $du\n");
+	t_relay();
+	exit;
+}
+
+# apply DB based aliases
+alias_db_lookup("dbaliases");
+
+```
+
+/etc/freeswitch/autoload_config/switch.conf.xml
 ```
 <param name="event-heartbeat-interval" value="20"/>
 <param name="max-sessions" value="1000"/>
 ```
 
-/etc/freeswitch/autoload_configs/event_socket.conf.xml
+/etc/freeswitch/autoload_config/event_socket.conf.xml
 ```
 <configuration name="event_socket.conf" description="Socket Client">
   <settings>
@@ -172,4 +207,3 @@ insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>",
   </settings>
 </configuration>
 ```
-systemctl restart freeswitch
