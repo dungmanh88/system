@@ -7,6 +7,8 @@ https://blog.opensips.org/2017/03/01/freeswitch-driven-routing-in-opensips-2-3/
 http://www.opensips.org/html/docs/modules/2.3.x/load_balancer#id293644
 https://voipmagazine.wordpress.com/tag/osipsconfig/
 http://www.opensips.org/html/docs/modules/2.3.x/load_balancer.html
+https://freeswitch.org/confluence/display/FREESWITCH/OpenSIPS+configuration+for+2+or+more+FreeSWITCH+installs
+https://www.opensips.org/Documentation/Tutorials-LoadBalancing
 
 Disable selinux
 
@@ -18,8 +20,10 @@ make clean
 make all ### compile core module
 make menuconfig > configure compile options > configure install prefix, change to /usr/local/opensips
 make menuconfig > configure compile options > configure excluded module ->
-Select the db_mysql modules with the spacebar key, then hit the 'q' key
+Select the db_mysql, db_unixodbc, dialplan, mi_xmlrpc_ng, regex, presence*, pua* modules with the spacebar key, then hit the 'q' key
 q > save > q > compile and install opensips (= make all && make install)
+
+You can re-make anytime.
 
 yum -y install mariadb-server
 systemctl start mariadb-server
@@ -33,6 +37,7 @@ Query OK, 0 rows affected (0.00 sec)
 cp /usr/local/opensips/etc/opensips/opensipsctlrc /usr/local/opensips/etc/opensips/opensipsctlrc.orig
 vi /usr/local/opensips/etc/opensips/opensipsctlrc
 ```
+SIP_DOMAIN=lb-ip
 DBENGINE=MYSQL
 DBPORT=3306
 DBHOST=localhost
@@ -56,13 +61,14 @@ Install tables for imc cpl siptrace domainpolicy carrierroute userblacklist b2b 
 INFO: creating extra tables into opensips ...
 INFO: Extra tables successfully created.
 ```
+56 tables will be created
 
 /usr/local/opensips/sbin/osipsconfig > Generate opensips script
 Residential Script > Configure residential script
 Trunking script (when you have PBX)
 Load balancer script (simple load balancer)
 ```
->  Add ENABLE_TCP, USE_DBUSRLOC, USE_ALIASES, USE_DIALOG > q > Generate residential script
+>  Add ENABLE_TCP, USE_ALIASES, USE_AUTH, USE_DBACC, USE_DBUSRLOC, USE_DIALOG, USE_DIALPLAN, VM_DIVERSION > q > Generate residential script
 ```
 Try to Generate loadbalancer script with ENABLE_TCP
 
@@ -74,7 +80,7 @@ mv opensips_residential_2017-9-9_23:41:7.cfg opensips_residential.cfg
 
 vi opensips_residential.cfg
 ```
-log_level=6
+log_level=3
 log_facility=LOG_LOCAL1
 
 listen=udp:<lb-ip>:5060   # CUSTOMIZE ME
@@ -94,6 +100,22 @@ modparam("load_balancer", "initial_freeswitch_load", 15)
 modparam("load_balancer", "fetch_freeswitch_stats", 1)
 
 ....
+
+if ($rU==NULL) {
+        # request with no Username in RURI
+        sl_send_reply("484","Address Incomplete");
+        exit;
+}
+
+if ($rU=~"^\*") {
+        strip(1);
+        $du = "sip:fs-ip:5060"; # CUSTOMIZE ME
+        route(relay);
+}
+
+...
+
+
 # do lookup with method filtering
 if (!lookup("location","m")) {
 
@@ -118,6 +140,30 @@ route(relay);
 ...
 
 ```
+Some config is using 127.0.0.1
+```
+# do lookup with method filtering
+if (!lookup("location","m")) {
+        if (!db_does_uri_exist()) {
+                send_reply("420","Bad Extension");
+                exit;
+        }
+
+        # redirect to a different VM system
+        $du = "sip:127.0.0.2:5060"; # CUSTOMIZE ME
+        route(relay);
+
+}
+
+
+# redirect the failed to a different VM system
+if (t_check_status("486|408")) {
+        $du = "sip:127.0.0.2:5060"; # CUSTOMIZE ME
+        # do not set the missed call flag again
+        route(relay);
+}
+```
+
 
 vi /etc/rsyslog.conf
 ```
@@ -150,7 +196,7 @@ useradd -d /dev/null -c "OpenSIPS SIP Server" -s /sbin/nologin opensips
 /etc/init.d/opensips start
 chkconfig opensips on
 
-insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>", "ch=fs://:ClueCon@<fs-ip>");
+insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>:5060", "ch=fs://:ClueCon@<fs-ip>");
 
 
 /etc/freeswitch/autoload_configs/switch.conf.xml
@@ -164,12 +210,18 @@ insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>",
 <configuration name="event_socket.conf" description="Socket Client">
   <settings>
     <param name="nat-map" value="false"/>
-    <param name="listen-ip" value="::"/>
+    <param name="listen-ip" value="fs-ip"/>
     <param name="listen-port" value="8021"/>
     <param name="password" value="ClueCon"/>
-    <!--<param name="apply-inbound-acl" value="loopback.auto"/>-->
-    <!--<param name="stop-on-bind-error" value="true"/>-->
+    <param name="apply-inbound-acl" value="lb-net/net-mask"/>
+    <!--    <param name="stop-on-bind-error" value="true"/> -->
   </settings>
 </configuration>
 ```
 systemctl restart freeswitch
+
+On opensips - this is new register on opensips
+opensipsctl add 5000 5000
+opensipsctl add 5001 5001
+
+How to forward to freeswitch
