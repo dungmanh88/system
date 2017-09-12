@@ -108,6 +108,31 @@ setting extension, edit something
 <extension name=”Local_Extension”>
 <condition field=”destination_number” expression=”^(10[01][0-9]|50[01][0-9])$”>
 
+Configure log file
+/etc/freeswitch/autoload_configs/logfile.conf.xml
+```
+        <!-- File to log to -->
+        <param name="logfile" value="/var/log/freeswitch.log"/>
+        <!-- At this length in bytes rotate the log file (0 for never) -->
+```
+
+
+Make sure:
+/etc/freeswitch/vars.xml
+```
+<!-- Internal SIP Profile -->
+<X-PRE-PROCESS cmd="set" data="internal_auth_calls=true"/>
+<X-PRE-PROCESS cmd="set" data="internal_sip_port=5060"/>
+<X-PRE-PROCESS cmd="set" data="internal_tls_port=5061"/>
+<X-PRE-PROCESS cmd="set" data="internal_ssl_enable=false"/>
+
+<!-- External SIP Profile -->
+<X-PRE-PROCESS cmd="set" data="external_auth_calls=false"/>
+<X-PRE-PROCESS cmd="set" data="external_sip_port=5080"/>
+<X-PRE-PROCESS cmd="set" data="external_tls_port=5081"/>
+<X-PRE-PROCESS cmd="set" data="external_ssl_enable=false"/>
+```
+
 fs_cli
 freeswitch@template-centos7> reloadxml
 or

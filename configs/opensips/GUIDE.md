@@ -169,7 +169,7 @@ vi /etc/rsyslog.conf
 ```
 # Save boot messages also to boot.log
 local7.*                                                /var/log/boot.log
-local1.*                        – /var/log/opensips.log
+local1.*                        - /var/log/opensips.log
 ```
 systemctl restart rsyslog
 
@@ -198,7 +198,6 @@ chkconfig opensips on
 
 insert into load_balancer(group_id, dst_uri, resources) values(1, "sip:<fs-ip>:5060", "ch=fs://:ClueCon@<fs-ip>");
 
-
 /etc/freeswitch/autoload_configs/switch.conf.xml
 ```
 <param name="event-heartbeat-interval" value="20"/>
@@ -222,6 +221,12 @@ systemctl restart freeswitch
 
 On opensips - this is new register on opensips
 opensipsctl add 5000 5000
+
+Database changed: subscriber and location
+
+
 opensipsctl add 5001 5001
 
-How to forward to freeswitch
+How to forward from 5000 opensips to 5000 freeswitch
+
+That bai roi
