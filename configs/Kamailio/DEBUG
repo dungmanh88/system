@@ -1,0 +1,2 @@
+ngrep -W byline -d eth0 port 5060 -O capture_file
+ngrep -I capture_file -W byline

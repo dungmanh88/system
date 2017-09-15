@@ -244,3 +244,9 @@ failure_route[FAIL_FSVBOX] {
   <node type="allow" cidr="xx.xx.xx.0/24"/>
 </list>
 ```
+
+kamctl add 101 101
+kamctl add 102 102
+
+Lấy số 101 gọi cho 102
+Kiểm tra freeswitch xem nó có tham gia vào cuộc hội thoại này không.
