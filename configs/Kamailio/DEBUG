@@ -1,2 +1,6 @@
 ngrep -W byline -d eth0 port 5060 -O capture_file
 ngrep -I capture_file -W byline
+kamailio -c -f kamailio.cfg
+kamctl rm 101
+kamctl add 101 101
+xlog
