@@ -11,3 +11,26 @@ fs_cli -x "log 6"
 5 Notify Light Blue
 6 Information (Info) Green
 7 Debug Yellow
+
+freeswitch@template-centos7> version
+FreeSWITCH Version 1.6.19~64bit ( 64bit)
+
+freeswitch@template-centos7> status
+UP 0 years, 0 days, 0 hours, 7 minutes, 21 seconds, 789 milliseconds, 181 microseconds
+FreeSWITCH (Version 1.6.19  64bit) is ready
+2 session(s) since startup
+0 session(s) - peak 1, last 5min 0
+0 session(s) per Sec out of max 30, peak 1, last 5min 0
+1000 session(s) max
+min idle cpu 0.00/100.00
+Current Stack Size/Max 240K/8192K
+
+freeswitch@template-centos7> show calls
+
+0 total.
+
+freeswitch@template-centos7> show channels
+
+0 total.
+
+Call 9192 to see channel variables

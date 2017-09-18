@@ -150,3 +150,8 @@ transport: tcp
 
 Call 3000 to hear music
 Call 9196 to hear echo
+Call 9198 to hear Tetris extension
+The sound is generated solely using tone generation.
+Call 9664 to hear music on hold
+Call 3000 to join conference. All parties will be able to hear each other.
+Call 9192 to see channel variables
