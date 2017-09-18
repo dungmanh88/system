@@ -1,0 +1,13 @@
+fs_cli -x "show module"
+fs_cli -x "xml_curl debug_on"
+fs_cli -x "reloadxml"
+fs_cli -x "log 6"
+
+0 Console White
+1 Alert Red
+2 Critical (Crit) Red
+3 Error (Err) Red
+4 Warning Violet
+5 Notify Light Blue
+6 Information (Info) Green
+7 Debug Yellow

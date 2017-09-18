@@ -1,23 +1,106 @@
-On test4
-https://freeswitch.org/confluence/display/FREESWITCH/CentOS+7+and+RHEL+7
-https://astppdoc.atlassian.net/wiki/spaces/ASTPP/pages/11108393/CentOS+7+Installation
-https://jamesnbr.wordpress.com/2016/04/12/freeswitch-1-6-installation-configuration-on-centos-7/
+rpm -qa | grep freeswitch
+systemctl stop freeswitch
+mv /etc/freeswitch/ /etc/freeswitch.bak/
+yum remove freeswitch*
+https://freeswitch.org/confluence/display/FREESWITCH/CentOS+7+and+RHEL+7#CentOS7andRHEL7-CentOS7andRHEL7-Stable
+yum install -y http://files.freeswitch.org/freeswitch-release-1-6.noarch.rpm epel-release
 
-[root@template-centos7 default]# sestatus
-SELinux status:                 disabled
-systemctl stop firewalld
-iptables -F
-iptables -t nat -F
+yum install -y git alsa-lib-devel autoconf automake bison broadvoice-devel bzip2 curl-devel mysql-devel e2fsprogs-devel flite-devel g722_1-devel gcc-c++ gdbm-devel gnutls-devel ilbc2-devel ldns-devel libcodec2-devel libcurl-devel libedit-devel libidn-devel libjpeg-devel libmemcached-devel libogg-devel libsilk-devel libsndfile-devel libtheora-devel libtiff-devel libtool libuuid-devel libvorbis-devel libxml2-devel lua-devel lzo-devel mongo-c-driver-devel ncurses-devel net-snmp-devel openssl-devel opus-devel pcre-devel perl perl-ExtUtils-Embed pkgconfig portaudio-devel postgresql-devel python-devel php-devel soundtouch-devel speex-devel sqlite-devel unbound-devel unixODBC-devel wget which yasm zlib-devel
 
-yum update
-yum groupinstall "Development tools" -y
-yum install epel-release
+yum install erlang
 
-rpm -Uvh http://files.freeswitch.org/freeswitch-release-1-6.noarch.rpm
-yum install -y freeswitch-config-vanilla freeswitch-lang-* freeswitch-sounds-*
+cd /usr/local/src
+git clone -b v1.6 https://freeswitch.org/stash/scm/fs/freeswitch.git freeswitch
+cd /usr/local/src/freeswitch
+./bootstrap.sh -j
+./configure -C --enable-portable-binary \
+            --prefix=/usr --localstatedir=/var --sysconfdir=/etc \
+            --with-gnu-ld --with-python --with-erlang --with-openssl \
+            --enable-core-odbc-support --enable-zrtp \
+            --enable-core-pgsql-support \
+            --enable-static-v8 --disable-parallel-build-v8
+
+            -------------------------- FreeSWITCH configuration --------------------------
+
+              Locations:
+
+                  prefix:          /usr
+                  exec_prefix:     /usr
+                  bindir:          ${exec_prefix}/bin
+                  confdir:         /etc/freeswitch
+                  libdir:          /usr/lib
+                  datadir:         /usr/share/freeswitch
+                  localstatedir:   /var/lib/freeswitch
+                  includedir:      /usr/include/freeswitch
+
+                  certsdir:        /etc/freeswitch/tls
+                  dbdir:           /var/lib/freeswitch/db
+                  grammardir:      /usr/share/freeswitch/grammar
+                  htdocsdir:       /usr/share/freeswitch/htdocs
+                  fontsdir:        /usr/share/freeswitch/fonts
+                  logfiledir:      /var/log/freeswitch
+                  modulesdir:      /usr/lib/freeswitch/mod
+                  pkgconfigdir:    /usr/lib/pkgconfig
+                  recordingsdir:   /var/lib/freeswitch/recordings
+                  imagesdir:       /var/lib/freeswitch/images
+                  runtimedir:      /var/run/freeswitch
+                  scriptdir:       /usr/share/freeswitch/scripts
+                  soundsdir:       /usr/share/freeswitch/sounds
+                  storagedir:      /var/lib/freeswitch/storage
+                  cachedir:        /var/cache/freeswitch
+
+            ------------------------------------------------------------------------------
+
+
+make && \
+make -j install && \
+make -j cd-sounds-install && \
+make -j cd-moh-install
+
+If you want to recompile and install:
+```
+cd /usr/local/src/freeswitch
+make clean && make distclean && rm -f config.cache
+then compile and install
+```
+
+/etc/systemd/system/freeswitch.service
+```
+[Unit]
+Description=FreeSWITCH
+After=syslog.target network.target
+After=postgresql.service postgresql-9.3.service postgresql-9.4.service mysqld.service httpd.service
+
+[Service]
+##User=freeswitch - dirty config, i will fix later
+User=root
+EnvironmentFile=-/etc/sysconfig/freeswitch
+# RuntimeDirectory is not yet supported in CentOS 7. A workaround is to use /etc/tmpfiles.d/freeswitch.conf
+#RuntimeDirectory=/run/freeswitch
+#RuntimeDirectoryMode=0750
+WorkingDirectory=/run/freeswitch
+ExecStart=/usr/bin/freeswitch -nc -nf $FREESWITCH_PARAMS
+ExecReload=/usr/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+```
+
+/etc/sysconfig/freeswitch
+```
+## Type:                string
+## Default:             ""
+## Config:              ""
+## ServiceRestart:      freeswitch
+#
+# if not empty: parameters for freeswitch
+#
+FREESWITCH_PARAMS=""
+```
+systemctl daemon-reload
+systemctl restart freeswitch
 systemctl enable freeswitch
-systemctl start freeswitch
-fs_cli -rRS
+
 
 Some config you should know
 Default passwd of freeswitch
@@ -98,9 +181,6 @@ cp 1000.xml 5001.xml
   </user>
 </include>
 ```
-
-[root@template-centos7 default]# chown -R freeswitch:daemon 5000.xml
-[root@template-centos7 default]# chown -R freeswitch:daemon 5001.xml
 
 setting extension, edit something
 /etc/freeswitch/dialplan/default.xml
