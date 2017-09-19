@@ -151,8 +151,24 @@ MariaDB [freeswitch]> select * from directory;
 +----+----------+-----------+-------+
 
 
+```
 mysql> insert into directory_params (directory_id,param_name,param_value) VALUES (12,'password','40277');
 mysql> insert into directory_params (directory_id,param_name,param_value) VALUES (13,'password','50354');
+
+
+mysql> insert into directory_vars(directory_id, var_name, var_value) VALUES (12, 'user_context', 'default');
+mysql> insert into directory_vars(directory_id, var_name, var_value) VALUES (13, 'user_context', 'default');
+
+mysql> insert into directory_global_params(param_name, param_value, domain_id) VALUES ("dial-string", "{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})},${verto_contact(${dialed_user}@${dialed_domain})}", 3);
+```
+
+
+Modify something
+/etc/freeswitch/dialplan/default.xml
+```
+<extension name="Local_Extension">
+  <condition field="destination_number" expression="^(10[01][0-9]|50354|40227)$">
+```
 
 Thats All, now try registering your SOFT Phone using new username/password and see if your requests reach to WEB-Server.
 You can troubleshoot the XML_CURL module by issuing the following command on FS Console.

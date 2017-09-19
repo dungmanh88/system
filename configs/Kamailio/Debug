@@ -4,3 +4,4 @@ kamailio -c -f kamailio.cfg
 kamctl rm 101
 kamctl add 101 101
 xlog
+testing automation: SIPp

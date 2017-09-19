@@ -1,6 +1,6 @@
 fs_cli -x "show module"
 fs_cli -x "xml_curl debug_on"
-fs_cli -x "reloadxml"
+fs_cli -x "reloadxml"  ### always run for get valid xml
 fs_cli -x "log 6"
 
 0 Console White
@@ -11,6 +11,9 @@ fs_cli -x "log 6"
 5 Notify Light Blue
 6 Information (Info) Green
 7 Debug Yellow
+
+yum -y install libxml2
+cat /tmp/dba5ecb6-9ef6-437a-897e-d1c9ea9575ac.tmp.xml | xmllint --format -
 
 freeswitch@template-centos7> version
 FreeSWITCH Version 1.6.19~64bit ( 64bit)
