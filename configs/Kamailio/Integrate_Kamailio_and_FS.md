@@ -60,6 +60,10 @@ gpgcheck=1
 gpgkey=http://download.opensuse.org/repositories/home:/kamailio:/v4.3.x-rpms/RHEL_7//repodata/repomd.xml.key
 enabled=1
 
+mkdir -p /var/run/kamailio
+chown -R kamailio:kamailio /var/run/kamailio
+to save kamailio_fifo and kamailio_ctl...
+
 yum -y install kamailio wget tmux gdb
 yum -y install kamailio-mysql kamailio-tls
 yum -y install mysql mariadb-server
@@ -95,11 +99,12 @@ rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCA
 
 Config kamailio
 
+cd /etc/kamailio
 mv kamailio.cfg  kamailio.cfg.orig
 cp kamailio-basic.cfg kamailio.cfg
 
 Base on kamailio-basic.cfg
-
+```
 # *** To enable mysql:
 #     - define WITH_MYSQL
 #!define WITH_MYSQL
@@ -117,7 +122,7 @@ Base on kamailio-basic.cfg
 # *** To enable nat traversal execute:
 #     - define WITH_NAT
 #!define WITH_NAT
-
+```
 
 - Config log
 ```
@@ -135,7 +140,7 @@ or comment to listen all interface
 ```
 
 fork=yes
-children=<core number of cpu, output nproc>
+//children=<core number of cpu, output nproc>
 
 - Use avpops.so
 - Use dispatcher.so
@@ -350,7 +355,23 @@ description:
 2 rows in set (0.00 sec)
 ```
 
+kamailio -c -f kamailio.cfg
+```
+oading modules under config path: /usr/lib64/kamailio/modules/
+ 0(6505) INFO: <core> [sctp_core.c:75]: sctp_core_check_support(): SCTP API not enabled - if you want to use it, load sctp module
+Listening on
+             udp: 127.0.0.1:5060
+             udp: 172.31.21.142:5060
+             tcp: 127.0.0.1:5060
+             tcp: 172.31.21.142:5060
+Aliases:
+             *: 54.202.25.215:*
+
+config file ok, exiting...
+```
+
 On Freeswitch
+- Follow Install_from_pkgs.md to install Freeswitch
 - Follow Acl instruction
 - Some dialplan
 /etc/freeswitch/dialplan/public.xml
@@ -393,7 +414,7 @@ On Freeswitch
 <extension name="Local_Extension">
 ...
 ```
-config rsyslog.conf
+config /etc/rsyslog.conf
 ```
 local2.*                        -/var/log/kamailio.log
 ```
