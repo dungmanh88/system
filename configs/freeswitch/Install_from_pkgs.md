@@ -3,6 +3,8 @@ https://freeswitch.org/confluence/display/FREESWITCH/CentOS+7+and+RHEL+7
 https://astppdoc.atlassian.net/wiki/spaces/ASTPP/pages/11108393/CentOS+7+Installation
 https://jamesnbr.wordpress.com/2016/04/12/freeswitch-1-6-installation-configuration-on-centos-7/
 
+Off firewall and selinux
+
 [root@template-centos7 default]# sestatus
 SELinux status:                 disabled
 systemctl stop firewalld
@@ -12,8 +14,28 @@ iptables -t nat -F
 yum update
 yum groupinstall "Development tools" -y
 yum install epel-release
+or
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
+
 
 rpm -Uvh http://files.freeswitch.org/freeswitch-release-1-6.noarch.rpm
+
+On amazonaws redhat, you must change something
+
+vi /etc/yum.repos.d/freeswitch.repo
+Fix $releasever(7Server) -> 7server
+```
+[freeswitch]
+name=FreeSWITCH Packages for Enterprise Linux $releasever - $basearch
+baseurl=http://files.freeswitch.org/yum-1.6/7server/$basearch
+#mirrorlist=http://mirrors.freeswitch.org/mirrorlist?repo=freeswitch-5&arch=$basearch
+#failovermethod=priority
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-FREESWITCH
+```
+
 yum install -y freeswitch-config-vanilla freeswitch-lang-* freeswitch-sounds-*
 systemctl enable freeswitch
 systemctl start freeswitch

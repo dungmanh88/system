@@ -10,6 +10,7 @@ gpgcheck=1
 gpgkey=http://download.opensuse.org/repositories/home:/kamailio:/v4.3.x-rpms/RHEL_7//repodata/repomd.xml.key
 enabled=1
 
+hostnamectl set-hostname kamailio
 
 yum install kamailio
 

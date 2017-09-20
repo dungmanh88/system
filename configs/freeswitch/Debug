@@ -2,6 +2,7 @@ fs_cli -x "show module"
 fs_cli -x "xml_curl debug_on"
 fs_cli -x "reloadxml"  ### always run for get valid xml
 fs_cli -x "log 6"
+fs_cli -x "reloadacl"
 
 0 Console White
 1 Alert Red

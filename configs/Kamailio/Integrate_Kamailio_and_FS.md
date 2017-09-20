@@ -10,6 +10,7 @@ https://www.kamailio.org/wiki/cookbooks/4.4.x/core#mhomed --- If you use private
 https://www.kamailio.org/docs/modules/5.0.x/modules/rtpproxy.html
 https://lists.kamailio.org/pipermail/sr-users/2014-March/082250.html
 http://lists.freeswitch.org/pipermail/freeswitch-users/2010-March/055234.html
+http://lists.freeswitch.org/pipermail/freeswitch-users/2015-August/115098.html
 
 Mastering FS ebook
 Openser ebook
@@ -37,13 +38,19 @@ Kamailio:
 - SIP auth
 - SIP location
 - Support RTPProxy module to relay media service
+- Two interface: WAN and LAN
 
 Media server:
-FS process media service from RTP Proxy
+- FS process media service from RTP Proxy
+- Only have LAN IP
 
 Architecture
 
 SIP phone A ---> Kamailio(SIP) + rtpproxy(RTP) ---> (FS1,2,3,..,n) ---> Kamailio(SIP) + RTPProxy(RTP) ---> SIP phone B
+
+hostnamectl set-hostname kamailio
+
+Off firewall and selinux
 
 [home_kamailio_v4.3.x-rpms]
 name=RPM Packages for Kamailio v4.3.x (RHEL_7)
@@ -53,10 +60,15 @@ gpgcheck=1
 gpgkey=http://download.opensuse.org/repositories/home:/kamailio:/v4.3.x-rpms/RHEL_7//repodata/repomd.xml.key
 enabled=1
 
-yum install kamailio
-yum install kamailio-mysql kamailio-tls
+yum -y install kamailio wget tmux gdb
+yum -y install kamailio-mysql kamailio-tls
+yum -y install mysql mariadb-server
 
 yum install epel-release
+or
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
+
 yum install rtpproxy
 
 /etc/kamailio/kamctlrc
@@ -71,15 +83,42 @@ DBACCESSHOST=localhost
 DBROOTUSER="root"
 ```
 
+systemctl restart mariadb && systemctl enable mariadb
+systemctl restart kamailio && systemctl enable kamailio
+
 Gen DB
 kamdbctl create ### will create db kamailio by default
 grant all privileges on `kamailio`.* to 'kamailio'@'localhost' identified by 'kamailiorw';
 
 Start rtpproxy on bridge mode
-rtpproxy -F -l lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
+rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
 
 Config kamailio
+
+mv kamailio.cfg  kamailio.cfg.orig
+cp kamailio-basic.cfg kamailio.cfg
+
 Base on kamailio-basic.cfg
+
+# *** To enable mysql:
+#     - define WITH_MYSQL
+#!define WITH_MYSQL
+
+# *** To enable authentication execute:
+#     - enable mysql
+#     - define WITH_AUTH
+#!define WITH_AUTH
+
+# *** To enable persistent user location execute:
+#     - enable mysql
+#     - define WITH_USRLOCDB
+#!define WITH_USRLOCDB
+
+# *** To enable nat traversal execute:
+#     - define WITH_NAT
+#!define WITH_NAT
+
+
 - Config log
 ```
 log_facility=LOG_LOCAL2
@@ -92,7 +131,12 @@ alias="lb-ip"
 - Config listen
 ```
 listen=udp:lb-ip:5060
+or comment to listen all interface
 ```
+
+fork=yes
+children=<core number of cpu, output nproc>
+
 - Use avpops.so
 - Use dispatcher.so
 ```
@@ -172,6 +216,10 @@ route[AUTH] {
         }
 #!endif
 
+        if(ds_is_from_list("1")) {
+                return;
+        }
+
         if (!is_method("REGISTER")) {
                 # authenticate requests
                 if (!proxy_authorize("kamailio test","subscriber")) {
@@ -209,6 +257,15 @@ route(LOCATION);
 - route[DISPATCH]
 ```
 route[DISPATCH] {
+
+        if(!is_method("INVITE")){
+                return;
+        }
+
+        if(ds_is_from_list("1")) {
+                return;
+        }
+
         prefix("kb-");
         # round robin dispatching on gateways group '1'
         if(!ds_select_dst("1", "4"))
@@ -244,6 +301,9 @@ failure_route[RTF_DISPATCH] {
 ```
 - Rewrite route[NATMANAGE]
 ```
+if (!(isflagset(FLT_NATS) || isbflagset(FLB_NATB)))
+        return;
+
 if (is_method("BYE")) {
         xlog("L_NOTICE","$rm from $fu (IP:$si:$sp) in Route[RTPPROXY] unforced RTP Proxy STATS='$rtpstat'\n");
         rtpproxy_destroy();
@@ -268,12 +328,13 @@ if (is_method("BYE")) {
 ```
 
 - Add db of kamailio
+insert into dispatcher(setid, destination) values(1,'sip:fs-ip-1|2:5060');
 ```
 mysql> select * from dispatcher\G
 *************************** 1. row ***************************
          id: 1
       setid: 1
-destination: sip:fs-ip-1:5080
+destination: sip:fs-ip-1:5060
       flags: 0
    priority: 0
       attrs:
@@ -281,7 +342,7 @@ description:
 *************************** 2. row ***************************
          id: 2
       setid: 1
-destination: sip:fs-ip-2:5080
+destination: sip:fs-ip-2:5060
       flags: 0
    priority: 0
       attrs:
@@ -322,7 +383,7 @@ On Freeswitch
               <action application="set" data="call_timeout=50"/>
               <action application="set" data="continue_on_fail=true"/>
               <action application="set" data="hangup_after_bridge=true"/>
-              <action application="set" data="sip_invite_domain=lb-ip"/> // this is ip of kamailio
+              <action application="set" data="sip_invite_domain=fs-ip"/> // this is ip of fs
               <action application="export" data="sip_contact_user=ufs"/>
               <action application="bridge" data="sofia/$${domain}/$1@lb-ip"/> // this is ip of kamailio
               <action application="answer"/>
