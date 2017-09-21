@@ -38,7 +38,7 @@ Kamailio:
 - SIP auth
 - SIP location
 - Support RTPProxy module to relay media service
-- Two interface: WAN and LAN
+- Two interfaces: WAN and LAN
 
 Media server:
 - FS process media service from RTP Proxy
@@ -64,9 +64,7 @@ mkdir -p /var/run/kamailio
 chown -R kamailio:kamailio /var/run/kamailio
 to save kamailio_fifo and kamailio_ctl...
 
-yum -y install kamailio wget tmux gdb
-yum -y install kamailio-mysql kamailio-tls
-yum -y install mysql mariadb-server
+yum -y install kamailio wget tmux gdb kamailio-mysql kamailio-tls mysql mariadb-server
 
 yum install epel-release
 or
@@ -95,7 +93,13 @@ kamdbctl create ### will create db kamailio by default
 grant all privileges on `kamailio`.* to 'kamailio'@'localhost' identified by 'kamailiorw';
 
 Start rtpproxy on bridge mode
-rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
+//rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
+//rtpproxy -F -l localip -A publicip  -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
+rtpproxy -F -l 172.31.21.142/54.202.25.215 -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
+
+rtpproxy -F -A 34.213.179.216 172.31.30.47 -l 172.31.30.47 127.0.0.1 -m 10000 -M 65000 -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL3
+
+-m 10000 -M 65000
 
 Config kamailio
 
@@ -138,7 +142,7 @@ alias="lb-ip"
 listen=udp:lb-ip:5060
 or comment to listen all interface
 ```
-
+mhomed=1
 fork=yes
 //children=<core number of cpu, output nproc>
 
@@ -315,17 +319,17 @@ if (is_method("BYE")) {
 } else if (is_method("INVITE")) {
         if(avp_db_query("select destination from dispatcher where destination like '%$dd%'")){
                 xlog("L_NOTICE","$rm from $fu (IP:$si:$sp) in route[RTPPROXY] RTPproxy with IE Flags\n");
-                rtpproxy_manage("rie");
+                rtpproxy_manage("rwei");
 
         }
         else if(avp_db_query("select destination from dispatcher where destination='sip:$si:$sp'")){
                  xlog("L_NOTICE","$rm from $fu (IP:$si:$sp) in route[RTPPROXY] RTPproxy with EI Flags\n");
-                rtpproxy_manage("rei");
+                rtpproxy_manage("rwie");
 
         }
         else {
                 xlog("L_NOTICE","$rm from $fu (IP:$si:$sp) in Route[RTPPROXY] Forcing RTPproxy\n");
-                rtpproxy_manage("r");
+          #      rtpproxy_manage("r");
         }
 }
 
@@ -425,7 +429,7 @@ restart kamailio and FS service, rsyslog
 
 TEST
 Add some sip on kamailio
-kamctl add 8888 88881734
-kamctl add 9999 99991734
+kamctl add 8888 8888
+kamctl add 9999 9999
 
 register two sip phone with domain lb-ip
