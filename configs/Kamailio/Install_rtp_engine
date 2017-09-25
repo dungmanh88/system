@@ -1,0 +1,43 @@
+https://github.com/etamme/federated-sip/wiki/compile-and-set-up-rtpengine-on-centos-7
+https://voipmagazine.wordpress.com/2015/02/17/rtpengine-compilation-and-installation-in-fedora-redhat/
+https://sillycodes.com/installing-rtpengine-on-ubuntu-1404/
+
+yum -y install iptables-devel kernel-devel kernel-headers xmlrpc-c-devel glib2-devel libpcap-devel
+hiredis-devel libevent-devel json-glib-devel
+yum -y install gcc-c++ gcc automake autoconf
+
+yum update then reboot to update new kernel
+
+cd /usr/local/src
+git clone https://github.com/sipwise/rtpengine.git
+cd /usr/local/src/rtpengine/daemon && make
+cp rtpengine /usr/local/bin/
+
+cd /usr/local/src/rtpengine/kernel-module && make && insmod xt_RTPENGINE.ko
+
+cd /usr/local/src/rtpengine/iptables-extension && make && cp libxt_RTPENGINE.so /lib64/xtables/
+
+Config rtpengine
+/etc/default/ngcp-rtpengine-daemon
+```
+#
+RUN_RTPENGINE=yes
+LISTEN_TCP=25060
+LISTEN_UDP=12222
+LISTEN_NG=22222
+LISTEN_CLI=9900
+INTERFACES="kamailio-wan-ip"
+TIMEOUT=60
+SILENT_TIMEOUT=3600
+PIDFILE=/var/run/ngcp-rtpengine-daemon.pid
+FORK=yes
+TABLE=0
+PORT_MIN=30000
+PORT_MAX=50000
+LOG_LEVEL=7
+LOG_FACILITY=daemon
+```
+
+rtpengine --config-file=/etc/default/ngcp-rtpengine-daemon
+or
+rtpengine --interface=kamailio-wan-ip --listen-ng=127.0.0.1:22222 --listen-cli=9900 --listen-udp=12222 --listen-tcp=25060 -m 30000 -M 35000

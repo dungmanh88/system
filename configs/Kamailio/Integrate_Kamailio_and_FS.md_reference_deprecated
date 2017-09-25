@@ -105,7 +105,7 @@ Start rtpproxy on bridge mode
 //rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
 //rtpproxy -F -l localip -A publicip  -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
 
-rtpproxy -F -l 103.53.171.121/192.168.171.121 -s udp:127.0.0.1:7722 -d DBUG LOG_LOCAL0
+rtpproxy -F -l kamailio-wan-ip/192.168.171.121 -s udp:127.0.0.1:7722 -d DBUG LOG_LOCAL0
 
 Config kamailio
 

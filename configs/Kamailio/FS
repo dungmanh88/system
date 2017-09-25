@@ -1,0 +1,61 @@
+https://www.opensips.org/Documentation/Tutorials-OpenSIPSFreeSwitchIntegration
+
+vi /etc/freeswitch/dialplan/public.xml
+
+<extension name="from_kamailio">
+  <condition field="network_addr" expression="^192\.168\.171\.121$">
+    <action application="transfer" data="${destination_number} XML default"/>
+  </condition>
+</extension>
+
+vi /etc/freeswitch/vars.xml
+
+```
+<!-- Internal SIP Profile -->
+<X-PRE-PROCESS cmd="set" data="internal_auth_calls=false"/>
+<X-PRE-PROCESS cmd="set" data="internal_sip_port=5060"/>
+<X-PRE-PROCESS cmd="set" data="internal_tls_port=5061"/>
+<X-PRE-PROCESS cmd="set" data="internal_ssl_enable=false"/>
+
+<!-- External SIP Profile -->
+<X-PRE-PROCESS cmd="set" data="external_auth_calls=false"/>
+<X-PRE-PROCESS cmd="set" data="external_sip_port=5080"/>
+<X-PRE-PROCESS cmd="set" data="external_tls_port=5081"/>
+<X-PRE-PROCESS cmd="set" data="external_ssl_enable=false"/>
+
+```
+
+vi /etc/freeswitch/autoload_configs/acl.conf.xml
+```
+      <node type="allow" cidr="192.168.171.0/24"/>
+```
+
+vi /etc/freeswitch/dialplan/default.xml
+```
+<extension name="kbridge">
+  <condition field="destination_number" expression="^kb-(.+)$">
+              <action application="set" data="proxy_media=true"/>
+              <action application="set" data="call_timeout=50"/>
+              <action application="set" data="continue_on_fail=true"/>
+              <action application="set" data="hangup_after_bridge=true"/>
+              <action application="set" data="sip_invite_domain=192.168.171.26"/>
+              <action application="export" data="sip_contact_user=ufs"/>
+              <action application="bridge" data="sofia/external/$1@192.168.171.121"/>
+              <action application="answer"/>
+            <!--  <action application="voicemail" data="default ${domain_name} $1"/> -->
+  </condition>
+</extension>
+```
+
+vi /etc/freeswitch/autoload_configs/event_socket.conf.xml
+<configuration name="event_socket.conf" description="Socket Client">
+  <settings>
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="::"/>
+    <param name="listen-port" value="8021"/>
+    <param name="password" value="ClueCon"/>
+    <param name="apply-inbound-acl" value="any_v4.auto"/>
+    <!--<param name="apply-inbound-acl" value="loopback.auto"/>-->
+    <!--<param name="stop-on-bind-error" value="true"/> -->
+  </settings>
+</configuration>
