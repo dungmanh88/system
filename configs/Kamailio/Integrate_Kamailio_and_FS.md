@@ -12,6 +12,15 @@ https://lists.kamailio.org/pipermail/sr-users/2014-March/082250.html
 http://lists.freeswitch.org/pipermail/freeswitch-users/2010-March/055234.html
 http://lists.freeswitch.org/pipermail/freeswitch-users/2015-August/115098.html
 
+
+https://medium.com/southbridge-io/kamailio-sip-proxy-installation-and-minimal-configuration-example-c96b5729853a
+https://blog.voipxswitch.com/2015/08/11/rtpengine-with-kamailio-as-load-balancer-and-ip-gateway/
+http://www.kamailio.org/events/2010-cluecon/kamailio-cluecon2010.pdf
+http://nil.uniza.sk/sip/application-servers/kamailio-configuration-provide-load-balancing-and-failover-media-services
+https://blog.voipxswitch.com/2015/03/27/kamailio-basic-sip-proxy-all-requests-setup/#comment-358
+
+
+
 Mastering FS ebook
 Openser ebook
 Opensips ebook
@@ -95,11 +104,8 @@ grant all privileges on `kamailio`.* to 'kamailio'@'localhost' identified by 'ka
 Start rtpproxy on bridge mode
 //rtpproxy -F -l public-lb-ip/private-lb-ip -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
 //rtpproxy -F -l localip -A publicip  -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
-rtpproxy -F -l 172.31.21.142/54.202.25.215 -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL0
 
-rtpproxy -F -A 34.213.179.216 172.31.30.47 -l 172.31.30.47 127.0.0.1 -m 10000 -M 65000 -s udp:127.0.0.1:7722 -d DBUG:LOG_LOCAL3
-
--m 10000 -M 65000
+rtpproxy -F -l 103.53.171.121/192.168.171.121 -s udp:127.0.0.1:7722 -d DBUG LOG_LOCAL0
 
 Config kamailio
 
@@ -128,48 +134,46 @@ Base on kamailio-basic.cfg
 #!define WITH_NAT
 ```
 
-- Config log
+- Config global param
 ```
 log_facility=LOG_LOCAL2
-```
-- Config alias
-```
-auto_aliases=no
-alias="lb-ip"
-```
-- Config listen
-```
-listen=udp:lb-ip:5060
-or comment to listen all interface
-```
 mhomed=1
-fork=yes
-//children=<core number of cpu, output nproc>
 
-- Use avpops.so
-- Use dispatcher.so
+fork=yes
+children=4
+
+auto_aliases=no
+listen=LISTEN_UDP_PUBLIC:5060
+listen=LISTEN_UDP_PRIVATE:5060
+```
+
+- Config flag
+```
+#!define FLAG_FROM_FS 10
+#!define FLAG_FROM_PEER 11
+
+sip_warning=no
+```
+
+- Config module
 ```
 loadmodule "acc.so"
-loadmodule "avpops.so"
-loadmodule "dispatcher.so"
 
-#!ifdef WITH_AUTH
+loadmodule "dispatcher.so"
+loadmodule "stun.so"
+loadmodule "uac.so"
+loadmodule "ipops.so"
+
+#!ifdef WITH_NAT
+loadmodule "nathelper.so"
+#loadmodule "rtpproxy.so"
+loadmodule "rtpengine.so"
+#!endif
 ...
 ```
 - Config param module avpops.so
 ```
 # ----- tm params -----
-...
-# ------- AVP-OPS params ---------
-modparam("avpops","db_url", DBURL)
-modparam("avpops","avp_table","dispatcher")
-
-# ----- dispatcher params -----
-...
-```
-- Config param module dispatcher.so
-```
-# ------- AVP-OPS params ---------
 ...
 # ----- dispatcher params -----
 modparam("dispatcher", "db_url", DBURL)
@@ -179,10 +183,293 @@ modparam("dispatcher", "dst_avp", "$avp(AVP_DST)")
 modparam("dispatcher", "grp_avp", "$avp(AVP_GRP)")
 modparam("dispatcher", "cnt_avp", "$avp(AVP_CNT)")
 modparam("dispatcher", "sock_avp", "$avp(AVP_SOCK)")
-
-# ----- rr params -----
 ...
+# ----- rtpproxy params -----
+#modparam("rtpproxy", "rtpproxy_sock", "udp:127.0.0.1:7722")
+modparam("rtpengine", "rtpengine_sock", "udp:localhost:22222")
 ```
+
+
+- Config routing:
+```
+request_route {
+	# per request initial checks
+	route(SANITY_CHECK);
+
+  route(NATDETECT);
+
+	# CANCEL processing
+	if (is_method("CANCEL")) {
+		if (t_check_trans()) {
+			t_relay();
+		}
+		exit;
+	}
+
+  route(REGISTRAR);
+  route(AUTH);
+
+	# check src ip and set flag
+	route(CHECK_SOURCE_IP);
+
+	# always add record_route when forwarding SUBSCRIBEs
+	if (is_method("SUBSCRIBE")) {
+		exit;
+	}
+
+	# handle requests within SIP dialogs
+	route(WITHINDLG);
+
+	### only initial requests (no To tag)
+	t_check_trans();
+
+	# dispatch destinations
+	route(DISPATCH);
+}
+
+route[SANITY_CHECK] {
+
+	if (!mf_process_maxfwd_header("10")) {
+		#xlog("L_WARN", "$ci|end|too much hops, not enough barley");
+		send_reply("483", "Too Many Hops");
+		exit;
+	}
+
+	if (!sanity_check()) {
+		#xlog("L_WARN", "$ci|end|message is insane");
+		exit;
+	}
+
+	if ($ua == "friendly-scanner" ||
+		$ua == "sundayddr" ||
+		$ua =~ "sipcli" ) {
+		#xlog("L_WARN", "$ci|end|dropping message with user-agent $ua");
+		exit;
+	}
+
+}
+
+route[CHECK_SOURCE_IP] {
+	if(ds_is_from_list()) {
+		setflag(FLAG_FROM_FS);
+	} else {
+		setflag(FLAG_FROM_PEER);
+	}
+}
+
+route[RELAY] {
+
+	if (is_method("INVITE")) {
+		if(!t_is_set("failure_route")) {
+			t_on_failure("MANAGE_FAILURE");
+		}
+	}
+
+	if (isflagset(FLAG_FROM_PEER)) {
+		force_send_socket(LISTEN_UDP_PRIVATE);
+ 	} else {
+		force_send_socket(LISTEN_UDP_PUBLIC);
+	}
+
+
+	if (!t_relay()) {
+		sl_reply_error();
+	}
+	#exit;
+}
+
+# Handle requests within SIP dialogs
+route[WITHINDLG] {
+	if (has_totag()) {
+		# sequential request withing a dialog should
+		# take the path determined by record-routing
+		if (loose_route()) {
+			route(RELAY);
+		} else {
+			if (is_method("NOTIFY")) {
+				route(RELAY);
+			}
+
+			if (is_method("SUBSCRIBE") && uri == myself) {
+				# in-dialog subscribe requests
+				exit;
+			}
+
+			if (is_method("ACK")) {
+				if (t_check_trans()) {
+					# non loose-route, but stateful ACK;
+					# must be ACK after a 487 or e.g. 404 from upstream server
+					t_relay();
+					exit;
+				} else {
+					# ACK without matching transaction ... ignore and discard.
+					exit;
+				}
+			}
+			sl_send_reply("404","Not here");
+		}
+		exit;
+	}
+}
+
+# Manage failure routing cases
+failure_route[MANAGE_FAILURE] {
+	if (t_is_canceled()) {
+		exit;
+	}
+}
+
+onreply_route[1] {
+	if (has_body("application/sdp")) {
+		rtpengine_answer();
+	}
+}
+
+onreply_route[2] {
+	if (has_body("application/sdp")) {
+		rtpengine_offer();
+	}
+}
+
+# Dispatch requests
+route[DISPATCH] {
+	# round robin dispatching on gateways group '1'
+	# record routing for dialog forming requests (in case they are routed)
+	# - remove preloaded route headers
+	remove_hf("Route");
+	if (is_method("INVITE|REFER")) {
+		record_route();
+		if (has_body("application/sdp")) {
+			if (rtpengine_offer()) {
+				t_on_reply("1");
+			}
+		} else {
+			t_on_reply("2");
+		}
+		if (isflagset(FLAG_FROM_PEER)) {
+			if(!ds_select_dst("1", "4")) {
+				send_reply("404", "No destination");
+				exit;
+			}
+		}
+	}
+
+	if (is_method("ACK") && has_body("application/sdp")) {
+		rtpengine_answer();
+	}
+  prefix("kb-");
+	route(RELAY);
+}
+
+route[REGISTRAR] {
+        if (!is_method("REGISTER")) return;
+        if(isflagset(FLT_NATS)) {
+                setbflag(FLB_NATB);
+#!ifdef WITH_NATSIPPING
+                # do SIP NAT pinging
+                setbflag(FLB_NATSIPPING);
+#!endif
+        }
+        #xlog("test");
+        if (!www_authorize("kamailio test", "subscriber")) {
+                www_challenge("kamailio test", "0");
+                exit;
+        }
+
+        if (!save("location"))
+                sl_reply_error();
+
+        exit;
+}
+
+# Caller NAT detection
+route[NATDETECT] {
+#!ifdef WITH_NAT
+        force_rport();
+        if (nat_uac_test("19")) {
+                if (is_method("REGISTER")) {
+                        fix_nated_register();
+                } else {
+                        fix_nated_contact();
+                }
+                setflag(FLT_NATS);
+        }
+#!endif
+        return;
+}
+
+route[AUTH] {
+#!ifdef WITH_AUTH
+
+#!ifdef WITH_IPAUTH
+        if((!is_method("REGISTER")) && allow_source_address()) {
+                # source IP allowed
+                return;
+        }
+#!endif
+
+        if(ds_is_from_list("1")) {
+                return;
+        }
+
+        if (!is_method("REGISTER")) {
+                # authenticate requests
+                if (!proxy_authorize("kamailio test","subscriber")) {
+                        proxy_challenge("kamailio test","0");
+                        exit;
+                }
+
+                consume_credentials();
+
+        }
+        # if caller is not local subscriber, then check if it calls
+        # a local destination, otherwise deny, not an open relay here
+        if (from_uri!=myself && uri!=myself) {
+                sl_send_reply("403","Not relaying");
+                exit;
+        }
+
+#!endif
+        return;
+}
+```
+
+
+
+
+
+
+
+
+
+replace route[REQINIT] to route[SANITY_CHECK]
+```
+# per request initial checks
+#route(REQINIT);
+route(SANITY_CHECK);
+
+route[SANITY_CHECK] {
+        if (!mf_process_maxfwd_header("10")) {
+                #xlog("L_WARN", "$ci|end|too much hops, not enough barley");
+                send_reply("483", "Too Many Hops");
+                exit;
+        }
+
+        if (!sanity_check()) {
+                #xlog("L_WARN", "$ci|end|message is insane");
+                exit;
+        }
+
+        if ($ua == "friendly-scanner" ||
+                $ua == "sundayddr" ||
+                $ua =~ "sipcli" ) {
+                #xlog("L_WARN", "$ci|end|dropping message with user-agent $ua");
+                exit;
+        }
+}
+
+```
+
 - Block scanner
 ```
 if($ua =~ "friendly-scanner") {
