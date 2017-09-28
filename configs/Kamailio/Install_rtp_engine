@@ -2,9 +2,8 @@ https://github.com/etamme/federated-sip/wiki/compile-and-set-up-rtpengine-on-cen
 https://voipmagazine.wordpress.com/2015/02/17/rtpengine-compilation-and-installation-in-fedora-redhat/
 https://sillycodes.com/installing-rtpengine-on-ubuntu-1404/
 
-yum -y install iptables-devel kernel-devel kernel-headers xmlrpc-c-devel glib2-devel libpcap-devel
-hiredis-devel libevent-devel json-glib-devel
-yum -y install gcc-c++ gcc automake autoconf
+yum -y install iptables-devel kernel-devel kernel-headers xmlrpc-c-devel glib2-devel libpcap-devel hiredis-devel libevent-devel json-glib-devel
+yum -y install gcc-c++ gcc automake autoconf openssl-devel
 
 yum update then reboot to update new kernel
 
