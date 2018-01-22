@@ -4,18 +4,18 @@ echo "=================== Setup deployer user ==================="
 
 deployer_user=deployer
 deployer_group=ansible
-gw=""
+#gw=""
 
 ssh_dir=/home/${deployer_user}/.ssh
 authorized_keys=${ssh_dir}/authorized_keys
 sshd_cnf=/etc/ssh/sshd_config
 
 # Set gw
-if route -n | grep -q UG; then
-  echo "default gw is set"
-else
-  route add default gw ${gw}
-fi
+#if route -n | grep -q UG; then
+#  echo "default gw is set"
+#else
+#  route add default gw ${gw}
+#fi
 
 # Create user
 if grep -q ${deployer_user} /etc/passwd; then
@@ -63,11 +63,11 @@ sed -i '/^PermitEmptyPasswords/s/yes/no/' ${sshd_cnf} && \
 sed -i '/^#PasswordAuthentication/s/PasswordAuthentication/PasswordAuthentication/' ${sshd_cnf} && \
 sed -i '/^PasswordAuthentication/s/yes/no/' ${sshd_cnf}
 
-if grep -q "AllowGroups ${deployer_group}" ${sshd_cnf}; then
-  echo "Allowed groups ${deployer_group} in ${sshd_cnf}"
-else
-  echo "AllowGroups ${deployer_group}" >> ${sshd_cnf}
-fi
+#if grep -q "AllowGroups ${deployer_group}" ${sshd_cnf}; then
+#  echo "Allowed groups ${deployer_group} in ${sshd_cnf}"
+#else
+#  echo "AllowGroups ${deployer_group}" >> ${sshd_cnf}
+#fi
 
 systemctl enable sshd && systemctl restart sshd
 
@@ -82,14 +82,14 @@ fi
 systemctl disable firewalld && systemctl stop firewalld
 
 # Lock down cronjob
-grep -q -F "ALL" /etc/cron.deny || echo "ALL" >>/etc/cron.deny
+#grep -q -F "ALL" /etc/cron.deny || echo "ALL" >>/etc/cron.deny
 
 # Disable ipv6 and broadcast msg, echo ping msg on centos 7
-grep -q -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf || echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
-grep -q -F "net.ipv6.conf.default.disable_ipv6 = 1" /etc/sysctl.conf || echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
-grep -q -F "net.ipv4.icmp_echo_ignore_all = 1" /etc/sysctl.conf || echo "net.ipv4.icmp_echo_ignore_all = 1" >> /etc/sysctl.conf
-grep -q -F "net.ipv4.icmp_echo_ignore_broadcasts = 1" /etc/sysctl.conf || echo "net.ipv4.icmp_echo_ignore_broadcasts = 1" >> /etc/sysctl.conf
-sysctl -p
+#grep -q -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf || echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+#grep -q -F "net.ipv6.conf.default.disable_ipv6 = 1" /etc/sysctl.conf || echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+#grep -q -F "net.ipv4.icmp_echo_ignore_all = 1" /etc/sysctl.conf || echo "net.ipv4.icmp_echo_ignore_all = 1" >> /etc/sysctl.conf
+#grep -q -F "net.ipv4.icmp_echo_ignore_broadcasts = 1" /etc/sysctl.conf || echo "net.ipv4.icmp_echo_ignore_broadcasts = 1" >> /etc/sysctl.conf
+#sysctl -p
 
 # Remove user with empty password
 if [ ! -z "$(cat /etc/shadow | awk -F: '($2==""){print $1}')" ]; then

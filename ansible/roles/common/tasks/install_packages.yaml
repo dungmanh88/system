@@ -1,29 +1,21 @@
 - name: Install epel-release
   yum: name="epel-release" update_cache=yes
 
-- name: Install elrepo
-  yum:
-    name: "{{ elrepo_centos_7_url }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
-
-- name: Install elrepo
-  yum:
-    name: "{{ elrepo_centos_6_url }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
-
-- name: Install elrepo
-  yum:
-    name: "{{ elrepo_centos_5_url }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version5 }}"
+# - name: Install elrepo
+#   yum:
+#     name: "{{ elrepo_centos_7_url }}"
+#     update_cache: yes
+#   when:
+#     - ansible_distribution == "{{ distro_centos.name }}"
+#     - ansible_distribution_major_version == "{{ distro_centos.version7 }}"
+#
+# - name: Install elrepo
+#   yum:
+#     name: "{{ elrepo_centos_6_url }}"
+#     update_cache: yes
+#   when:
+#     - ansible_distribution == "{{ distro_centos.name }}"
+#     - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
 
 - name: Install remi repo
   yum:
@@ -40,14 +32,6 @@
   when:
     - ansible_distribution == "{{ distro_centos.name }}"
     - ansible_distribution_major_version == "{{ distro_centos.version6 }}"
-
-- name: Install remi repo
-  yum:
-    name: "{{ remi_centos_5_url }}"
-    update_cache: yes
-  when:
-    - ansible_distribution == "{{ distro_centos.name }}"
-    - ansible_distribution_major_version == "{{ distro_centos.version5 }}"
 
 - name: Get pip
   get_url: url="{{ pip_url }}" dest=/tmp/get-pip.py mode=0644

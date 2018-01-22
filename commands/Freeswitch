@@ -1,0 +1,5 @@
+fsctl debug_level 10
+console loglevel debug
+sofia global siptrace on
+sofia tracelevel alert
+log 6

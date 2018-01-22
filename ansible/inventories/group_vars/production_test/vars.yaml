@@ -1,7 +1,7 @@
 # Developers account
 dev_users:
-  - name: dev3
-    passwd: "{{ vault_dev3_passwd }}"
+  - name: dev1
+    passwd: "{{ vault_dev1_passwd }}"
     full_name:  Dev1
     active: 1
     public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8Y+ypqsOVLYCeWeQq6pXzDx8F8kAMa1nq488G/a+z7gFTq5uRHA3VZu19cwciCIiu6Hk+ZFA7TEaVjNZcdfVBd/Z/4zI0AAPd23rJtI8Tld2FRkP//a9zhq+jq/1RwoCOFnGUO5HruUKEqYR7GteEtWDBCn8Bn2LdGtBndPwaowrfz+ThTxrNZblRv3OWvI7DCvdRDOvUhbjI7bE2kdW9ynSTSUN9hzFB0LUmis5ZoI+Z4MagqCJD+GzylUDAaaPv0wBMoAgv1dmocsY6EmjGdDkU2Zo7RC/dBPqnIDKDTfFXTm2PTIvn2Te/A9KPHet5gyOwVN97wF0NKm+D1hBt dungnm@devops
